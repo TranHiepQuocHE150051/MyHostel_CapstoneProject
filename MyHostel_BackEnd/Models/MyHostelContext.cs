@@ -36,20 +36,18 @@ namespace MyHostel_BackEnd.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server =(local); database = MyHostel;uid=sa;pwd=quoc1910");
-            }
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyDB"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Admin>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AccountName)
                     .HasMaxLength(25)
@@ -130,9 +128,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Amenity>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AmenitiyName)
                     .HasMaxLength(50)
@@ -142,9 +138,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Chat>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.CreatedAt)
                     .IsRowVersion()
@@ -219,9 +213,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Facility>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.UtilityName)
                     .HasMaxLength(50)
@@ -231,9 +223,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Hostel>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.CreatedAt)
                     .IsRowVersion()
@@ -282,9 +272,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Member>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Avatar)
                     .HasMaxLength(255)
@@ -322,9 +310,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Message>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AnonymousFlg).HasColumnName("anonymous_flg");
 
@@ -358,9 +344,7 @@ namespace MyHostel_BackEnd.Models
             {
                 entity.ToTable("Nearby_Facilities");
 
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Distance)
                     .HasColumnType("decimal(18, 0)")
@@ -393,9 +377,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Participant>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.AnonymousTime)
                     .HasColumnName("anonymous_time")
@@ -515,9 +497,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.RoleName)
                     .HasMaxLength(25)
@@ -527,9 +507,7 @@ namespace MyHostel_BackEnd.Models
 
             modelBuilder.Entity<Room>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
 

@@ -13,8 +13,8 @@ namespace MyHostel_BackEnd.Models
         }
 
         public int Id { get; set; }
-        public string GoogleId { get; set; } = null!;
-        public string FacebookId { get; set; } = null!;
+        public string? GoogleId { get; set; }
+        public string? FacebookId { get; set; }
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
         public string Avatar { get; set; } = null!;

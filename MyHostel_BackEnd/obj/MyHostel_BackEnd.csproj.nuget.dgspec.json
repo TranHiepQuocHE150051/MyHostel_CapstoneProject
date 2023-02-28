@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\This PC\\source\\repos\\MyHostel_BackEnd\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {}
+    "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {}
   },
   "projects": {
-    "C:\\Users\\This PC\\source\\repos\\MyHostel_BackEnd\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {
+    "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\This PC\\source\\repos\\MyHostel_BackEnd\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
+        "projectUniqueName": "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
         "projectName": "MyHostel_BackEnd",
-        "projectPath": "C:\\Users\\This PC\\source\\repos\\MyHostel_BackEnd\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
+        "projectPath": "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
         "packagesPath": "C:\\Users\\This PC\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\This PC\\source\\repos\\MyHostel_BackEnd\\MyHostel_BackEnd\\obj\\",
+        "outputPath": "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\This PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,6 +40,18 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[6.0.14, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[6.0.14, )"
@@ -53,6 +65,10 @@
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[6.0.14, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[6.0.1, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
