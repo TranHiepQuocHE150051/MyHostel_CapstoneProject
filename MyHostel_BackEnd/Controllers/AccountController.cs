@@ -73,7 +73,7 @@ namespace MyHostel_BackEnd.Controllers
         {
             if (account != null && account.GoogleId != null)
             {
-                var acc = await _context.Members.FirstOrDefaultAsync(x => x.FacebookId == account.GoogleId);
+                var acc = await _context.Members.FirstOrDefaultAsync(x => x.GoogleId == account.GoogleId);
                 if (acc != null)
                 {
                     var claims = new[]
@@ -84,8 +84,7 @@ namespace MyHostel_BackEnd.Controllers
                         new Claim(ClaimTypes.Name,  acc.GoogleId.ToString()),
                         new Claim("GoogleId", acc.GoogleId.ToString()),
                         new Claim("Fname", acc.FirstName.ToString()),
-                        new Claim("Lname", acc.LastName.ToString()),
-                        new Claim(ClaimTypes.Role, acc.Role.ToString())
+                        new Claim("Lname", acc.LastName.ToString())
                     };
                     var accessToken = GenerateJSONWebToken(claims);
                     return Ok(accessToken);
@@ -94,7 +93,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     Member member = new Member
                     {
-                        FacebookId = account.GoogleId,
+                        GoogleId = account.GoogleId,
                         FirstName = account.FirstName,
                         LastName = account.LastName,
                         Avatar = account.Avatar,
