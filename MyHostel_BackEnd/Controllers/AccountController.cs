@@ -22,99 +22,101 @@ namespace MyHostel_BackEnd.Controllers
             _configuration = configuration;
             _context = context;
         }
-        [HttpPost("loginfacebook")]
-        public async Task<IActionResult> Login([FromForm] FacebookLoginDTO account)
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTO account)
         {
-            if (account != null && account.FacebookId != null)
+            if (account != null && account.id != null)
             {
-                var acc = await _context.Members.FirstOrDefaultAsync(x => x.FacebookId == account.FacebookId);
-                if (acc != null)
+                if (account.socialType.ToLower().Equals("facebook"))
                 {
-                    var claims = new[]
+                    var acc = await _context.Members.FirstOrDefaultAsync(x => x.FacebookId == account.id);
+                    if (acc != null)
                     {
+                        var claims = new[]
+                        {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim(ClaimTypes.Name,  acc.FacebookId.ToString()),
                         new Claim("FacebookId", acc.FacebookId.ToString()),
                         new Claim("Fname", acc.FirstName.ToString()),
-                        new Claim("Lname", acc.LastName.ToString())
-                       
+                        new Claim("Lname", acc.LastName.ToString()),
+                        new Claim(ClaimTypes.Role, acc.RoleId.ToString())
+
                     };
-                    var accessToken = GenerateJSONWebToken(claims);
-                    return Ok(accessToken);
-                }
-                else
-                {
-                    Member member = new Member
-                    {
-                        FacebookId = account.FacebookId,
-                        FirstName = account.FirstName,
-                        LastName = account.LastName,
-                        Avatar = account.Avatar,
-                        CreatedAt = BitConverter.GetBytes(DateTime.Now.Ticks),
-                        RoleId = 2
-                    };
-                    await _context.Members.AddAsync(member);
-                    if (await _context.SaveChangesAsync() > 0)
-                    {
-                        return Ok("Register success");
+                        var accessToken = GenerateJSONWebToken(claims);
+                        return Ok(accessToken);
                     }
-                    return StatusCode(500);
-                }
-            }
-            else
-            {
-                return BadRequest("Login failed");
-            }
-        }
-        [HttpPost("logingoogle")]
-        public async Task<IActionResult> LoginGoogle([FromForm] GoogleLoginDTO account)
-        {
-            if (account != null && account.GoogleId != null)
-            {
-                var acc = await _context.Members.FirstOrDefaultAsync(x => x.GoogleId == account.GoogleId);
-                if (acc != null)
-                {
-                    var claims = new[]
+                    else
                     {
+                        Member member = new Member
+                        {
+                            FacebookId = account.id,
+                            FirstName = account.FirstName,
+                            LastName = account.LastName,
+                            Avatar = account.AvatarURL,
+                            CreatedAt = BitConverter.GetBytes(DateTime.Now.Ticks),
+                            RoleId = account.role
+                        };
+                        await _context.Members.AddAsync(member);
+                        if (await _context.SaveChangesAsync() > 0)
+                        {
+                            return Ok("Register success");
+                        }
+                        return StatusCode(500);
+                    }
+                } else if (account.socialType.ToLower().Equals("google"))
+                {
+                    var acc = await _context.Members.FirstOrDefaultAsync(x => x.GoogleId == account.id);
+                    if (acc != null)
+                    {
+                        var claims = new[]
+                        {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim(ClaimTypes.Name,  acc.GoogleId.ToString()),
                         new Claim("GoogleId", acc.GoogleId.ToString()),
                         new Claim("Fname", acc.FirstName.ToString()),
-                        new Claim("Lname", acc.LastName.ToString())
+                        new Claim("Lname", acc.LastName.ToString()),
+                        new Claim(ClaimTypes.Role, acc.RoleId.ToString())
+
                     };
-                    var accessToken = GenerateJSONWebToken(claims);
-                    return Ok(accessToken);
+                        var accessToken = GenerateJSONWebToken(claims);
+                        return Ok(accessToken);
+                    }
+                    else
+                    {
+                        Member member = new Member
+                        {
+                            GoogleId = account.id,
+                            FirstName = account.FirstName,
+                            LastName = account.LastName,
+                            Avatar = account.AvatarURL,
+                            CreatedAt = BitConverter.GetBytes(DateTime.Now.Ticks),
+                            RoleId = account.role
+                        };
+                        await _context.Members.AddAsync(member);
+                        if (await _context.SaveChangesAsync() > 0)
+                        {
+                            return Ok("Register success");
+                        }
+                        return StatusCode(500);
+                    }
                 }
                 else
                 {
-                    Member member = new Member
-                    {
-                        GoogleId = account.GoogleId,
-                        FirstName = account.FirstName,
-                        LastName = account.LastName,
-                        Avatar = account.Avatar,
-                        CreatedAt = BitConverter.GetBytes(DateTime.Now.Ticks),
-                        RoleId = 2
-                    };
-                    await _context.Members.AddAsync(member);
-                    if (await _context.SaveChangesAsync() > 0)
-                    {
-                        return Ok("Register success");
-                    }
-                    
-                        return StatusCode(500);
-                    
+                    return BadRequest("Invalid Credentials");
                 }
             }
+
+
             else
             {
                 return BadRequest("Login failed");
             }
         }
+       
         private string GenerateJSONWebToken(IEnumerable<Claim> claims)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

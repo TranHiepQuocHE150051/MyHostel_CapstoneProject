@@ -8,6 +8,7 @@ namespace MyHostel_BackEnd.Models
         public Hostel()
         {
             Chats = new HashSet<Chat>();
+            HostelImages = new HashSet<HostelImage>();
             NearbyFacilities = new HashSet<NearbyFacility>();
             Residents = new HashSet<Resident>();
             Amenities = new HashSet<Amenity>();
@@ -19,9 +20,18 @@ namespace MyHostel_BackEnd.Models
         public string GoogleLocationLnd { get; set; } = null!;
         public byte[] CreatedAt { get; set; } = null!;
         public string WardsCode { get; set; } = null!;
+        public decimal Price { get; set; }
+        public string Capacity { get; set; } = null!;
+        public string Phone { get; set; } = null!;
+        public int LandlordId { get; set; }
+        public string Description { get; set; } = null!;
+        public string RoomArea { get; set; } = null!;
+        public string DetailLocation { get; set; } = null!;
 
+        public virtual Member Landlord { get; set; } = null!;
         public virtual Ward WardsCodeNavigation { get; set; } = null!;
         public virtual ICollection<Chat> Chats { get; set; }
+        public virtual ICollection<HostelImage> HostelImages { get; set; }
         public virtual ICollection<NearbyFacility> NearbyFacilities { get; set; }
         public virtual ICollection<Resident> Residents { get; set; }
 

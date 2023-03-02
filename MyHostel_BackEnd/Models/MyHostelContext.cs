@@ -24,6 +24,7 @@ namespace MyHostel_BackEnd.Models
         public virtual DbSet<District> Districts { get; set; } = null!;
         public virtual DbSet<Facility> Facilities { get; set; } = null!;
         public virtual DbSet<Hostel> Hostels { get; set; } = null!;
+        public virtual DbSet<HostelImage> HostelImages { get; set; } = null!;
         public virtual DbSet<Member> Members { get; set; } = null!;
         public virtual DbSet<Message> Messages { get; set; } = null!;
         public virtual DbSet<NearbyFacility> NearbyFacilities { get; set; } = null!;
@@ -37,8 +38,8 @@ namespace MyHostel_BackEnd.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyDB"));
         }
@@ -225,10 +226,23 @@ namespace MyHostel_BackEnd.Models
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.Capacity)
+                    .HasMaxLength(10)
+                    .HasColumnName("capacity")
+                    .IsFixedLength();
+
                 entity.Property(e => e.CreatedAt)
                     .IsRowVersion()
                     .IsConcurrencyToken()
                     .HasColumnName("created_at");
+
+                entity.Property(e => e.Description)
+                    .HasMaxLength(1000)
+                    .HasColumnName("description");
+
+                entity.Property(e => e.DetailLocation)
+                    .HasMaxLength(255)
+                    .HasColumnName("detail_Location");
 
                 entity.Property(e => e.GoogleLocationLat)
                     .HasMaxLength(50)
@@ -238,13 +252,35 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(50)
                     .HasColumnName("google_location_lnd");
 
+                entity.Property(e => e.LandlordId).HasColumnName("landlord_id");
+
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
                     .HasColumnName("name");
 
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(10)
+                    .HasColumnName("phone")
+                    .IsFixedLength();
+
+                entity.Property(e => e.Price)
+                    .HasColumnType("money")
+                    .HasColumnName("price");
+
+                entity.Property(e => e.RoomArea)
+                    .HasMaxLength(10)
+                    .HasColumnName("room_Area")
+                    .IsFixedLength();
+
                 entity.Property(e => e.WardsCode)
                     .HasMaxLength(20)
                     .HasColumnName("wards_code");
+
+                entity.HasOne(d => d.Landlord)
+                    .WithMany(p => p.Hostels)
+                    .HasForeignKey(d => d.LandlordId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Hostels_Members");
 
                 entity.HasOne(d => d.WardsCodeNavigation)
                     .WithMany(p => p.Hostels)
@@ -268,6 +304,27 @@ namespace MyHostel_BackEnd.Models
 
                             j.IndexerProperty<int>("AmenitiesId").HasColumnName("amenities_id");
                         });
+            });
+
+            modelBuilder.Entity<HostelImage>(entity =>
+            {
+                entity.ToTable("Hostel_Images");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+
+                entity.Property(e => e.HostelId).HasColumnName("hostel_id");
+
+                entity.Property(e => e.ImageUrl)
+                    .HasMaxLength(1000)
+                    .HasColumnName("imageURL");
+
+                entity.HasOne(d => d.Hostel)
+                    .WithMany(p => p.HostelImages)
+                    .HasForeignKey(d => d.HostelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Hostel_Images_Hostels");
             });
 
             modelBuilder.Entity<Member>(entity =>

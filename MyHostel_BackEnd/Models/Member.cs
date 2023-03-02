@@ -7,6 +7,7 @@ namespace MyHostel_BackEnd.Models
     {
         public Member()
         {
+            Hostels = new HashSet<Hostel>();
             Messages = new HashSet<Message>();
             Participants = new HashSet<Participant>();
             Residents = new HashSet<Resident>();
@@ -22,6 +23,7 @@ namespace MyHostel_BackEnd.Models
         public int RoleId { get; set; }
 
         public virtual Role Role { get; set; } = null!;
+        public virtual ICollection<Hostel> Hostels { get; set; }
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<Participant> Participants { get; set; }
         public virtual ICollection<Resident> Residents { get; set; }
