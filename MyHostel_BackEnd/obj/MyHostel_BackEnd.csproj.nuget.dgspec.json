@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Learning\\FPT_U\\Ki9\\Capstone\\MyHostel\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {}
+    "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {}
   },
   "projects": {
-    "D:\\Learning\\FPT_U\\Ki9\\Capstone\\MyHostel\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {
+    "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Learning\\FPT_U\\Ki9\\Capstone\\MyHostel\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
+        "projectUniqueName": "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
         "projectName": "MyHostel_BackEnd",
-        "projectPath": "D:\\Learning\\FPT_U\\Ki9\\Capstone\\MyHostel\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
-        "packagesPath": "C:\\Users\\tk10x\\.nuget\\packages\\",
-        "outputPath": "D:\\Learning\\FPT_U\\Ki9\\Capstone\\MyHostel\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\obj\\",
+        "projectPath": "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\MyHostel_BackEnd.csproj",
+        "packagesPath": "C:\\Users\\This PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\This PC\\Desktop\\MyHostel_CapstoneProject\\MyHostel_BackEnd\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tk10x\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\This PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -47,6 +47,10 @@
             "AutoMapper.Extensions.Microsoft.DependencyInjection": {
               "target": "Package",
               "version": "[12.0.0, )"
+            },
+            "GoogleApi": {
+              "target": "Package",
+              "version": "[4.5.4, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",

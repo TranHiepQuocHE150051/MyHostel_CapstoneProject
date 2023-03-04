@@ -24,6 +24,7 @@ namespace MyHostel_BackEnd.Models
         public virtual DbSet<District> Districts { get; set; } = null!;
         public virtual DbSet<Facility> Facilities { get; set; } = null!;
         public virtual DbSet<Hostel> Hostels { get; set; } = null!;
+        public virtual DbSet<HostelAmenity> HostelAmenities { get; set; } = null!;
         public virtual DbSet<HostelImage> HostelImages { get; set; } = null!;
         public virtual DbSet<Member> Members { get; set; } = null!;
         public virtual DbSet<Message> Messages { get; set; } = null!;
@@ -287,32 +288,36 @@ namespace MyHostel_BackEnd.Models
                     .HasForeignKey(d => d.WardsCode)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Hostels_wards");
+            });
 
-                entity.HasMany(d => d.Amenities)
-                    .WithMany(p => p.Hosteds)
-                    .UsingEntity<Dictionary<string, object>>(
-                        "HostelAmenity",
-                        l => l.HasOne<Amenity>().WithMany().HasForeignKey("AmenitiesId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_Hostel_Amenities_Amenities"),
-                        r => r.HasOne<Hostel>().WithMany().HasForeignKey("HostedId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_Hostel_Amenities_Hostels"),
-                        j =>
-                        {
-                            j.HasKey("HostedId", "AmenitiesId");
+            modelBuilder.Entity<HostelAmenity>(entity =>
+            {
+                entity.ToTable("Hostel_Amenities");
 
-                            j.ToTable("Hostel_Amenities");
+                entity.Property(e => e.Id).HasColumnName("id");
 
-                            j.IndexerProperty<int>("HostedId").HasColumnName("hosted_id");
+                entity.Property(e => e.AmenitiesId).HasColumnName("amenities_id");
 
-                            j.IndexerProperty<int>("AmenitiesId").HasColumnName("amenities_id");
-                        });
+                entity.Property(e => e.HostedId).HasColumnName("hosted_id");
+
+                entity.HasOne(d => d.Amenities)
+                    .WithMany(p => p.HostelAmenities)
+                    .HasForeignKey(d => d.AmenitiesId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Hostel_Amenities_Amenities");
+
+                entity.HasOne(d => d.Hosted)
+                    .WithMany(p => p.HostelAmenities)
+                    .HasForeignKey(d => d.HostedId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Hostel_Amenities_Hostels");
             });
 
             modelBuilder.Entity<HostelImage>(entity =>
             {
                 entity.ToTable("Hostel_Images");
 
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
 

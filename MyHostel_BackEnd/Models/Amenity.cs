@@ -7,12 +7,12 @@ namespace MyHostel_BackEnd.Models
     {
         public Amenity()
         {
-            Hosteds = new HashSet<Hostel>();
+            HostelAmenities = new HashSet<HostelAmenity>();
         }
 
         public int Id { get; set; }
         public string AmenitiyName { get; set; } = null!;
 
-        public virtual ICollection<Hostel> Hosteds { get; set; }
+        public virtual ICollection<HostelAmenity> HostelAmenities { get; set; }
     }
 }

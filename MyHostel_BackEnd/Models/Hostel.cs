@@ -8,10 +8,10 @@ namespace MyHostel_BackEnd.Models
         public Hostel()
         {
             Chats = new HashSet<Chat>();
+            HostelAmenities = new HashSet<HostelAmenity>();
             HostelImages = new HashSet<HostelImage>();
             NearbyFacilities = new HashSet<NearbyFacility>();
             Residents = new HashSet<Resident>();
-            Amenities = new HashSet<Amenity>();
         }
 
         public int Id { get; set; }
@@ -31,10 +31,9 @@ namespace MyHostel_BackEnd.Models
         public virtual Member Landlord { get; set; } = null!;
         public virtual Ward WardsCodeNavigation { get; set; } = null!;
         public virtual ICollection<Chat> Chats { get; set; }
+        public virtual ICollection<HostelAmenity> HostelAmenities { get; set; }
         public virtual ICollection<HostelImage> HostelImages { get; set; }
         public virtual ICollection<NearbyFacility> NearbyFacilities { get; set; }
         public virtual ICollection<Resident> Residents { get; set; }
-
-        public virtual ICollection<Amenity> Amenities { get; set; }
     }
 }
