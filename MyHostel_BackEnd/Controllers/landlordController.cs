@@ -41,8 +41,7 @@ namespace MyHostel_BackEnd.Controllers
         }
         [HttpPost("register")]
         public async Task<IActionResult> HostelRegister([FromBody] HostelRegisterDTO hostel)
-        {
-            
+        { 
             try
             {
                 Hostel hostel1 = new Hostel
@@ -139,10 +138,10 @@ namespace MyHostel_BackEnd.Controllers
                             Duration = distanceAndDuration.Duration
 
                         };
-                    }
-                    
+                        _context.NearbyFacilities.Add(nearbyFacility);
+                        _context.SaveChanges();
+                    } 
                 }
-                
             }
         }
         private DistanceAndDuration CalculateDistanceAndDuration(double orglat, double orglng, double deslat, double deslng)
