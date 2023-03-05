@@ -168,8 +168,6 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-               
-                
                 var hostels = await _context.Hostels.Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode)).ToListAsync();
                 if(userLocationLat!=null && userLocationLng!=null && !userLocationLat.Equals("") && !userLocationLng.Equals("")){
                     foreach (var hostel in hostels)
@@ -184,9 +182,6 @@ namespace MyHostel_BackEnd.Controllers
                         }
                     }
                 }
-                
-
-
                 if (hostels.Count != 0)
                     return Ok(hostels);
                 else
@@ -200,9 +195,7 @@ namespace MyHostel_BackEnd.Controllers
         private int CalculateDistance(double orglat, double orglng, double deslat, double deslng)
         {
             DirectionsRequest request = new DirectionsRequest();
-
             request.Key = GlobalVariables.API_KEY;
-
             request.Origin = new LocationEx(new CoordinateEx(orglat, orglng));
             request.Destination = new LocationEx(new CoordinateEx(deslat, deslng));
             var response = GoogleApi.GoogleMaps.Directions.Query(request);

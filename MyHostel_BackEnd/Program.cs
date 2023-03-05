@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyHostel_BackEnd.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +16,11 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
     options.SuppressInferBindingSourcesForParameters = true;
     options.SuppressModelStateInvalidFilter = true;
     options.SuppressMapClientErrors = true;
-}); ;
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+});
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -48,7 +52,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddCors();
-builder.Services.AddDbContext<MyHostelContext >(opt => opt.UseSqlServer(
+builder.Services.AddDbContext<MyHostelContext>(opt => opt.UseSqlServer(
             builder.Configuration.GetConnectionString("MyDB")));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
 {

@@ -203,3 +203,14 @@ C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net
 C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\System.Text.Encodings.Web.dll
 C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\System.Text.Json.dll
 C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\GoogleApi.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Extensions.Http.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Extensions.Logging.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Extensions.Logging.Abstractions.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Extensions.Options.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Extensions.Primitives.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\System.Text.Encodings.Web.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\System.Text.Json.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
