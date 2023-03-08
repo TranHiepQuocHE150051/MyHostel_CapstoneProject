@@ -10,6 +10,7 @@ using System.Text;
 
 namespace MyHostel_BackEnd.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -37,7 +38,7 @@ namespace MyHostel_BackEnd.Controllers
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                        new Claim(ClaimTypes.Name,  acc.FacebookId.ToString()),
+                        new Claim("Id",  acc.Id.ToString()),
                         new Claim("FacebookId", acc.FacebookId.ToString()),
                         new Claim("Fname", acc.FirstName.ToString()),
                         new Claim("Lname", acc.LastName.ToString()),
@@ -65,7 +66,8 @@ namespace MyHostel_BackEnd.Controllers
                         }
                         return StatusCode(500);
                     }
-                } else if (account.socialType.ToLower().Equals("google"))
+                }
+                else if (account.socialType.ToLower().Equals("google"))
                 {
                     var acc = await _context.Members.FirstOrDefaultAsync(x => x.GoogleId == account.id);
                     if (acc != null)
@@ -75,7 +77,7 @@ namespace MyHostel_BackEnd.Controllers
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                        new Claim(ClaimTypes.Name,  acc.GoogleId.ToString()),
+                        new Claim(ClaimTypes.Name,  acc.Id.ToString()),
                         new Claim("GoogleId", acc.GoogleId.ToString()),
                         new Claim("Fname", acc.FirstName.ToString()),
                         new Claim("Lname", acc.LastName.ToString()),
@@ -116,7 +118,24 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest("Login failed");
             }
         }
-       
+
+        [HttpGet("member")]
+        public async Task<IActionResult> Member([FromQuery] int id)
+        {
+            try
+            {
+                var member = await _context.Members.Where(m => m.Id == id).FirstOrDefaultAsync();
+                if (member != null)
+                    return Ok(member);
+                else
+                    return NotFound();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
         private string GenerateJSONWebToken(IEnumerable<Claim> claims)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -131,6 +150,6 @@ namespace MyHostel_BackEnd.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
-    
+
 
 }

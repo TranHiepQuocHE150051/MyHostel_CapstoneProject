@@ -24,6 +24,7 @@ using System.Text.Json;
 using MyHostel_BackEnd.GoogleMapsResponseObject;
 using PlacesNearbySearchResponse = MyHostel_BackEnd.GoogleMapsResponseObject.PlacesNearbySearchResponse;
 using Place = MyHostel_BackEnd.GoogleMapsResponseObject.Place;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -39,11 +40,17 @@ namespace MyHostel_BackEnd.Controllers
             _configuration = configuration;
             _context = context;
         }
+        [Authorize(Roles = "2")] //Role 2 = LANDLORDS
         [HttpPost("register")]
         public async Task<IActionResult> HostelRegister([FromBody] HostelRegisterDTO hostel)
         { 
             try
             {
+                int landlordId = GetAccountId();
+                if(landlordId == -1)
+                {
+                    return Unauthorized();
+                }
                 Hostel hostel1 = new Hostel
                 {
                     Name = hostel.Name,
@@ -56,7 +63,7 @@ namespace MyHostel_BackEnd.Controllers
                     Phone = hostel.Phone,
                     Description = hostel.Description,
                     RoomArea = hostel.RoomArea,                   
-                    LandlordId = 1002
+                    LandlordId = landlordId
                 };
                 _context.Hostels.Add(hostel1);
                 await _context.SaveChangesAsync();
@@ -104,6 +111,17 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
             
+        }
+
+        private int GetAccountId()
+        {
+            int id = -1;
+            var identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity != null)
+            {
+                id = int.Parse(identity.FindFirst("Id").Value);
+            }
+            return id;
         }
 
         private void CheckNearbyAmenity(string latitude, string longitude , int hostelid)

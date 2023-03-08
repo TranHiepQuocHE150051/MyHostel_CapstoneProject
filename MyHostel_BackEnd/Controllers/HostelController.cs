@@ -149,8 +149,25 @@ namespace MyHostel_BackEnd.Controllers
                         hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString())).ToList();
                     }
                 }
-                if (hostels.Count != 0)
-                    return Ok(hostels);
+                List<HostelSearchDTO> result = new List<HostelSearchDTO>();
+                foreach(var hostel in hostels)
+                {
+                    string imgUrl = "";
+                    if (hostel.HostelImages.FirstOrDefault() != null)
+                    {
+                        imgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
+                    }
+                    result.Add(new HostelSearchDTO()
+                    {
+                        DetailLocation = hostel.DetailLocation,
+                        Id = hostel.Id,
+                        Name = hostel.Name,
+                        Price = hostel.Price,
+                        imgUrl = imgUrl
+                    });
+                }
+                if (result.Count != 0)
+                    return Ok(result);
                 else
                     return NotFound();
             }
