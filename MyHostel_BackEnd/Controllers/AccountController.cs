@@ -62,7 +62,20 @@ namespace MyHostel_BackEnd.Controllers
                         await _context.Members.AddAsync(member);
                         if (await _context.SaveChangesAsync() > 0)
                         {
-                            return Ok("Register success");
+                            var claims = new[]
+                        {
+                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                        new Claim("Id",  member.Id.ToString()),
+                        new Claim("FacebookId", member.FacebookId.ToString()),
+                        new Claim("Fname", member.FirstName.ToString()),
+                        new Claim("Lname", member.LastName.ToString()),
+                        new Claim(ClaimTypes.Role, member.RoleId.ToString())
+
+                        };
+                            var accessToken = GenerateJSONWebToken(claims);
+                            return Ok(accessToken);
                         }
                         return StatusCode(500);
                     }
@@ -101,7 +114,20 @@ namespace MyHostel_BackEnd.Controllers
                         await _context.Members.AddAsync(member);
                         if (await _context.SaveChangesAsync() > 0)
                         {
-                            return Ok("Register success");
+                            var claims = new[]
+                        {
+                        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                        new Claim("Id",  member.Id.ToString()),
+                        new Claim("FacebookId", member.GoogleId.ToString()),
+                        new Claim("Fname", member.FirstName.ToString()),
+                        new Claim("Lname", member.LastName.ToString()),
+                        new Claim(ClaimTypes.Role, member.RoleId.ToString())
+
+                        };
+                            var accessToken = GenerateJSONWebToken(claims);
+                            return Ok(accessToken);
                         }
                         return StatusCode(500);
                     }
