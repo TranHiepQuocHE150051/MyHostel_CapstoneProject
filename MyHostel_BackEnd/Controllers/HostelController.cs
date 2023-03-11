@@ -33,7 +33,7 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                var hostels = await _context.Hostels.ToListAsync();
+                var hostels = await _context.Hostels.Include(h=>h.WardsCodeNavigation).ToListAsync();
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
                 if (locationType != null)
                 {
@@ -42,7 +42,7 @@ namespace MyHostel_BackEnd.Controllers
                         hostels = hostels.Where(h => h.WardsCode == locationCode).ToList();
                     }
                     if (locationType == 2)
-                    {
+                    {                      
                         hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCode == locationCode).ToList();
                     }
                 }
@@ -166,10 +166,7 @@ namespace MyHostel_BackEnd.Controllers
                         imgUrl = imgUrl
                     });
                 }
-                if (result.Count != 0)
-                    return Ok(result);
-                else
-                    return NotFound();
+                return Ok(result);
             }
             catch (Exception e)
             {
@@ -199,10 +196,7 @@ namespace MyHostel_BackEnd.Controllers
                         }
                     }
                 }
-                if (hostels.Count != 0)
-                    return Ok(hostels);
-                else
-                    return NotFound();
+                return Ok(hostels);
             }
             catch (Exception e)
             {
