@@ -182,7 +182,8 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                var hostels = await _context.Hostels.Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode)).ToListAsync();
+                var hostels = await _context.Hostels.Include(h => h.WardsCodeNavigation).ThenInclude(w => w.DistrictCodeNavigation)
+                    .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode)).ToListAsync();
                 if(userLocationLat!=null && userLocationLng!=null && !userLocationLat.Equals("") && !userLocationLng.Equals("")){
                     foreach (var hostel in hostels)
                     {
