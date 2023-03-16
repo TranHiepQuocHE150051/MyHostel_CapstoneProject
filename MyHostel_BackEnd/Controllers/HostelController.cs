@@ -23,34 +23,30 @@ namespace MyHostel_BackEnd.Controllers
         }
         [HttpGet("search")]
         public async Task<IActionResult> SearchHostel(
-            [FromQuery] string? locationCode, 
-            [FromQuery] int? locationType, 
-            [FromQuery] string? priceRange, 
-            [FromQuery] string? amenities, 
+            [FromQuery] string locationCode,
+            [FromQuery] string? priceRange,
+            [FromQuery] string? amenities,
             [FromQuery] string? nearbyFacilities,
             [FromQuery] int? capacity
             )
         {
             try
             {
-                var hostels = await _context.Hostels.Include(h=>h.WardsCodeNavigation).ToListAsync();
+                var hostels = await _context.Hostels.Include(h => h.WardsCodeNavigation).ToListAsync();
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
-                if (locationType != null)
+                if (locationCode.Length == 5)
                 {
-                    if(locationType == 1)
-                    {
-                        hostels = hostels.Where(h => h.WardsCode == locationCode).ToList();
-                    }
-                    if (locationType == 2)
-                    {                      
-                        hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCode == locationCode).ToList();
-                    }
+                    hostels = hostels.Where(h => h.WardsCode == locationCode).ToList();
                 }
-                if(priceRange != null)
+                if (locationCode.Length == 3)
+                {
+                    hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCode == locationCode).ToList();
+                }
+                if (priceRange != null)
                 {
                     string[] prices = priceRange.Split("-");
 
-                    for(int i = 0; i < prices.Length; i++)
+                    for (int i = 0; i < prices.Length; i++)
                     {
                         if (prices[i].ToLower().Contains("k"))
                         {
@@ -78,25 +74,25 @@ namespace MyHostel_BackEnd.Controllers
                         }
                     }
                 }
-                if(capacity != null)
+                if (capacity != null)
                 {
                     hostels = hostels.Where(h => Int32.Parse(h.Capacity) >= capacity).ToList();
                 }
-                if(amenities != null)
+                if (amenities != null)
                 {
                     var amenityIdList = new HashSet<string>(amenities.Split(' '));
-                    
+
                     HashSet<string> hostelIdList = new HashSet<string>();
                     var AllHostelAmenities = _context.HostelAmenities.ToList();
-                    List<string> resultsId = new List<string>(); 
-                    foreach(var hostelamenity in AllHostelAmenities)
+                    List<string> resultsId = new List<string>();
+                    foreach (var hostelamenity in AllHostelAmenities)
                     {
                         hostelIdList.Add(hostelamenity.HostedId.ToString());
                     }
-                    foreach(var hostelId in hostelIdList)
+                    foreach (var hostelId in hostelIdList)
                     {
                         HashSet<string> amenityInHostelIdList = new HashSet<string>();
-                        var hostelamenities= _context.HostelAmenities.Where(h=>h.HostedId==int.Parse(hostelId)).ToList();
+                        var hostelamenities = _context.HostelAmenities.Where(h => h.HostedId == int.Parse(hostelId)).ToList();
                         foreach (var hostelamenity in hostelamenities)
                         {
                             amenityInHostelIdList.Add(hostelamenity.AmenitiesId.ToString());
@@ -114,7 +110,7 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString())).ToList();
                     }
-                                      
+
                 }
                 if (nearbyFacilities != null)
                 {
@@ -150,7 +146,7 @@ namespace MyHostel_BackEnd.Controllers
                     }
                 }
                 List<HostelSearchDTO> result = new List<HostelSearchDTO>();
-                foreach(var hostel in hostels)
+                foreach (var hostel in hostels)
                 {
                     string imgUrl = "";
                     if (hostel.HostelImages.FirstOrDefault() != null)
@@ -184,7 +180,8 @@ namespace MyHostel_BackEnd.Controllers
             {
                 var hostels = await _context.Hostels.Include(h => h.WardsCodeNavigation).ThenInclude(w => w.DistrictCodeNavigation)
                     .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode)).ToListAsync();
-                if(userLocationLat!=null && userLocationLng!=null && !userLocationLat.Equals("") && !userLocationLng.Equals("")){
+                if (userLocationLat != null && userLocationLng != null && !userLocationLat.Equals("") && !userLocationLng.Equals(""))
+                {
                     foreach (var hostel in hostels)
                     {
                         int distance = CalculateDistance(Double.Parse(userLocationLat),
@@ -213,9 +210,9 @@ namespace MyHostel_BackEnd.Controllers
             var response = GoogleApi.GoogleMaps.Directions.Query(request);
 
             int distance = response.Routes.First().Legs.First().Distance.Value;
-                return distance;
+            return distance;
 
         }
     }
-    
+
 }

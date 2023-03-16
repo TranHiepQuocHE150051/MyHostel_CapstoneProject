@@ -12,6 +12,7 @@ namespace MyHostel_BackEnd.Models
 
         public int Id { get; set; }
         public string AmenitiyName { get; set; } = null!;
+        public string? Icon { get; set; }
 
         public virtual ICollection<HostelAmenity> HostelAmenities { get; set; }
     }

@@ -8,6 +8,7 @@ namespace MyHostel_BackEnd.Models
         public Room()
         {
             Residents = new HashSet<Resident>();
+            Transactions = new HashSet<Transaction>();
         }
 
         public int Id { get; set; }
@@ -15,5 +16,6 @@ namespace MyHostel_BackEnd.Models
         public string Name { get; set; } = null!;
 
         public virtual ICollection<Resident> Residents { get; set; }
+        public virtual ICollection<Transaction> Transactions { get; set; }
     }
 }

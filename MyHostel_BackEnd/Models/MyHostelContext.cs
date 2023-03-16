@@ -29,18 +29,20 @@ namespace MyHostel_BackEnd.Models
         public virtual DbSet<Member> Members { get; set; } = null!;
         public virtual DbSet<Message> Messages { get; set; } = null!;
         public virtual DbSet<NearbyFacility> NearbyFacilities { get; set; } = null!;
+        public virtual DbSet<Notification> Notifications { get; set; } = null!;
         public virtual DbSet<Participant> Participants { get; set; } = null!;
         public virtual DbSet<Province> Provinces { get; set; } = null!;
         public virtual DbSet<Resident> Residents { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<Room> Rooms { get; set; } = null!;
+        public virtual DbSet<Transaction> Transactions { get; set; } = null!;
         public virtual DbSet<Ward> Wards { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                 .SetBasePath(Directory.GetCurrentDirectory())
-                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyDB"));
         }
@@ -134,8 +136,12 @@ namespace MyHostel_BackEnd.Models
 
                 entity.Property(e => e.AmenitiyName)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("amenitiy_name");
+
+                entity.Property(e => e.Icon)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("icon");
             });
 
             modelBuilder.Entity<Chat>(entity =>
@@ -219,7 +225,6 @@ namespace MyHostel_BackEnd.Models
 
                 entity.Property(e => e.UtilityName)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("utility_name");
             });
 
@@ -349,6 +354,11 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(255)
                     .HasColumnName("facebook_id");
 
+                entity.Property(e => e.FcmToken)
+                    .HasMaxLength(255)
+                    .IsUnicode(false)
+                    .HasColumnName("fcm_token");
+
                 entity.Property(e => e.FirstName)
                     .HasMaxLength(255)
                     .HasColumnName("first_name");
@@ -435,6 +445,29 @@ namespace MyHostel_BackEnd.Models
                     .HasForeignKey(d => d.UltilityId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Nearby_Facilities_Facilities");
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Message)
+                    .HasMaxLength(8000)
+                    .IsUnicode(false)
+                    .HasColumnName("message");
+
+                entity.Property(e => e.SendAt)
+                    .IsRowVersion()
+                    .IsConcurrencyToken()
+                    .HasColumnName("send_at");
+
+                entity.Property(e => e.SendTo).HasColumnName("send_to");
+
+                entity.HasOne(d => d.SendToNavigation)
+                    .WithMany(p => p.Notifications)
+                    .HasForeignKey(d => d.SendTo)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Notifications_Members");
             });
 
             modelBuilder.Entity<Participant>(entity =>
@@ -577,6 +610,48 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(255)
                     .IsUnicode(false)
                     .HasColumnName("name");
+            });
+
+            modelBuilder.Entity<Transaction>(entity =>
+            {
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Electricity)
+                    .HasColumnType("money")
+                    .HasColumnName("electricity");
+
+                entity.Property(e => e.Internet)
+                    .HasColumnType("money")
+                    .HasColumnName("internet");
+
+                entity.Property(e => e.Other)
+                    .HasMaxLength(1000)
+                    .HasColumnName("other");
+
+                entity.Property(e => e.PaidAt)
+                    .IsRowVersion()
+                    .IsConcurrencyToken()
+                    .HasColumnName("paid_at");
+
+                entity.Property(e => e.Rent)
+                    .HasColumnType("money")
+                    .HasColumnName("rent");
+
+                entity.Property(e => e.RoomId).HasColumnName("room_id");
+
+                entity.Property(e => e.Security)
+                    .HasColumnType("money")
+                    .HasColumnName("security");
+
+                entity.Property(e => e.Water)
+                    .HasColumnType("money")
+                    .HasColumnName("water");
+
+                entity.HasOne(d => d.Room)
+                    .WithMany(p => p.Transactions)
+                    .HasForeignKey(d => d.RoomId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Transactions_Rooms");
             });
 
             modelBuilder.Entity<Ward>(entity =>

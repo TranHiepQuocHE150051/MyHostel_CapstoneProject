@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyHostel_BackEnd.Models;
+using MyHostel_BackEnd.Quartz;
+using Quartz;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -50,7 +52,20 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddQuartz(q =>
+{
+    q.UseMicrosoftDependencyInjectionScopedJobFactory();
+    var jobKey = new JobKey("DemoJob");
+    q.AddJob<QuartzJob>(opts => opts.WithIdentity(jobKey));
 
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("DemoJob-trigger")
+        .WithCronSchedule("0/5 * * * * ?"));
+
+});
+
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddCors();
 builder.Services.AddDbContext<MyHostelContext>(opt => opt.UseSqlServer(
             builder.Configuration.GetConnectionString("MyDB")));
