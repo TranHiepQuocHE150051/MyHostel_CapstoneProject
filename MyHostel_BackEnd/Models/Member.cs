@@ -20,7 +20,7 @@ namespace MyHostel_BackEnd.Models
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
         public string Avatar { get; set; } = null!;
-        public byte[] CreatedAt { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
         public int RoleId { get; set; }
         public string FcmToken { get; set; } = null!;
 

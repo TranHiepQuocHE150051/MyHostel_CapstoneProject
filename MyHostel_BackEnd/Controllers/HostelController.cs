@@ -1,7 +1,9 @@
 ﻿using GoogleApi.Entities.Maps.Common;
 using GoogleApi.Entities.Maps.Directions.Request;
+using GoogleApi.Entities.Search.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
 using Org.BouncyCastle.Utilities;
@@ -169,6 +171,230 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetHostel(int id)
+        {
+            try
+            {
+                var hostel = await _context.Hostels.Include(h => h.HostelImages)
+                    .Include(h => h.NearbyFacilities)
+                    .Include(h => h.HostelAmenities)
+                    .Include(h => h.WardsCodeNavigation)
+                    .Where(h => h.Id == id).FirstOrDefaultAsync();
+                if (hostel != null)
+                {
+                    GetHostelDTO result = new GetHostelDTO();
+                    result.Id = hostel.Id;
+                    result.Name = hostel.Name;
+                    List<string> imageList = new List<string>();
+                    foreach (var image in hostel.HostelImages)
+                    {
+                        imageList.Add(image.ImageUrl);
+                    }
+                    result.ImgURL = imageList.ToArray();
+                    List<NearbyFacilitiesGetHostelDTO> nearbyFacilitiesResult = new List<NearbyFacilitiesGetHostelDTO>();
+                    foreach (var nearbyFacility in hostel.NearbyFacilities)
+                    {
+                        NearbyFacilitiesGetHostelDTO nearbyFacilitiesGetHostelDTO = new NearbyFacilitiesGetHostelDTO
+                        {
+                            Name = nearbyFacility.Name,
+                            Distance = nearbyFacility.Distance,
+                            Duration = nearbyFacility.Duration
+                        };
+                        nearbyFacilitiesResult.Add(nearbyFacilitiesGetHostelDTO);
+                    }
+                    result.NearbyFacilities = nearbyFacilitiesResult.ToArray();
+
+                    List<int> AmenitiesResult = new List<int>();
+                    foreach (var amenity in hostel.HostelAmenities)
+                    {
+                        AmenitiesResult.Add(amenity.AmenitiesId);
+                    }
+                    result.Amenities = AmenitiesResult.ToArray();
+                    result.DetailLocation = hostel.DetailLocation;
+                    result.WardName = hostel.WardsCodeNavigation.FullName;
+                    result.RoomArea = hostel.RoomArea;
+                    result.Description = hostel.Description;
+                    var lanlord = _context.Members.Where(l => l.Id == hostel.LandlordId).SingleOrDefault();
+                    result.Landlord = new LandlordGetHostelDTO
+                    {
+                        Id = hostel.LandlordId,
+                        Name = lanlord.FirstName + lanlord.LastName,
+                        Phone = hostel.Phone,
+                        Avatar = lanlord.Avatar
+                    };
+                    var reviews = _context.Residents.Where(r => r.HostelId == id).ToList();
+                    if (reviews.Count() > 0)
+                    {
+                        ReviewGetHostelDTO review = new ReviewGetHostelDTO();
+                        double rate = 0.0;
+                        int noRate = 0;
+                        int noComment = 0;
+                        foreach (var item in reviews)
+                        {
+                            rate += item.Rate;
+                            if (item.Rate != 0)
+                            {
+                                noRate++;
+                            }
+                            if (!item.Comment.Equals("") || item.Comment != null)
+                            {
+                                noComment++;
+                            }
+                        }
+                        result.Review = new ReviewGetHostelDTO
+                        {
+                            Rate = rate / noRate,
+                            NoRate = noRate,
+                            NoComment = noComment
+
+                        };
+                    }
+                    else
+                    {
+                        result.Review = new ReviewGetHostelDTO
+                        {
+                            Rate = 0.0,
+                            NoRate = 0,
+                            NoComment = 0
+                        };
+                    }
+
+                    return Ok(result);
+                }
+                else
+                    return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("landlord/{id}")]
+        public async Task<ActionResult> GetHostelForLandlord(int id)
+        {
+            try
+            {
+                var hostels = await _context.Hostels
+                    .Include(h => h.HostelImages)
+                    .Where(h => h.LandlordId == id).ToListAsync();
+                var rooms = await _context.Rooms.ToListAsync();
+                List<HostelForLanlordResponse> result = new List<HostelForLanlordResponse>();
+                foreach (var hostel in hostels)
+                {
+                    int RoomNo = 0;
+                    string ImgUrl = "";
+                    if (rooms.Where(r => r.HostelId == hostel.Id).Any())
+                    {
+                        RoomNo = rooms.Where(r => r.HostelId == hostel.Id).Count();
+                    }
+                    if (hostel.HostelImages.FirstOrDefault() != null)
+                    {
+                        ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
+                    }
+                    result.Add(
+                        new HostelForLanlordResponse
+                        {
+                            Id = hostel.Id,
+                            DetailLocation = hostel.DetailLocation,
+                            Name = hostel.Name,
+                            RoomNo = RoomNo,
+                            ImgUrl = ImgUrl
+                        }
+                    );
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("{id}/reviews")]
+        public async Task<ActionResult> GetHostelReviews(int id)
+        {
+            try
+            {
+                var reviews = await _context.Residents.Where(r => r.HostelId == id).ToListAsync();
+                var result = new ReviewGetHostelDTO
+                {
+                    Rate = 0.0,
+                    NoRate = 0,
+                    NoComment = 0
+                };
+                List<CommentReviewDTO> comment = new List<CommentReviewDTO>();
+                if (reviews.Count() > 0)
+                {
+                    ReviewGetHostelDTO review = new ReviewGetHostelDTO();
+                    double rate = 0.0;
+                    int noRate = 0;
+                    int noComment = 0;
+                    foreach (var item in reviews)
+                    {
+                        rate += item.Rate;
+                        if (item.Rate != 0)
+                        {
+                            noRate++;
+                        }
+                        if (!item.Comment.Equals("") || item.Comment != null)
+                        {
+                            noComment++;
+                        }
+
+                        var AvatarUrl = "";
+                        if (_context.Members.Where(m => m.Id == item.MemberId).FirstOrDefault() != null)
+                        {
+                            AvatarUrl = _context.Members.Where(m => m.Id == item.MemberId).FirstOrDefault().Avatar;
+                        }
+                        comment.Add(new CommentReviewDTO
+                        {
+                            MemberId = item.MemberId,
+                            Text = item.Comment,
+                            CreatedDate = String.Format("{0:dd/MM/yyyy}", item.CreatedAt),
+                            AvatarUrl = AvatarUrl
+                        });
+                    }
+                    result = new ReviewGetHostelDTO
+                    {
+                        Rate = rate / noRate,
+                        NoRate = noRate,
+                        NoComment = noComment,
+                        Comment = comment.ToArray()
+                    };
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("{id}/rooms")]
+        public async Task<ActionResult> GetHostelRooms(int id)
+        {
+            try
+            {
+                var rooms = await _context.Rooms.Where(r => r.HostelId == id).ToListAsync();
+                List<RoomDTO> result = new List<RoomDTO>();
+                foreach (var room in rooms)
+                {
+                    result.Add(new RoomDTO
+                    {
+                        RoomId = room.Id,
+                        Name = room.Name
+                    });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500);
+            }
+        }
+
         [HttpGet("searchNearbyHostel")]
         public async Task<IActionResult> SearchNearbyHostel(
             [FromQuery] string? provinceCode,

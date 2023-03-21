@@ -56,7 +56,7 @@ namespace MyHostel_BackEnd.Controllers
                             FirstName = account.FirstName,
                             LastName = account.LastName,
                             Avatar = account.AvatarURL,
-                            CreatedAt = BitConverter.GetBytes(DateTime.Now.Ticks),
+                            CreatedAt = DateTime.Now,
                             RoleId = account.role
                         };
                         await _context.Members.AddAsync(member);
@@ -108,7 +108,7 @@ namespace MyHostel_BackEnd.Controllers
                             FirstName = account.FirstName,
                             LastName = account.LastName,
                             Avatar = account.AvatarURL,
-                            CreatedAt = BitConverter.GetBytes(DateTime.Now.Ticks),
+                            CreatedAt = DateTime.Now,
                             RoleId = account.role
                         };
                         await _context.Members.AddAsync(member);

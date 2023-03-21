@@ -8,7 +8,7 @@ namespace MyHostel_BackEnd.Models
         public int Id { get; set; }
         public int ChatId { get; set; }
         public int MemberId { get; set; }
-        public byte[] JoinedAt { get; set; } = null!;
+        public DateTime JoinedAt { get; set; }
         public byte Role { get; set; }
         public int AnonymousTime { get; set; }
 

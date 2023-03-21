@@ -14,7 +14,7 @@ namespace MyHostel_BackEnd.Models
         public int Id { get; set; }
         public int HostelId { get; set; }
         public string Name { get; set; } = null!;
-        public byte[] CreatedAt { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
         public DateTime LastMsgAt { get; set; }
 
         public virtual Hostel Hostel { get; set; } = null!;

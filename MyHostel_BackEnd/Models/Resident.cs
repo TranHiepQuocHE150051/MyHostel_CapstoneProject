@@ -11,7 +11,7 @@ namespace MyHostel_BackEnd.Models
         public byte ActiveFlg { get; set; }
         public byte Rate { get; set; }
         public string Comment { get; set; } = null!;
-        public byte[] CreatedAt { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
 
         public virtual Hostel Hostel { get; set; } = null!;
         public virtual Member Member { get; set; } = null!;

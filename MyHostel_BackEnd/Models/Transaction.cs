@@ -13,7 +13,7 @@ namespace MyHostel_BackEnd.Models
         public decimal? Security { get; set; }
         public decimal? Internet { get; set; }
         public string? Other { get; set; }
-        public byte[]? PaidAt { get; set; }
+        public DateTime? PaidAt { get; set; }
 
         public virtual Room Room { get; set; } = null!;
     }

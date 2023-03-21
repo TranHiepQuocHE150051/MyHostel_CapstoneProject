@@ -10,7 +10,7 @@ namespace MyHostel_BackEnd.Models
         public int SenderId { get; set; }
         public string MsgText { get; set; } = null!;
         public int ParentMsgId { get; set; }
-        public byte[] CreatedAt { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
         public bool AnonymousFlg { get; set; }
 
         public virtual Chat Chat { get; set; } = null!;

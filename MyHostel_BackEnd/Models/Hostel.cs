@@ -18,7 +18,7 @@ namespace MyHostel_BackEnd.Models
         public string Name { get; set; } = null!;
         public string GoogleLocationLat { get; set; } = null!;
         public string GoogleLocationLnd { get; set; } = null!;
-        public byte[] CreatedAt { get; set; } = null!;
+        public DateTime CreatedAt { get; set; }
         public string WardsCode { get; set; } = null!;
         public decimal Price { get; set; }
         public string Capacity { get; set; } = null!;

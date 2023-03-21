@@ -149,8 +149,7 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.CreatedAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
@@ -238,8 +237,7 @@ namespace MyHostel_BackEnd.Models
                     .IsFixedLength();
 
                 entity.Property(e => e.CreatedAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.Description)
@@ -346,8 +344,7 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("avatar");
 
                 entity.Property(e => e.CreatedAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.FacebookId)
@@ -389,8 +386,7 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.ChatId).HasColumnName("chat_id");
 
                 entity.Property(e => e.CreatedAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.MsgText).HasColumnName("msg_text");
@@ -457,8 +453,7 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("message");
 
                 entity.Property(e => e.SendAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("send_at");
 
                 entity.Property(e => e.SendTo).HasColumnName("send_to");
@@ -481,8 +476,7 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.ChatId).HasColumnName("chat_id");
 
                 entity.Property(e => e.JoinedAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("joined_at");
 
                 entity.Property(e => e.MemberId).HasColumnName("member_id");
@@ -565,8 +559,7 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("comment");
 
                 entity.Property(e => e.CreatedAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.Rate).HasColumnName("rate");
@@ -629,8 +622,7 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("other");
 
                 entity.Property(e => e.PaidAt)
-                    .IsRowVersion()
-                    .IsConcurrencyToken()
+                    .HasColumnType("datetime")
                     .HasColumnName("paid_at");
 
                 entity.Property(e => e.Rent)
