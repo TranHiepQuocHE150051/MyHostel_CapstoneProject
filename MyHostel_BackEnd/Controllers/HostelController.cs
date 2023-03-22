@@ -427,6 +427,112 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
+
+        [HttpPost("{id}/resident")]
+        public async Task<ActionResult> AddResident(int id, [FromBody] AddResidentRequest resident)
+        {          
+            var hostel = _context.Hostels.Where(h => h.Id == id).SingleOrDefault();
+            if (hostel == null)
+            {
+                return BadRequest("Hostel not exist");
+            } 
+            else
+            {
+                bool RoomInHostel = false;
+                var rooms = _context.Rooms.Where(r => r.HostelId == id).ToList();
+                foreach(var room in rooms)
+                {
+                    if (resident.RoomId == room.Id)
+                    {
+                        RoomInHostel = true;
+                    }
+                }
+                if (!RoomInHostel)
+                {
+                    return BadRequest("Room is not in hostel");
+                }
+            }
+            var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
+            if (member == null)
+            {
+                return BadRequest("Account not exist");
+            }
+            try
+            {                
+                Resident resident1 = new Resident
+                {
+                   HostelId = id,
+                   MemberId = resident.MemberId,
+                   RoomId = resident.RoomId,
+                   ActiveFlg=1,
+                   Rate=0,
+                   Comment="",
+                   CreatedAt=DateTime.Now
+                };
+                _context.Residents.Add(resident1);
+                await _context.SaveChangesAsync();              
+                
+                return Ok("Add new resident success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost("{id}/transaction")]
+        public async Task<ActionResult> AddTransaction(int id, [FromBody] AddTransactionRequest transaction)
+        {
+            var hostel = _context.Hostels.Where(h => h.Id == id).SingleOrDefault();
+            if (hostel == null)
+            {
+                return BadRequest("Hostel not exist");
+            }
+            else
+            {
+                HashSet<int> roomInHostel = new HashSet<int>();
+                var rooms = _context.Rooms.Where(r => r.HostelId == id).ToList();
+                foreach (var room in rooms)
+                {
+                    roomInHostel.Add(room.Id);
+                }
+                HashSet<int> roomIds = new HashSet<int>(transaction.roomId);
+                if (!roomIds.IsSubsetOf(roomInHostel))
+                {
+                    return BadRequest("Room is not in hostel");
+                }
+            }           
+            try
+            {
+                string message = "";
+                foreach (var it in transaction.other)
+                {
+                    message = message+it+ " \n";
+                }
+
+                foreach (var item in transaction.roomId)
+                {
+                    Transaction transaction1 = new Transaction
+                    {
+                        RoomId = item,
+                        Electricity=transaction.electricity,
+                        Water = transaction.water,
+                        Internet=transaction.internet,
+                        Rent=transaction.rent,
+                        Security=transaction.security,
+                        PaidAt = DateTime.Parse(transaction.sendAt),
+                        Other=message
+
+                    };
+                    _context.Transactions.Add(transaction1);
+                    await _context.SaveChangesAsync();
+                }
+                return Ok("Add new transaction success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         private int CalculateDistance(double orglat, double orglng, double deslat, double deslng)
         {
             DirectionsRequest request = new DirectionsRequest();
