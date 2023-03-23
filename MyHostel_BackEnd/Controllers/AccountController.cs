@@ -46,7 +46,11 @@ namespace MyHostel_BackEnd.Controllers
 
                     };
                         var accessToken = GenerateJSONWebToken(claims);
-                        return Ok(accessToken);
+                        return Ok(new LoginResponse
+                        {
+                            Token = accessToken,
+                            MemberId= acc.Id
+                        });
                     }
                     else
                     {
@@ -57,7 +61,8 @@ namespace MyHostel_BackEnd.Controllers
                             LastName = account.LastName,
                             Avatar = account.AvatarURL,
                             CreatedAt = DateTime.Now,
-                            RoleId = account.role
+                            RoleId = account.role,
+                            FcmToken = ""
                         };
                         await _context.Members.AddAsync(member);
                         if (await _context.SaveChangesAsync() > 0)
@@ -75,7 +80,11 @@ namespace MyHostel_BackEnd.Controllers
 
                         };
                             var accessToken = GenerateJSONWebToken(claims);
-                            return Ok(accessToken);
+                            return Ok(new LoginResponse
+                            {
+                                Token = accessToken,
+                                MemberId = member.Id
+                            });
                         }
                         return StatusCode(500);
                     }
@@ -98,7 +107,11 @@ namespace MyHostel_BackEnd.Controllers
 
                     };
                         var accessToken = GenerateJSONWebToken(claims);
-                        return Ok(accessToken);
+                        return Ok(new LoginResponse
+                        {
+                            Token = accessToken,
+                            MemberId = acc.Id
+                        });
                     }
                     else
                     {
@@ -109,7 +122,8 @@ namespace MyHostel_BackEnd.Controllers
                             LastName = account.LastName,
                             Avatar = account.AvatarURL,
                             CreatedAt = DateTime.Now,
-                            RoleId = account.role
+                            RoleId = account.role,
+                            FcmToken= ""
                         };
                         await _context.Members.AddAsync(member);
                         if (await _context.SaveChangesAsync() > 0)
@@ -127,7 +141,11 @@ namespace MyHostel_BackEnd.Controllers
 
                         };
                             var accessToken = GenerateJSONWebToken(claims);
-                            return Ok(accessToken);
+                            return Ok(new LoginResponse
+                            {
+                                Token = accessToken,
+                                MemberId = member.Id
+                            });
                         }
                         return StatusCode(500);
                     }
