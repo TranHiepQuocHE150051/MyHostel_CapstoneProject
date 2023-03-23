@@ -220,3 +220,13 @@ C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net
 C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\This PC\Desktop\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\FirebaseAdmin.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Google.Api.Gax.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Google.Api.Gax.Rest.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Google.Apis.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Google.Apis.Auth.PlatformServices.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Google.Apis.Auth.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Google.Apis.Core.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Microsoft.Bcl.AsyncInterfaces.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\Newtonsoft.Json.dll
+D:\Learning\FPT_U\Ki9\Capstone\MyHostel\MyHostel_CapstoneProject\MyHostel_BackEnd\bin\Debug\net6.0\GoogleCredential\myhostel-d4a76-firebase-adminsdk-c9z7z-bd4a7134a3.json

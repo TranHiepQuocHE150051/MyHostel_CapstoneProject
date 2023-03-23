@@ -41,8 +41,8 @@ namespace MyHostel_BackEnd.Models
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
             IConfigurationRoot configuration = builder.Build();
             optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyDB"));
         }
@@ -601,7 +601,6 @@ namespace MyHostel_BackEnd.Models
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("name");
             });
 
@@ -634,6 +633,10 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.Security)
                     .HasColumnType("money")
                     .HasColumnName("security");
+
+                entity.Property(e => e.SendAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("send_at");
 
                 entity.Property(e => e.Water)
                     .HasColumnType("money")

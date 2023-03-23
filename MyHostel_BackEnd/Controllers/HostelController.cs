@@ -506,9 +506,9 @@ namespace MyHostel_BackEnd.Controllers
                 string message = "";
                 foreach (var it in transaction.other)
                 {
-                    message = message+it+ " \n";
+                    message = message+it+ " - ";
                 }
-
+                message = message.Substring(0, message.Length - 3);
                 foreach (var item in transaction.roomId)
                 {
                     Transaction transaction1 = new Transaction
@@ -519,9 +519,8 @@ namespace MyHostel_BackEnd.Controllers
                         Internet=transaction.internet,
                         Rent=transaction.rent,
                         Security=transaction.security,
-                        PaidAt = DateTime.Parse(transaction.sendAt),
+                        SendAt = DateTime.Parse(transaction.sendAt),
                         Other=message
-
                     };
                     _context.Transactions.Add(transaction1);
                     await _context.SaveChangesAsync();
@@ -540,7 +539,6 @@ namespace MyHostel_BackEnd.Controllers
             request.Origin = new LocationEx(new CoordinateEx(orglat, orglng));
             request.Destination = new LocationEx(new CoordinateEx(deslat, deslng));
             var response = GoogleApi.GoogleMaps.Directions.Query(request);
-
             int distance = response.Routes.First().Legs.First().Distance.Value;
             return distance;
 

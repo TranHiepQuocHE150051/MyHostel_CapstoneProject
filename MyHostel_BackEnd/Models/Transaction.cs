@@ -14,6 +14,7 @@ namespace MyHostel_BackEnd.Models
         public decimal? Internet { get; set; }
         public string? Other { get; set; }
         public DateTime? PaidAt { get; set; }
+        public DateTime? SendAt { get; set; }
 
         public virtual Room Room { get; set; } = null!;
     }

@@ -1,3 +1,5 @@
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -61,10 +63,16 @@ builder.Services.AddQuartz(q =>
     q.AddTrigger(opts => opts
         .ForJob(jobKey)
         .WithIdentity("DemoJob-trigger")
-        .WithCronSchedule("0/5 * * * * ?"));
+        .WithCronSchedule("0/5 * * ? * *"));
 
 });
-
+string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\GoogleCredential\myhostel-d4a76-firebase-adminsdk-c9z7z-bd4a7134a3.json");
+string sFilePath = Path.GetFullPath(sFile);
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile(sFilePath),
+});
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddCors();
 builder.Services.AddDbContext<MyHostelContext>(opt => opt.UseSqlServer(
