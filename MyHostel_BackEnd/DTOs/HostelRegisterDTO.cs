@@ -11,7 +11,7 @@
         public string LocationLng { get; set; } = null!;
         
         public string WardsCode { get; set; } = null!;
-        public int[] Amenities { get; set; }
+        public string Amenities { get; set; }
         public string[] imagesUrl { get; set; }
         public string Phone { get; set; } = null!;
         public string Description { get; set; } = null!;

@@ -80,14 +80,15 @@ namespace MyHostel_BackEnd.Controllers
                     _context.HostelImages.Add(hostelImage);
                     _context.SaveChanges();
                 }
-                foreach (int amenityId in hostel.Amenities)
+                var amenityIdList = new List<string>(hostel.Amenities.Split(' '));
+                foreach (var amenityId in amenityIdList)
                 {
-                    var amenity = _context.Amenities.SingleOrDefault(a => a.Id == amenityId);
+                    var amenity = _context.Amenities.SingleOrDefault(a => a.Id == int.Parse(amenityId));
                     if (amenity != null) {
                         HostelAmenity hostelAmenity = new HostelAmenity
                         {
                             HostedId = hostel1.Id,
-                            AmenitiesId = amenityId
+                            AmenitiesId = int.Parse(amenityId)
 
                         };
                         _context.HostelAmenities.Add(hostelAmenity);
