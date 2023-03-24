@@ -67,7 +67,7 @@ builder.Services.AddQuartz(q =>
 
 });
 string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\GoogleCredential\myhostel-d4a76-firebase-adminsdk-c9z7z-bd4a7134a3.json");
+string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\GoogleCredential\googlekey.json");
 string sFilePath = Path.GetFullPath(sFile);
 FirebaseApp.Create(new AppOptions()
 {

@@ -11,6 +11,7 @@ namespace MyHostel_BackEnd.Quartz
         private MyHostelContext _context = new MyHostelContext();
         public async Task Execute(IJobExecutionContext context)
         {
+            Console.WriteLine("Start sent message ");
             var transactions = await _context.Transactions.Include(t => t.Room).Where(t => t.PaidAt == null).ToListAsync();
             var registrationToken = "eoCu8IdWRZiP8StEZku0O7:APA91bGf_t2j0z4tEukJO8RMTfEyu9FpfxX6WI9Zqm0zdlk0x_fAGWERbgURnZ2pGAAyY5BXaA6gpGHCEJoyJhHnEiL6AtCIdZ_DH6PNVGqwULTgcwMHVVzGBkTOvI2ZR0IG_TNjn-dV";
             foreach (var transaction in transactions)
