@@ -248,6 +248,10 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(255)
                     .HasColumnName("detail_Location");
 
+                entity.Property(e => e.Electricity)
+                    .HasColumnType("money")
+                    .HasColumnName("electricity");
+
                 entity.Property(e => e.GoogleLocationLat)
                     .HasMaxLength(50)
                     .HasColumnName("google_location_lat");
@@ -255,6 +259,10 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.GoogleLocationLnd)
                     .HasMaxLength(50)
                     .HasColumnName("google_location_lnd");
+
+                entity.Property(e => e.Internet)
+                    .HasColumnType("money")
+                    .HasColumnName("internet");
 
                 entity.Property(e => e.LandlordId).HasColumnName("landlord_id");
 
@@ -279,6 +287,10 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.WardsCode)
                     .HasMaxLength(20)
                     .HasColumnName("wards_code");
+
+                entity.Property(e => e.Water)
+                    .HasColumnType("money")
+                    .HasColumnName("water");
 
                 entity.HasOne(d => d.Landlord)
                     .WithMany(p => p.Hostels)

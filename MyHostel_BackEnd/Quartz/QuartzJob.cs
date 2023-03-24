@@ -21,7 +21,7 @@ namespace MyHostel_BackEnd.Quartz
                     + transaction.Electricity
                     + transaction.Water
                     + transaction.Security
-                    + transaction.Internet;0
+                    + transaction.Internet;
                 foreach (var other in others)
                 {
                     decimal price = Decimal.Parse(other.Split(':')[1]);

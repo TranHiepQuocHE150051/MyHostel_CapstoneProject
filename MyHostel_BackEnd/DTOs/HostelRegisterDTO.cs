@@ -3,7 +3,7 @@
     public class HostelRegisterDTO
     {
         public string Name { get; set; } = null!;
-        public Decimal Price { get; set; }
+        public decimal Price { get; set; }
         public int rooms { get; set; }
         public string Capacity { get; set; }
         public string DetailLocation { get; set; } = null!;
@@ -16,7 +16,9 @@
         public string Phone { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string RoomArea { get; set; } = null!;
-        
-        
+
+        public decimal Electricity { get; set; }
+        public decimal Water { get; set; }
+        public decimal Internet { get; set; }
     }
 }

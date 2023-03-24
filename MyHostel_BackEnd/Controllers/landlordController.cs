@@ -40,7 +40,7 @@ namespace MyHostel_BackEnd.Controllers
             _configuration = configuration;
             _context = context;
         }
-        [Authorize(Roles = "2")] //Role 2 = LANDLORDS
+        [Authorize] //Role 2 = LANDLORDS
         [HttpPost("register")]
         public async Task<IActionResult> HostelRegister([FromBody] HostelRegisterDTO hostel)
         { 
@@ -57,13 +57,15 @@ namespace MyHostel_BackEnd.Controllers
                     Price = hostel.Price,
                     Capacity = hostel.Capacity,
                     DetailLocation = hostel.DetailLocation,
-                    GoogleLocationLat = hostel.LocationLat,
-                    GoogleLocationLnd = hostel.LocationLng,
                     WardsCode = hostel.WardsCode,
                     Phone = hostel.Phone,
                     Description = hostel.Description,
                     RoomArea = hostel.RoomArea,                   
-                    LandlordId = landlordId
+                    LandlordId = landlordId,
+                    Electricity= hostel.Electricity,
+                    Water=hostel.Water,
+                    Internet=hostel.Internet,
+                    CreatedAt=DateTime.Now
                 };
                 _context.Hostels.Add(hostel1);
                 await _context.SaveChangesAsync();
@@ -104,7 +106,10 @@ namespace MyHostel_BackEnd.Controllers
                     _context.Rooms.Add(room);
                     _context.SaveChanges();
                 }
-                CheckNearbyAmenity(hostel.LocationLat, hostel.LocationLng, hostel1.Id);
+                if (hostel.LocationLat != null && hostel.LocationLng != null)
+                {
+                    CheckNearbyAmenity(hostel.LocationLat, hostel.LocationLng, hostel1.Id);
+                }
                 return Ok("Add new hostel Success");
             } catch (Exception e)
             {

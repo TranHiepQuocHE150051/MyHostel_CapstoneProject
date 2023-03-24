@@ -16,8 +16,8 @@ namespace MyHostel_BackEnd.Models
 
         public int Id { get; set; }
         public string Name { get; set; } = null!;
-        public string GoogleLocationLat { get; set; } = null!;
-        public string GoogleLocationLnd { get; set; } = null!;
+        public string? GoogleLocationLat { get; set; }
+        public string? GoogleLocationLnd { get; set; }
         public DateTime CreatedAt { get; set; }
         public string WardsCode { get; set; } = null!;
         public decimal Price { get; set; }
@@ -27,6 +27,9 @@ namespace MyHostel_BackEnd.Models
         public string Description { get; set; } = null!;
         public string RoomArea { get; set; } = null!;
         public string DetailLocation { get; set; } = null!;
+        public decimal Electricity { get; set; }
+        public decimal Water { get; set; }
+        public decimal Internet { get; set; }
 
         public virtual Member Landlord { get; set; } = null!;
         public virtual Ward WardsCodeNavigation { get; set; } = null!;
