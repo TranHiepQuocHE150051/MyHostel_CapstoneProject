@@ -21,7 +21,7 @@ namespace MyHostel_BackEnd.Quartz
                     + transaction.Electricity
                     + transaction.Water
                     + transaction.Security
-                    + transaction.Internet;
+                    + transaction.Internet;0
                 foreach (var other in others)
                 {
                     decimal price = Decimal.Parse(other.Split(':')[1]);
@@ -30,7 +30,7 @@ namespace MyHostel_BackEnd.Quartz
                 {
                     Data = new Dictionary<string, string>()
                     {
-                        { "Tiền cần đóng của phòng "+transaction.Room.Name+": ", total.ToString() }
+                        { "Tiền cần đóng của "+transaction.Room.Name+": ", total.ToString() }
                     },
                     Token = registrationToken,
                 };
