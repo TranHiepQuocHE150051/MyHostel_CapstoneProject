@@ -77,7 +77,7 @@ namespace MyHostel_BackEnd.Controllers
                     result.Add(new Provinces_District_Ward_Response()
                     {
                         Code = district.Code,
-                        Name = district.Name
+                        Name = district.FullName
                     });
                 }
                 if (result.Count != 0)
@@ -115,7 +115,7 @@ namespace MyHostel_BackEnd.Controllers
                     result.Add(new Provinces_District_Ward_Response()
                     {
                         Code = ward.Code,
-                        Name = ward.Name
+                        Name = ward.FullName
                     });
                 }
                 if (result.Count != 0)
