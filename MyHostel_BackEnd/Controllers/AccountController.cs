@@ -187,8 +187,7 @@ namespace MyHostel_BackEnd.Controllers
             var token = new JwtSecurityToken(
                     _configuration["Jwt:Issuer"],
                     _configuration["Jwt:Audience"],
-                    claims,
-                    expires: DateTime.UtcNow.AddSeconds(3600),
+                    claims,                  
                     signingCredentials: signIn
                     );
             return new JwtSecurityTokenHandler().WriteToken(token);
