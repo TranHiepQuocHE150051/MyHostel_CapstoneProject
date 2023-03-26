@@ -284,6 +284,8 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("room_Area")
                     .IsFixedLength();
 
+                entity.Property(e => e.Status).HasColumnName("status");
+
                 entity.Property(e => e.WardsCode)
                     .HasMaxLength(20)
                     .HasColumnName("wards_code");

@@ -65,7 +65,8 @@ namespace MyHostel_BackEnd.Controllers
                     Electricity= hostel.Electricity,
                     Water=hostel.Water,
                     Internet=hostel.Internet,
-                    CreatedAt=DateTime.Now
+                    CreatedAt=DateTime.Now,
+                    Status=0
                 };
                 _context.Hostels.Add(hostel1);
                 await _context.SaveChangesAsync();

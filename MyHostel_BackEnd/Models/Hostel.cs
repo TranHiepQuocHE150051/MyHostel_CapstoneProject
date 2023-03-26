@@ -30,6 +30,7 @@ namespace MyHostel_BackEnd.Models
         public decimal Electricity { get; set; }
         public decimal Water { get; set; }
         public decimal Internet { get; set; }
+        public int Status { get; set; }
 
         public virtual Member Landlord { get; set; } = null!;
         public virtual Ward WardsCodeNavigation { get; set; } = null!;
