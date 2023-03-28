@@ -215,6 +215,10 @@ namespace MyHostel_BackEnd.Controllers
                     result.WardName = hostel.WardsCodeNavigation.FullName;
                     result.RoomArea = hostel.RoomArea;
                     result.Description = hostel.Description;
+                    result.Price= replaceString(hostel.Price);
+                    result.Electricity= replaceString(hostel.Electricity);
+                    result.Water= replaceString(hostel.Water);
+                    result.Internet= replaceString(hostel.Internet);
                     var lanlord = _context.Members.Where(l => l.Id == hostel.LandlordId).SingleOrDefault();
                     result.Landlord = new LandlordGetHostelDTO
                     {
@@ -542,6 +546,22 @@ namespace MyHostel_BackEnd.Controllers
             int distance = response.Routes.First().Legs.First().Distance.Value;
             return distance;
 
+        }
+        public string replaceString(decimal price)
+        {
+            int result = (int)price;
+            string result1 = result.ToString();
+            if (price >= 1000 && price < 1000000)
+            {
+                result1 = result1.Replace("000", "");
+                result1 += "K";
+            }
+            else if(price >= 1000000)
+            {
+                result1 = result1.Replace("000000", "");
+                result1 += "M";
+            }
+            return result1;
         }
     }
 

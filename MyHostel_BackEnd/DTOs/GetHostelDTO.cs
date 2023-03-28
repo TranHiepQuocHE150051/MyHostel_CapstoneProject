@@ -11,6 +11,10 @@
         public string WardName { get; set; } = null!;
         public string RoomArea { get; set; } = null!;
         public string Description { get; set; } = null!;
+        public string Price { get; set; } = null!;
+        public string Electricity { get; set; } = null!;
+        public string Water { get; set; } = null!;
+        public string Internet { get; set; } = null!;
         public LandlordGetHostelDTO Landlord { get; set; } = null!;
         public ReviewGetHostelDTO Review { get; set; } = null!;
     }
