@@ -215,10 +215,10 @@ namespace MyHostel_BackEnd.Controllers
                     result.WardName = hostel.WardsCodeNavigation.FullName;
                     result.RoomArea = hostel.RoomArea;
                     result.Description = hostel.Description;
-                    result.Price= replaceString(hostel.Price);
-                    result.Electricity= replaceString(hostel.Electricity);
-                    result.Water= replaceString(hostel.Water);
-                    result.Internet= replaceString(hostel.Internet);
+                    result.Price = replaceString(hostel.Price);
+                    result.Electricity = replaceString(hostel.Electricity);
+                    result.Water = replaceString(hostel.Water);
+                    result.Internet = replaceString(hostel.Internet);
                     var lanlord = _context.Members.Where(l => l.Id == hostel.LandlordId).SingleOrDefault();
                     result.Landlord = new LandlordGetHostelDTO
                     {
@@ -434,17 +434,17 @@ namespace MyHostel_BackEnd.Controllers
 
         [HttpPost("{id}/resident")]
         public async Task<ActionResult> AddResident(int id, [FromBody] AddResidentRequest resident)
-        {          
+        {
             var hostel = _context.Hostels.Where(h => h.Id == id).SingleOrDefault();
             if (hostel == null)
             {
                 return BadRequest("Hostel not exist");
-            } 
+            }
             else
             {
                 bool RoomInHostel = false;
                 var rooms = _context.Rooms.Where(r => r.HostelId == id).ToList();
-                foreach(var room in rooms)
+                foreach (var room in rooms)
                 {
                     if (resident.RoomId == room.Id)
                     {
@@ -462,20 +462,20 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest("Account not exist");
             }
             try
-            {                
+            {
                 Resident resident1 = new Resident
                 {
-                   HostelId = id,
-                   MemberId = resident.MemberId,
-                   RoomId = resident.RoomId,
-                   ActiveFlg=1,
-                   Rate=0,
-                   Comment="",
-                   CreatedAt=DateTime.Now
+                    HostelId = id,
+                    MemberId = resident.MemberId,
+                    RoomId = resident.RoomId,
+                    ActiveFlg = 1,
+                    Rate = 0,
+                    Comment = "",
+                    CreatedAt = DateTime.Now
                 };
                 _context.Residents.Add(resident1);
-                await _context.SaveChangesAsync();              
-                
+                await _context.SaveChangesAsync();
+
                 return Ok("Add new resident success");
             }
             catch (Exception e)
@@ -504,13 +504,13 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("Room is not in hostel");
                 }
-            }           
+            }
             try
             {
                 string message = "";
                 foreach (var it in transaction.other)
                 {
-                    message = message+it+ " - ";
+                    message = message + it + " - ";
                 }
                 message = message.Substring(0, message.Length - 3);
                 foreach (var item in transaction.roomId)
@@ -518,13 +518,13 @@ namespace MyHostel_BackEnd.Controllers
                     Transaction transaction1 = new Transaction
                     {
                         RoomId = item,
-                        Electricity=transaction.electricity,
+                        Electricity = transaction.electricity,
                         Water = transaction.water,
-                        Internet=transaction.internet,
-                        Rent=transaction.rent,
-                        Security=transaction.security,
+                        Internet = transaction.internet,
+                        Rent = transaction.rent,
+                        Security = transaction.security,
                         SendAt = DateTime.Parse(transaction.sendAt),
-                        Other=message
+                        Other = message
                     };
                     _context.Transactions.Add(transaction1);
                     await _context.SaveChangesAsync();
@@ -547,7 +547,7 @@ namespace MyHostel_BackEnd.Controllers
             return distance;
 
         }
-        public string replaceString(decimal price)
+        private string replaceString(decimal price)
         {
             int result = (int)price;
             string result1 = result.ToString();
@@ -556,7 +556,7 @@ namespace MyHostel_BackEnd.Controllers
                 result1 = result1.Replace("000", "");
                 result1 += "K";
             }
-            else if(price >= 1000000)
+            else if (price >= 1000000)
             {
                 result1 = result1.Replace("000000", "");
                 result1 += "M";
@@ -564,5 +564,4 @@ namespace MyHostel_BackEnd.Controllers
             return result1;
         }
     }
-
 }
