@@ -285,18 +285,34 @@ namespace MyHostel_BackEnd.Controllers
                     .Include(h => h.HostelImages)
                     .Where(h => h.LandlordId == id).ToListAsync();
                 var rooms = await _context.Rooms.ToListAsync();
+                var residents = await _context.Residents.ToListAsync();
                 List<HostelForLanlordResponse> result = new List<HostelForLanlordResponse>();
                 foreach (var hostel in hostels)
                 {
                     int RoomNo = 0;
+                    int ResidentNo = 0;
+                    int AvailableRooms=0;
                     string ImgUrl = "";
                     if (rooms.Where(r => r.HostelId == hostel.Id).Any())
                     {
                         RoomNo = rooms.Where(r => r.HostelId == hostel.Id).Count();
                     }
+                    if (residents.Where(r => r.HostelId == hostel.Id).Any())
+                    {
+                        ResidentNo = residents.Where(r => r.HostelId == hostel.Id).Count();
+                    }
                     if (hostel.HostelImages.FirstOrDefault() != null)
                     {
                         ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
+                    }
+                    var roomsInHostel = _context.Rooms.Where(r => r.HostelId == hostel.Id).ToList();
+                    
+                    foreach(var room in roomsInHostel)
+                    {
+                        if (CountResidentInRoom(room) < int.Parse(hostel.Capacity))
+                        {
+                            AvailableRooms++;
+                        }
                     }
                     result.Add(
                         new HostelForLanlordResponse
@@ -305,7 +321,10 @@ namespace MyHostel_BackEnd.Controllers
                             DetailLocation = hostel.DetailLocation,
                             Name = hostel.Name,
                             RoomNo = RoomNo,
-                            ImgUrl = ImgUrl
+                            ImgUrl = ImgUrl,
+                            Status=hostel.Status,
+                            ResidentNo=ResidentNo,
+                            AvailableRooms=AvailableRooms
                         }
                     );
                 }
@@ -469,12 +488,18 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         RoomInHostel = true;
                     }
+                    if (CountResidentInRoom(room) >= int.Parse(hostel.Capacity))
+                    {
+                        return BadRequest("Room is full");
+                    }
                 }
                 if (!RoomInHostel)
                 {
                     return BadRequest("Room is not in hostel");
                 }
             }
+
+
             var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
             if (member == null)
             {
@@ -581,6 +606,11 @@ namespace MyHostel_BackEnd.Controllers
                 result1 = result.ToString() + "M";
             }
             return result1;
+        }
+        private int CountResidentInRoom(Room room)
+        {
+            var residents = _context.Residents.Where(r => r.RoomId == room.Id).ToList();
+            return residents.Count();
         }
     }
 }
