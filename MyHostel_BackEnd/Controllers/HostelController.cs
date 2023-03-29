@@ -8,6 +8,7 @@ using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
 using Org.BouncyCastle.Utilities;
 using System.Linq;
+using static GoogleApi.GoogleMaps;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -408,7 +409,7 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                var hostels = await _context.Hostels.Include(h => h.WardsCodeNavigation).ThenInclude(w => w.DistrictCodeNavigation)
+                var hostels = await _context.Hostels.Include(h=>h.HostelImages).Include(h => h.WardsCodeNavigation).ThenInclude(w => w.DistrictCodeNavigation)
                     .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode)).ToListAsync();
                 if (userLocationLat != null && userLocationLng != null && !userLocationLat.Equals("") && !userLocationLng.Equals(""))
                 {
@@ -423,8 +424,26 @@ namespace MyHostel_BackEnd.Controllers
                             hostels.Remove(hostel);
                         }
                     }
+                }     
+                
+                List<NearbyHostelReponse> reponses = new List<NearbyHostelReponse>();
+                foreach (var hostel in hostels)
+                {
+                    string ImgUrl = "";                  
+                    if (hostel.HostelImages.FirstOrDefault() != null)
+                    {
+                        ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
+                    }
+                    reponses.Add(new NearbyHostelReponse
+                    {
+                        Name = hostel.Name,
+                        DetailLocation = hostel.DetailLocation,
+                        Price = replaceString(hostel.Price),
+                        ImgUrl = ImgUrl
+                    })
+                ;
                 }
-                return Ok(hostels);
+                return Ok(reponses);
             }
             catch (Exception e)
             {
