@@ -568,17 +568,17 @@ namespace MyHostel_BackEnd.Controllers
         }
         private string replaceString(decimal price)
         {
-            int result = (int)price;
-            string result1 = result.ToString();
-            if (price >= 1000 && price < 1000000)
+            double result = (double)price;
+            string result1 = "";
+            if (result >= 1000 && result < 1000000)
             {
-                result1 = result1.Replace("000", "");
-                result1 += "K";
+                result = result/1000;
+                result1 = result.ToString()+"K";
             }
             else if (price >= 1000000)
             {
-                result1 = result1.Replace("000000", "");
-                result1 += "M";
+                result = result / 1000000;
+                result1 = result.ToString() + "M";
             }
             return result1;
         }
