@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
 using Org.BouncyCastle.Utilities;
+using System.Configuration;
 using System.Linq;
 using static GoogleApi.GoogleMaps;
 
@@ -30,20 +31,29 @@ namespace MyHostel_BackEnd.Controllers
             [FromQuery] string? priceRange,
             [FromQuery] string? amenities,
             [FromQuery] string? nearbyFacilities,
-            [FromQuery] int? capacity
+            [FromQuery] int? capacity,
+            [FromQuery] int? pageIndex
             )
         {
             try
             {
-                var hostels = await _context.Hostels.Include(h => h.WardsCodeNavigation).ToListAsync();
+                if (pageIndex == null || pageIndex <= 0)
+                {
+                    pageIndex = 1;
+                }
+                IQueryable<Hostel> hostels;
+                hostels = from h 
+                            in _context.Hostels
+                            .Include(h => h.WardsCodeNavigation)
+                            select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
                 if (locationCode.Length == 5)
                 {
-                    hostels = hostels.Where(h => h.WardsCode == locationCode).ToList();
+                    hostels = hostels.Where(h => h.WardsCode == locationCode);
                 }
                 if (locationCode.Length == 3)
                 {
-                    hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCode == locationCode).ToList();
+                    hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCode == locationCode);
                 }
                 if (priceRange != null)
                 {
@@ -63,23 +73,23 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     if (prices[0] != "" && prices[1] != "")
                     {
-                        hostels = hostels.Where(h => h.Price >= Decimal.Parse(prices[0]) && h.Price <= Decimal.Parse(prices[1])).ToList();
+                        hostels = hostels.Where(h => h.Price >= Decimal.Parse(prices[0]) && h.Price <= Decimal.Parse(prices[1]));
                     }
                     else
                     {
                         if (prices[0] != "" && prices[1] == "")
                         {
-                            hostels = hostels.Where(h => h.Price >= Decimal.Parse(prices[0])).ToList();
+                            hostels = hostels.Where(h => h.Price >= Decimal.Parse(prices[0]));
                         }
                         else if (prices[0] == "" && prices[1] != "")
                         {
-                            hostels = hostels.Where(h => h.Price <= Decimal.Parse(prices[1])).ToList();
+                            hostels = hostels.Where(h => h.Price <= Decimal.Parse(prices[1]));
                         }
                     }
                 }
                 if (capacity != null)
                 {
-                    hostels = hostels.Where(h => Int32.Parse(h.Capacity) >= capacity).ToList();
+                    hostels = hostels.Where(h => Int32.Parse(h.Capacity) >= capacity);
                 }
                 if (amenities != null)
                 {
@@ -111,7 +121,7 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     else
                     {
-                        hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString())).ToList();
+                        hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString()));
                     }
 
                 }
@@ -145,11 +155,12 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     else
                     {
-                        hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString())).ToList();
+                        hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString()));
                     }
                 }
+                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), pageIndex ?? 1, 6);
                 List<HostelSearchDTO> result = new List<HostelSearchDTO>();
-                foreach (var hostel in hostels)
+                foreach (var hostel in hostelsPL)
                 {
                     string imgUrl = "";
                     if (hostel.HostelImages.FirstOrDefault() != null)
@@ -181,6 +192,8 @@ namespace MyHostel_BackEnd.Controllers
                     .Include(h => h.NearbyFacilities)
                     .Include(h => h.HostelAmenities)
                     .Include(h => h.WardsCodeNavigation)
+                    .ThenInclude(w=>w.DistrictCodeNavigation)
+                    .ThenInclude(d=>d.ProvinceCodeNavigation)
                     .Where(h => h.Id == id).FirstOrDefaultAsync();
                 if (hostel != null)
                 {
@@ -213,7 +226,12 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     result.Amenities = AmenitiesResult.ToArray();
                     result.DetailLocation = hostel.DetailLocation;
+                    result.WardCode = hostel.WardsCode;
                     result.WardName = hostel.WardsCodeNavigation.FullName;
+                    result.DistrictCode = hostel.WardsCodeNavigation.DistrictCode;
+                    result.DistricName = hostel.WardsCodeNavigation.DistrictCodeNavigation.FullName;
+                    result.ProvinceCode = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCode;
+                    result.ProvinceName = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.FullName;
                     result.RoomArea = hostel.RoomArea;
                     result.Description = hostel.Description;
                     result.Price = replaceString(hostel.Price);
