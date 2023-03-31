@@ -425,15 +425,29 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                var rooms = await _context.Rooms.Where(r => r.HostelId == id).ToListAsync();
+                var rooms = await _context.Rooms.Where(r => r.HostelId == id).Include(r=>r.Residents).ToListAsync();
                 List<RoomDTO> result = new List<RoomDTO>();
                 foreach (var room in rooms)
                 {
-                    result.Add(new RoomDTO
+                    List<ResidentDTO> residents = new List<ResidentDTO>();
+                    RoomDTO room1 = new RoomDTO();
+                    room1.RoomId=room.Id;
+                    room1.Name = room.Name;
+                    foreach (var resident in room.Residents)
                     {
-                        RoomId = room.Id,
-                        Name = room.Name
-                    });
+                        var member = _context.Members.Where(m => m.Id == resident.MemberId).FirstOrDefault();
+                        if (member != null) {
+                            residents.Add(new ResidentDTO
+                            {
+                                MemberId = member.Id,
+                                FullName = member.FirstName + member.LastName,
+                                Avatar = member.Avatar
+                            });
+                        }
+                        
+                    }
+                    room1.Residents= residents;
+                    result.Add(room1);
                 }
                 return Ok(result);
             }
