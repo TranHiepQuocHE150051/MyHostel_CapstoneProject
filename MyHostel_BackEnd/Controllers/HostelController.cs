@@ -32,7 +32,8 @@ namespace MyHostel_BackEnd.Controllers
             [FromQuery] string? amenities,
             [FromQuery] string? nearbyFacilities,
             [FromQuery] int? capacity,
-            [FromQuery] int? pageIndex
+            [FromQuery] int? pageIndex,
+            [FromQuery] int? pageSize
             )
         {
             try
@@ -41,11 +42,14 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     pageIndex = 1;
                 }
-                IQueryable<Hostel> hostels;
-                hostels = from h 
-                            in _context.Hostels
-                            .Include(h => h.WardsCodeNavigation)
-                            select h;
+                if (pageSize == null || pageSize <= 0)
+                {
+                    pageSize = 6;
+                }
+                IQueryable<Hostel> hostels= from h 
+                                            in _context.Hostels
+                                            .Include(h => h.WardsCodeNavigation) 
+                                            select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
                 if (locationCode.Length == 5)
                 {
@@ -158,7 +162,7 @@ namespace MyHostel_BackEnd.Controllers
                         hostels = hostels.Where(h => resultsId.Contains(h.Id.ToString()));
                     }
                 }
-                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), pageIndex ?? 1, 6);
+                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), (int)pageIndex, (int)pageSize);
                 List<HostelSearchDTO> result = new List<HostelSearchDTO>();
                 foreach (var hostel in hostelsPL)
                 {
@@ -192,8 +196,8 @@ namespace MyHostel_BackEnd.Controllers
                     .Include(h => h.NearbyFacilities)
                     .Include(h => h.HostelAmenities)
                     .Include(h => h.WardsCodeNavigation)
-                    .ThenInclude(w=>w.DistrictCodeNavigation)
-                    .ThenInclude(d=>d.ProvinceCodeNavigation)
+                    .ThenInclude(w => w.DistrictCodeNavigation)
+                    .ThenInclude(d => d.ProvinceCodeNavigation)
                     .Where(h => h.Id == id).FirstOrDefaultAsync();
                 if (hostel != null)
                 {
@@ -310,7 +314,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     int RoomNo = 0;
                     int ResidentNo = 0;
-                    int AvailableRooms=0;
+                    int AvailableRooms = 0;
                     string ImgUrl = "";
                     if (rooms.Where(r => r.HostelId == hostel.Id).Any())
                     {
@@ -325,8 +329,8 @@ namespace MyHostel_BackEnd.Controllers
                         ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
                     }
                     var roomsInHostel = _context.Rooms.Where(r => r.HostelId == hostel.Id).ToList();
-                    
-                    foreach(var room in roomsInHostel)
+
+                    foreach (var room in roomsInHostel)
                     {
                         if (CountResidentInRoom(room) < int.Parse(hostel.Capacity))
                         {
@@ -341,9 +345,9 @@ namespace MyHostel_BackEnd.Controllers
                             Name = hostel.Name,
                             RoomNo = RoomNo,
                             ImgUrl = ImgUrl,
-                            Status=hostel.Status,
-                            ResidentNo=ResidentNo,
-                            AvailableRooms=AvailableRooms
+                            Status = hostel.Status,
+                            ResidentNo = ResidentNo,
+                            AvailableRooms = AvailableRooms
                         }
                     );
                 }
@@ -442,13 +446,28 @@ namespace MyHostel_BackEnd.Controllers
         public async Task<IActionResult> SearchNearbyHostel(
             [FromQuery] string? provinceCode,
             [FromQuery] string? userLocationLat,
-            [FromQuery] string? userLocationLng
+            [FromQuery] string? userLocationLng,
+            [FromQuery] int? pageIndex,
+            [FromQuery] int? pageSize
             )
         {
             try
             {
-                var hostels = await _context.Hostels.Include(h=>h.HostelImages).Include(h => h.WardsCodeNavigation).ThenInclude(w => w.DistrictCodeNavigation)
-                    .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode)).ToListAsync();
+                if (pageIndex == null || pageIndex <= 0)
+                {
+                    pageIndex = 1;
+                }
+                if (pageSize == null || pageSize <= 0)
+                {
+                    pageSize = 6;
+                }
+                IQueryable<Hostel> hostels = from h 
+                                             in _context.Hostels
+                                             .Include(h => h.HostelImages)
+                                             .Include(h => h.WardsCodeNavigation)
+                                             .ThenInclude(w => w.DistrictCodeNavigation)
+                                             .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode))
+                                             select h;
                 if (userLocationLat != null && userLocationLng != null && !userLocationLat.Equals("") && !userLocationLng.Equals(""))
                 {
                     foreach (var hostel in hostels)
@@ -459,15 +478,15 @@ namespace MyHostel_BackEnd.Controllers
                             Double.Parse(hostel.GoogleLocationLnd));
                         if (distance > 2000)
                         {
-                            hostels.Remove(hostel);
+                            hostels = hostels.Where(h => h != hostel);
                         }
                     }
-                }     
-                
+                }
+                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), (int)pageIndex, (int)pageSize);
                 List<NearbyHostelReponse> reponses = new List<NearbyHostelReponse>();
-                foreach (var hostel in hostels)
+                foreach (var hostel in hostelsPL)
                 {
-                    string ImgUrl = "";                  
+                    string ImgUrl = "";
                     if (hostel.HostelImages.FirstOrDefault() != null)
                     {
                         ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
@@ -616,8 +635,8 @@ namespace MyHostel_BackEnd.Controllers
             string result1 = "";
             if (result >= 1000 && result < 1000000)
             {
-                result = result/1000;
-                result1 = result.ToString()+"K";
+                result = result / 1000;
+                result1 = result.ToString() + "K";
             }
             else if (price >= 1000000)
             {
@@ -630,6 +649,107 @@ namespace MyHostel_BackEnd.Controllers
         {
             var residents = _context.Residents.Where(r => r.RoomId == room.Id).ToList();
             return residents.Count();
+        }
+        [HttpPut("{id}/inspect")]
+        public async Task<ActionResult> UpdateStatus(int id, [FromBody] UpdateStatusDTO status)
+        {
+            try
+            {
+                var hostel = _context.Hostels.Where(h => h.Id == id).SingleOrDefault();
+                if (hostel == null)
+                {
+                    return BadRequest("Hostel not exist");
+                }
+                else
+                {
+                    hostel.Status = status.Status;
+                }
+                
+                _context.Hostels.Update(hostel);
+                await _context.SaveChangesAsync();
+
+                return Ok("Update inspect success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPut("{id}")]
+        public async Task<ActionResult> UpdateHostel(int id, [FromBody] UpdateHostelDTO updateHostelDTO)
+        {
+            try
+            {
+                var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+                if (hostel == null)
+                {
+                    return BadRequest("Hostel not exist");
+                }
+                else
+                {
+                    hostel.Name = updateHostelDTO.Name;
+                    hostel.Price = updateHostelDTO.Price;
+                    hostel.Capacity = updateHostelDTO.Capacity;
+                    hostel.DetailLocation = updateHostelDTO.DetailLocation;
+                    hostel.WardsCode = updateHostelDTO.WardsCode;
+                    hostel.Phone = updateHostelDTO.Phone;
+                    hostel.Description = updateHostelDTO.Description;
+                    hostel.RoomArea = updateHostelDTO.RoomArea;
+                    hostel.Electricity = updateHostelDTO.Electricity;
+                    hostel.Water = updateHostelDTO.Water;
+                    hostel.Internet = updateHostelDTO.Internet;
+                }
+                _context.Hostels.Update(hostel);
+                await _context.SaveChangesAsync();
+                var amenities = await _context.HostelAmenities.Where(h => h.HostedId == id).ToListAsync();
+                foreach (var amenity in amenities)
+                {
+                    _context.HostelAmenities.Remove(amenity);
+                }
+                await _context.SaveChangesAsync();
+                var amenityIdList = new List<string>(updateHostelDTO.Amenities.Trim().Split(' '));
+                foreach (var amenityId in amenityIdList)
+                {
+                    var amenity = _context.Amenities.SingleOrDefault(a => a.Id == int.Parse(amenityId));
+                    if (amenity != null)
+                    {
+                        HostelAmenity hostelAmenity = new HostelAmenity
+                        {
+                            HostedId = hostel.Id,
+                            AmenitiesId = int.Parse(amenityId)
+
+                        };
+                        _context.HostelAmenities.Add(hostelAmenity);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                var images = await _context.HostelImages.Where(h => h.HostelId == id).ToListAsync();
+                foreach(var image in updateHostelDTO.ImagesUrl.deleted)
+                {
+                    var deletedImage = images.Where(i => i.ImageUrl.Equals(image)).FirstOrDefault();
+                    if(deletedImage != null)
+                    {
+                        _context.HostelImages.Remove(deletedImage);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                foreach (string image in updateHostelDTO.ImagesUrl.added)
+                {
+                    HostelImage hostelImage = new HostelImage
+                    {
+                        HostelId = hostel.Id,
+                        ImageUrl = image
+
+                    };
+                    _context.HostelImages.Add(hostelImage);
+                    _context.SaveChanges();
+                }
+                return Ok("Update hostel success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }
