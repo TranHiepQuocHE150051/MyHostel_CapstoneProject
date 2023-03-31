@@ -237,6 +237,7 @@ namespace MyHostel_BackEnd.Controllers
                     result.ProvinceCode = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCode;
                     result.ProvinceName = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.FullName;
                     result.RoomArea = hostel.RoomArea;
+                    result.Capacity = hostel.Capacity;
                     result.Rooms = (await _context.Rooms.Where(h => h.HostelId == result.Id).CountAsync()).ToString();
                     result.Description = hostel.Description;
                     result.Price = priceConvert == 0 ? string.Format("{0:0.##}", hostel.Price) : replaceString(hostel.Price);

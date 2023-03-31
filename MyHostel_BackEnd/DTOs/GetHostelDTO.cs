@@ -15,6 +15,7 @@
         public string ProvinceCode { get; set; } = null!;
         public string ProvinceName { get; set; } = null!;
         public string Rooms { get; set; } = null!;
+        public string Capacity { get; set; } = null!;
         public string RoomArea { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string Price { get; set; } = null!;
