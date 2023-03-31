@@ -184,7 +184,7 @@ namespace MyHostel_BackEnd.Controllers
             }
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult> GetHostel(int id)
+        public async Task<ActionResult> GetHostel(int id, [FromQuery] int? priceConvert)
         {
             try
             {
@@ -234,10 +234,10 @@ namespace MyHostel_BackEnd.Controllers
                     result.ProvinceName = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.FullName;
                     result.RoomArea = hostel.RoomArea;
                     result.Description = hostel.Description;
-                    result.Price = replaceString(hostel.Price);
-                    result.Electricity = replaceString(hostel.Electricity);
-                    result.Water = replaceString(hostel.Water);
-                    result.Internet = replaceString(hostel.Internet);
+                    result.Price = priceConvert == 0 ? string.Format("{0:0.##}", hostel.Price) : replaceString(hostel.Price);
+                    result.Electricity = priceConvert == 0 ? string.Format("{0:0.##}", hostel.Electricity) : replaceString(hostel.Electricity);
+                    result.Water = priceConvert == 0 ? string.Format("{0:0.##}", hostel.Water) : replaceString(hostel.Water);
+                    result.Internet = priceConvert == 0 ? string.Format("{0:0.##}", hostel.Internet) : replaceString(hostel.Internet);
                     var lanlord = _context.Members.Where(l => l.Id == hostel.LandlordId).SingleOrDefault();
                     result.Landlord = new LandlordGetHostelDTO
                     {
