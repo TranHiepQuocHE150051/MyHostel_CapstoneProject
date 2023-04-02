@@ -1,0 +1,108 @@
+﻿@page
+@model MyHostel_Admin.Pages.Admin_Page.Hostels.DetailModel
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="page-breadcrumb">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
+                    <li class="breadcrumb-item active" aria-current="page">Person</li>
+                </ol>
+            </nav>
+            <h1 class="mb-0 fw-bold">Hostel Detail Management</h1>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                Id
+                            </th>
+                            <th scope="col">
+                                Name
+                            </th>
+                            <th scope="col">
+                                Price
+                            </th>
+                            <th scope="col">
+                                Room Capacity
+                            </th>
+                            <th scope="col">
+                                Description
+                            </th>
+                            <th scope="col">
+                                Room Area
+                            </th>
+                            <th scope="col">
+                                Electric
+                            </th>
+                            <th scope="col">
+                                Water
+                            </th>
+                            <th scope="col">
+                                Internet
+                            </th>
+                            <th scope="col">
+                                Room
+                            </th>
+                            <th scope="col">
+                                Resident
+                            </th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                <th scope="row">
+                                    @Html.DisplayFor(modelItem => Model.Hostel.Id)
+                                </th>
+                                <td>
+                                @Html.DisplayFor(modelItem => Model.Hostel.Name)
+                                </td>
+                                <td>
+                                @Html.DisplayFor(modelItem => (Model.Hostel.Price))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => (Model.Hostel.Capacity))
+                                </td>
+                                <td>
+                                @Html.DisplayFor(modelItem => (Model.Hostel.Description))
+                                </td>
+                                <td>
+                                @Html.DisplayFor(modelItem => (Model.Hostel.RoomArea))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => (Model.Hostel.Electricity))
+                                </td>
+                                <td>
+                                @Html.DisplayFor(modelItem => (Model.Hostel.Water))
+                                </td>
+                                <td>
+                                @Html.DisplayFor(modelItem => (Model.Hostel.Internet))
+                                </td>
+                                <td>
+                                <a asp-page="/Admin_Page/Hostels/Rooms" asp-route-id="@Model.Hostel.Id">Details</a>
+                                </td>
+                                <td>
+                                <a asp-page="/Admin_Page/Hostels/Residents" asp-route-id="@Model.Hostel.Id">Details</a>
+                                </td>
+                            </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>

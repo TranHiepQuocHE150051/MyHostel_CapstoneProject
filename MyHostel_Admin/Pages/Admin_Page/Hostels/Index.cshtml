@@ -1,0 +1,156 @@
+﻿@page
+@model MyHostel_Admin.Pages.Admin_Page.Hostels.IndexModel
+@{Layout = "_LayoutAdmin";
+}
+
+<div class="page-breadcrumb">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
+                    <li class="breadcrumb-item active" aria-current="page">Person</li>
+                </ol>
+            </nav>
+            <h1 class="mb-0 fw-bold">Hostel Management</h1>
+        </div>
+        <div class="col-6">
+            <div class="text-end upgrade-btn">
+                <a asp-page="Create" class="btn btn-primary text-white">Create New</a>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <form asp-page="./Index" method="get" class="col-8">
+            <div class="form-actions no-color">
+                <p>
+                    <input style="width:70%" type="text" name="searchString" value="@Model.CurrentFilter" class="btn btn-outline-primary" placeholder="Enter Hostel's name" />
+                    @*<input type="hidden" name="currentGender" value="@Model.CurrentGender" />
+                    <input type="hidden" name="currentType" value="@Model.CurrentType" />*@
+                    <input style="width:20%" type="submit" value="Search" class="btn btn-primary" />
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                Id
+                            </th>
+                            <th scope="col">
+                                Name
+                            </th>
+                            <th scope="col">
+                                Ward
+                            </th>
+                            <th scope="col">
+                                Phone
+                            </th>
+                            <th scope="col">
+                                Landlord
+                            </th>
+                            <th scope="col">
+                                Location
+                            </th>
+                            <th scope="col">
+                                Status
+                            </th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Hostel)
+                        {
+                            <tr>
+                                <th scope="row">
+                                    @Html.DisplayFor(modelItem => item.Id)
+                                </th>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => (item.WardsCodeNavigation.Name))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => (item.Phone))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => (item.Landlord.FirstName)) @Html.DisplayFor(modelItem => (item.Landlord.LastName))
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => (item.DetailLocation))
+                                </td>
+                                <td>
+                                    @{
+                                        var typeOfUser = "";
+                                        @if(item.Status == 2){
+                                            typeOfUser = "Canceled";
+                                        }
+                                        @if (item.Status == 1)
+                                        {
+                                            typeOfUser = "Approved";
+                                        }
+                                        @if(item.Status == 0){
+                                            typeOfUser = "Pending";
+                                        }
+                                        //var typeOfUser = item.RoleId == 3 ? "Admin" : item.RoleId == 2 ? "Member" : item.RoleId == 1 ? "Member";
+                                    } @typeOfUser
+                                </td>
+                                <td>
+                                    <a asp-page="./Detail" asp-route-id="@item.Id">Details</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @{
+        var prevDisabled = !Model.Hostel.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.Hostel.HasNextPage ? "disabled" : "";
+    }
+    <div class="text-center mt-3">
+        <a asp-page="./Index"
+           asp-route-pageIndex="1"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @prevDisabled">
+            First page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.Hostel.PageIndex - 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @prevDisabled">
+            Previous page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.Hostel.PageIndex + 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @nextDisabled">
+            Next page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.Hostel.TotalPages)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @nextDisabled">
+            Last page
+        </a>
+    </div>
+    <div class="text-center mt-3">
+        <p>Page: @Model.Hostel.PageIndex / @Model.Hostel.TotalPages</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>

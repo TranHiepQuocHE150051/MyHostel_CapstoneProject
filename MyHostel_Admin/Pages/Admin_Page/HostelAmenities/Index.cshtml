@@ -1,0 +1,104 @@
+﻿@page
+@model MyHostel_Admin.Pages.Admin_Page.HostelAmenities.IndexModel
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="page-breadcrumb">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
+                    <li class="breadcrumb-item active" aria-current="page">Genre</li>
+                </ol>
+            </nav>
+            <h1 class="mb-0 fw-bold">Hostel Amenity Management</h1>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <form asp-page="./Index" method="get" class="col-9">
+            <div class="form-actions no-color">
+                <p>
+                    <input style="width:70%" type="text" name="searchString" value="@Model.CurrentFilter" class="btn btn-outline-primary" placeholder="Enter genres's name" />
+                    <input style="width:20%" type="submit" value="Search" class="btn btn-primary" />
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                Id
+                            </th>
+                            <th scope="col">
+                                Hostel Name
+                            </th>
+                            <th scope="col">
+                                Amenity Name
+                            </th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.HostelAmenity)
+                        {
+                            <tr>
+                                <th scope="row">
+                                    @Html.DisplayFor(modelItem => item.Id)
+                                </th>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Hosted.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Amenities.AmenitiyName)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @{
+        var prevDisabled = !Model.HostelAmenity.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HostelAmenity.HasNextPage ? "disabled" : "";
+    }
+    <div class="text-center mt-3">
+        <a asp-page="./Index"
+           asp-route-pageIndex="1"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           class="btn btn-primary @prevDisabled">
+            First page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.HostelAmenity.PageIndex - 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           class="btn btn-primary @prevDisabled">
+            Previous page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.HostelAmenity.PageIndex + 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           class="btn btn-primary @nextDisabled">
+            Next page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.HostelAmenity.TotalPages)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           class="btn btn-primary @nextDisabled">
+            Last page
+        </a>
+    </div>
+    <div class="text-center mt-3">
+        <p>Page: @Model.HostelAmenity.PageIndex / @Model.HostelAmenity.TotalPages</p>
+    </div>
+</div>
+

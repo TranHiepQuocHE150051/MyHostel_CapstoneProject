@@ -1,0 +1,138 @@
+﻿@page
+@model MyHostel_Admin.Pages.Admin_Page.Members.IndexModel
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="page-breadcrumb">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
+                    <li class="breadcrumb-item active" aria-current="page">Person</li>
+                </ol>
+            </nav>
+            <h1 class="mb-0 fw-bold">Members Management</h1>
+        </div>
+        <div class="col-6">
+            <div class="text-end upgrade-btn">
+                <a asp-page="Create" class="btn btn-primary text-white">Create New</a>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <form asp-page="./Index" method="get" class="col-8">
+            <div class="form-actions no-color">
+                <p>
+                    <input style="width:70%" type="text" name="searchString" value="@Model.CurrentFilter" class="btn btn-outline-primary" placeholder="Enter Member's name" />
+                    <input style="width:20%" type="submit" value="Search" class="btn btn-primary" />
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                Id
+                            </th>
+                            <th scope="col">
+                                Fullname
+                            </th>
+                            <th scope="col">
+                                Avatar
+                            </th>
+                            <th scope="col">
+                                Role
+                            </th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Member)
+                        {
+                            <tr>
+                                <th scope="row">
+                                    @Html.DisplayFor(modelItem => item.Id)
+                                </th>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
+                                </td>
+                                <td>
+                                    <img src="item.Avatar" />
+                                </td>
+                                <td>
+                                    @{
+                                        var typeOfUser = "";
+                                        @if (item.RoleId == 3)
+                                        {
+                                            typeOfUser = "Admin";
+                                        }
+                                        @if (item.RoleId == 2)
+                                        {
+                                            typeOfUser = "Landlord";
+                                        }
+                                        @if (item.RoleId == 1)
+                                        {
+                                            typeOfUser = "Resident";
+                                        }
+                                    } @typeOfUser
+                                </td>
+                                <td>
+                                    <a asp-page="./Edit" asp-route-id="@item.Id">Details</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @{
+        var prevDisabled = !Model.Member.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.Member.HasNextPage ? "disabled" : "";
+    }
+    <div class="text-center mt-3">
+        <a asp-page="./Index"
+           asp-route-pageIndex="1"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @prevDisabled">
+            First page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.Member.PageIndex - 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @prevDisabled">
+            Previous page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.Member.PageIndex + 1)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @nextDisabled">
+            Next page
+        </a>
+        <a asp-page="./Index"
+           asp-route-pageIndex="@(Model.Member.TotalPages)"
+           asp-route-currentFilter="@Model.CurrentFilter"
+           asp-route-currentType="@Model.CurrentType"
+           class="btn btn-primary @nextDisabled">
+            Last page
+        </a>
+    </div>
+    <div class="text-center mt-3">
+        <p>Page: @Model.Member.PageIndex / @Model.Member.TotalPages</p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>

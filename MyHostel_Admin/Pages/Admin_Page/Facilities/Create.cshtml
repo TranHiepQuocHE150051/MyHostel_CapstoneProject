@@ -1,0 +1,45 @@
+﻿@page
+@model MyHostel_Admin.Pages.Admin_Page.Facilities.CreateModel
+@{
+    Layout = "_LayoutAdmin";
+}
+<div class="page-breadcrumb">
+    <div class="row align-items-center">
+        <div class="col-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 d-flex align-items-center">
+                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
+                    <li class="breadcrumb-item" aria-current="page">Genre</li>
+                    <li class="breadcrumb-item active" aria-current="page">Create Genre</li>
+                </ol>
+            </nav>
+            <h1 class="mb-0 fw-bold">Create Facility</h1>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-body">
+            <form class="form-horizontal form-material mx-2" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Facility.UtilityName" class="col-md-12"></label>
+                    <div class="col-md-12">
+                        <input asp-for="Facility.UtilityName" type="text"
+                               class="form-control form-control-line">
+                    </div>
+                    <span asp-validation-for="Facility.UtilityName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <input type="submit" value="Save" class="btn btn-success text-white" />
+                    </div>
+                </div>
+                @if (ViewBag.Alert != null)
+                {
+                    <span class="text-danger mb-3">@ViewBag.Alert</span>
+                }
+            </form>
+        </div>
+    </div>
+</div>
