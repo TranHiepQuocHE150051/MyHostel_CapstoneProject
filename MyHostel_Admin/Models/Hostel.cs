@@ -12,6 +12,7 @@ namespace MyHostel_Admin.Models
             HostelImages = new HashSet<HostelImage>();
             NearbyFacilities = new HashSet<NearbyFacility>();
             Residents = new HashSet<Resident>();
+            Rooms = new HashSet<Room>();
         }
 
         public int Id { get; set; }
@@ -39,5 +40,6 @@ namespace MyHostel_Admin.Models
         public virtual ICollection<HostelImage> HostelImages { get; set; }
         public virtual ICollection<NearbyFacility> NearbyFacilities { get; set; }
         public virtual ICollection<Resident> Residents { get; set; }
+        public virtual ICollection<Room> Rooms { get; set; }
     }
 }
