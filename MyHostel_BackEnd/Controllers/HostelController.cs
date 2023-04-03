@@ -526,13 +526,33 @@ namespace MyHostel_BackEnd.Controllers
         [HttpPost("{id}/resident")]
         public async Task<ActionResult> AddResident(int id, [FromBody] AddResidentRequest resident)
         {
+            if (resident.InviteCode == null || resident.RoomId == 0)
+            {
+                return Ok(new
+                {
+                    IsSuccess = false
+                });
+            }
             var hostel = _context.Hostels.Where(h => h.Id == id).SingleOrDefault();
             if (hostel == null)
             {
-                return BadRequest("Hostel not exist");
+                //return BadRequest("Hostel not exist");
+                return Ok(new
+                {
+                    IsSuccess = false
+                });
             }
             else
             {
+                var lanlord = _context.Members.Where(m => m.Id == hostel.LandlordId).SingleOrDefault();
+                if (resident.InviteCode.Trim().Equals(lanlord.InviteCode.Trim()))
+                {
+                    return Ok(new
+                    {
+                        IsSuccess = false
+                    });
+                }
+
                 bool RoomInHostel = false;
                 var rooms = _context.Rooms.Where(r => r.HostelId == id).ToList();
                 foreach (var room in rooms)
@@ -543,27 +563,50 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     if (CountResidentInRoom(room) >= int.Parse(hostel.Capacity))
                     {
-                        return BadRequest("Room is full");
+                        //return BadRequest("Room is full");
+                        return Ok(new
+                        {
+                            IsSuccess = false
+                        });
                     }
                 }
                 if (!RoomInHostel)
                 {
-                    return BadRequest("Room is not in hostel");
+                    //return BadRequest("Room is not in hostel");
+                    return Ok(new
+                    {
+                        IsSuccess = false
+                    });
                 }
             }
 
 
-            var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
+            var member = _context.Members.Where(m => m.InviteCode.Trim().Equals(resident.InviteCode.Trim())).SingleOrDefault();
             if (member == null)
             {
-                return BadRequest("Account not exist");
+                //return BadRequest("Account not exist");
+                return Ok(new
+                {
+                    IsSuccess = false
+                });
             }
+            var residents = _context.Residents.ToList();
+            foreach(var item in residents)
+            {
+                if (item.MemberId == member.Id)
+                {
+                    return Ok(new
+                    {
+                        IsSuccess = false
+                    });
+                }
+            }   
             try
             {
                 Resident resident1 = new Resident
                 {
                     HostelId = id,
-                    MemberId = resident.MemberId,
+                    MemberId = member.Id,
                     RoomId = resident.RoomId,
                     ActiveFlg = 1,
                     Rate = 0,
@@ -573,11 +616,18 @@ namespace MyHostel_BackEnd.Controllers
                 _context.Residents.Add(resident1);
                 await _context.SaveChangesAsync();
 
-                return Ok("Add new resident success");
+                //return Ok("Add new resident success");
+                return Ok(new
+                {
+                    IsSuccess = true
+                });
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return Ok(new
+                {
+                    IsSuccess = false
+                });
             }
         }
         [HttpPost("{id}/transaction")]

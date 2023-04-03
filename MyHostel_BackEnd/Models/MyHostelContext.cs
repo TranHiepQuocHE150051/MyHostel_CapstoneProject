@@ -378,6 +378,12 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(255)
                     .HasColumnName("google_id");
 
+                entity.Property(e => e.InviteCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("inviteCode")
+                    .IsFixedLength();
+
                 entity.Property(e => e.LastName)
                     .HasMaxLength(255)
                     .HasColumnName("last_name");
@@ -616,6 +622,12 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
                     .HasColumnName("name");
+
+                entity.HasOne(d => d.Hostel)
+                    .WithMany(p => p.Rooms)
+                    .HasForeignKey(d => d.HostelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Rooms_Hostels");
             });
 
             modelBuilder.Entity<Transaction>(entity =>

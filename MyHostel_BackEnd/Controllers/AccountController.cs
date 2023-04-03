@@ -62,7 +62,8 @@ namespace MyHostel_BackEnd.Controllers
                             Avatar = account.AvatarURL,
                             CreatedAt = DateTime.Now,
                             RoleId = account.role,
-                            FcmToken = ""
+                            FcmToken = "",
+                            InviteCode=GenerateInviteCode()
                         };
                         await _context.Members.AddAsync(member);
                         if (await _context.SaveChangesAsync() > 0)
@@ -123,7 +124,8 @@ namespace MyHostel_BackEnd.Controllers
                             Avatar = account.AvatarURL,
                             CreatedAt = DateTime.Now,
                             RoleId = account.role,
-                            FcmToken= ""
+                            FcmToken= "",
+                            InviteCode = GenerateInviteCode()
                         };
                         await _context.Members.AddAsync(member);
                         if (await _context.SaveChangesAsync() > 0)
@@ -178,6 +180,13 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+        private string GenerateInviteCode()
+        {
+            Guid g = Guid.NewGuid();
+            string code = g.ToString();
+            string[] codes = code.Split("-");
+            return codes[0] +"-"+ codes[1];
         }
 
         private string GenerateJSONWebToken(IEnumerable<Claim> claims)
