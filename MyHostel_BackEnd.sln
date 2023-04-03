@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHostel_BackEnd", "MyHoste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHostel_Admin", "MyHostel_Admin\MyHostel_Admin.csproj", "{364E53D0-1473-405B-9FF5-42F3FF715B97}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHostel_Backend_UnitTest", "MyHostel_Backend_UnitTest\MyHostel_Backend_UnitTest.csproj", "{332272D3-29B0-4288-B072-8AD2A3E6534A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{364E53D0-1473-405B-9FF5-42F3FF715B97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{364E53D0-1473-405B-9FF5-42F3FF715B97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{364E53D0-1473-405B-9FF5-42F3FF715B97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{332272D3-29B0-4288-B072-8AD2A3E6534A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{332272D3-29B0-4288-B072-8AD2A3E6534A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{332272D3-29B0-4288-B072-8AD2A3E6534A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{332272D3-29B0-4288-B072-8AD2A3E6534A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -51,6 +51,10 @@ namespace MyHostel_BackEnd.Controllers
                                             .Include(h => h.WardsCodeNavigation) 
                                             select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
+                if (locationCode == null)
+                {
+                    return NotFound();
+                }
                 if (locationCode.Length == 5)
                 {
                     hostels = hostels.Where(h => h.WardsCode == locationCode);
@@ -93,7 +97,7 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 if (capacity != null)
                 {
-                    hostels = hostels.Where(h => Int32.Parse(h.Capacity) >= capacity);
+                    hostels = hostels.Where(h=> (int)(object)(h.Capacity.Trim()) >= capacity);
                 }
                 if (amenities != null)
                 {
@@ -236,8 +240,8 @@ namespace MyHostel_BackEnd.Controllers
                     result.DistricName = hostel.WardsCodeNavigation.DistrictCodeNavigation.FullName;
                     result.ProvinceCode = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCode;
                     result.ProvinceName = hostel.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.FullName;
-                    result.RoomArea = hostel.RoomArea;
-                    result.Capacity = hostel.Capacity;
+                    result.RoomArea = hostel.RoomArea.Trim();
+                    result.Capacity = hostel.Capacity.Trim();
                     result.Rooms = (await _context.Rooms.Where(h => h.HostelId == result.Id).CountAsync()).ToString();
                     result.Description = hostel.Description;
                     result.Price = priceConvert == 0 ? string.Format("{0:0.##}", hostel.Price) : replaceString(hostel.Price);

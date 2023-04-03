@@ -166,15 +166,36 @@ namespace MyHostel_BackEnd.Controllers
         }
 
         [HttpGet("member")]
-        public async Task<IActionResult> Member([FromQuery] int id)
+        public async Task<IActionResult> Member([FromQuery] int id,
+                                                 [FromQuery] string inviteCode   )
         {
             try
             {
-                var member = await _context.Members.Where(m => m.Id == id).FirstOrDefaultAsync();
-                if (member != null)
-                    return Ok(member);
+                if (id != 0) {
+                    var member = await _context.Members.Where(m => m.Id == id).FirstOrDefaultAsync();
+                    if (member != null)
+                        return Ok(new
+                        {
+                            MemberId = member.Id,
+                            Name = member.FirstName + " " + member.LastName,
+                            AvatarUrl = member.Avatar
+                        });                   
+                }
                 else
-                    return NotFound();
+                {
+                    var member = await _context.Members.Where(m => m.InviteCode.Trim().Equals(inviteCode)).FirstOrDefaultAsync();
+                    if (member != null)
+                        return Ok(new
+                        {
+                            MemberId = member.Id,
+                            Name = member.FirstName + " " + member.LastName,
+                            AvatarUrl = member.Avatar
+                        });
+
+
+                }
+                return NotFound();
+                
             }
             catch (Exception e)
             {
