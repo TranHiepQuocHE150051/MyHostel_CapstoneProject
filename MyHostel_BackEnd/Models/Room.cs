@@ -15,7 +15,6 @@ namespace MyHostel_BackEnd.Models
         public int HostelId { get; set; }
         public string Name { get; set; } = null!;
 
-        public virtual Hostel Hostel { get; set; } = null!;
         public virtual ICollection<Resident> Residents { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; }
     }

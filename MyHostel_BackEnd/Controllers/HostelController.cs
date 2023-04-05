@@ -46,10 +46,10 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     pageSize = 6;
                 }
-                IQueryable<Hostel> hostels= from h 
+                IQueryable<Hostel> hostels = from h
                                             in _context.Hostels
-                                            .Include(h => h.WardsCodeNavigation) 
-                                            select h;
+                                            .Include(h => h.WardsCodeNavigation)
+                                             select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
                 if (locationCode == null)
                 {
@@ -97,7 +97,7 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 if (capacity != null)
                 {
-                    hostels = hostels.Where(h=> (int)(object)(h.Capacity.Trim()) >= capacity);
+                    hostels = hostels.Where(h => (int)(object)(h.Capacity.Trim()) >= capacity);
                 }
                 if (amenities != null)
                 {
@@ -429,18 +429,19 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                var rooms = await _context.Rooms.Where(r => r.HostelId == id).Include(r=>r.Residents).ToListAsync();
+                var rooms = await _context.Rooms.Where(r => r.HostelId == id).Include(r => r.Residents).ToListAsync();
                 List<RoomDTO> result = new List<RoomDTO>();
                 foreach (var room in rooms)
                 {
                     List<ResidentDTO> residents = new List<ResidentDTO>();
                     RoomDTO room1 = new RoomDTO();
-                    room1.RoomId=room.Id;
+                    room1.RoomId = room.Id;
                     room1.Name = room.Name;
                     foreach (var resident in room.Residents)
                     {
                         var member = _context.Members.Where(m => m.Id == resident.MemberId).FirstOrDefault();
-                        if (member != null) {
+                        if (member != null)
+                        {
                             residents.Add(new ResidentDTO
                             {
                                 MemberId = member.Id,
@@ -448,9 +449,9 @@ namespace MyHostel_BackEnd.Controllers
                                 Avatar = member.Avatar
                             });
                         }
-                        
+
                     }
-                    room1.Residents= residents;
+                    room1.Residents = residents;
                     result.Add(room1);
                 }
                 return Ok(result);
@@ -480,7 +481,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     pageSize = 6;
                 }
-                IQueryable<Hostel> hostels = from h 
+                IQueryable<Hostel> hostels = from h
                                              in _context.Hostels
                                              .Include(h => h.HostelImages)
                                              .Include(h => h.WardsCodeNavigation)
@@ -597,7 +598,7 @@ namespace MyHostel_BackEnd.Controllers
                             Message = "Room is full"
                         });
                     }
-                }              
+                }
             }
 
 
@@ -612,12 +613,12 @@ namespace MyHostel_BackEnd.Controllers
                     Message = "Cannot find user"
                 });
             }
-            var residentInfo = _context.Residents.Where(r=> r.MemberId==member.Id && r.Status==1).SingleOrDefault();
+            var residentInfo = _context.Residents.Where(r => r.MemberId == member.Id && r.Status == 1).SingleOrDefault();
             if (residentInfo != null)
             {
-                if(residentInfo.HostelId == id)
+                if (residentInfo.HostelId == id)
                 {
-                    if(residentInfo.RoomId== resident.RoomId)
+                    if (residentInfo.RoomId == resident.RoomId)
                     {
                         return Ok(new
                         {
@@ -638,7 +639,7 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         IsSuccess = false,
                         IsInHostel = false,
-                        Message= "User is in another hostel"
+                        Message = "User is in another hostel"
                     });
                 }
             }
@@ -662,7 +663,7 @@ namespace MyHostel_BackEnd.Controllers
                 return Ok(new
                 {
                     IsSuccess = true,
-                    IsInHostel=false
+                    IsInHostel = false
                 });
             }
             catch (Exception e)
@@ -775,7 +776,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     hostel.Status = status.Status;
                 }
-                
+
                 _context.Hostels.Update(hostel);
                 await _context.SaveChangesAsync();
 
@@ -835,10 +836,10 @@ namespace MyHostel_BackEnd.Controllers
                     }
                 }
                 var images = await _context.HostelImages.Where(h => h.HostelId == id).ToListAsync();
-                foreach(var image in updateHostelDTO.ImagesUrl.deleted)
+                foreach (var image in updateHostelDTO.ImagesUrl.deleted)
                 {
                     var deletedImage = images.Where(i => i.ImageUrl.Equals(image)).FirstOrDefault();
-                    if(deletedImage != null)
+                    if (deletedImage != null)
                     {
                         _context.HostelImages.Remove(deletedImage);
                         await _context.SaveChangesAsync();
@@ -856,6 +857,118 @@ namespace MyHostel_BackEnd.Controllers
                     _context.SaveChanges();
                 }
                 return Ok("Update hostel success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPut("{id}/room")]
+        public async Task<ActionResult> UpdateRoomName(int id, [FromBody] UpdateRoomNameDTO updateRoomNameDTO)
+        {
+            try
+            {
+                var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+                if (hostel == null)
+                {
+                    return BadRequest("Hostel not exist");
+                }
+                var room = await _context.Rooms.Where(r => r.Id == updateRoomNameDTO.RoomId).SingleOrDefaultAsync();
+                if (room == null)
+                {
+                    return BadRequest("Room not exist");
+                }
+                room.Name = updateRoomNameDTO.Name;
+                _context.Rooms.Update(room);
+                await _context.SaveChangesAsync();
+                return Ok("Update room name success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost("{id}/room")]
+        public async Task<ActionResult> AddNewRoom(int id, [FromBody] AddNewRoomDTO addNewRoomDTO)
+        {
+            try
+            {
+                var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+                if (hostel == null)
+                {
+                    return BadRequest("Hostel not exist");
+                }
+                if (addNewRoomDTO.Name == null || addNewRoomDTO.Name == "")
+                {
+                    addNewRoomDTO.Name = "New room";
+                }
+                Room room = new Room
+                {
+                    HostelId = hostel.Id,
+                    Name = addNewRoomDTO.Name
+                };
+                _context.Rooms.Add(room);
+                await _context.SaveChangesAsync();
+                return Ok("Add new room success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPost("{id}/rooms/change")]
+        public async Task<ActionResult> ChangeRoom(int id, [FromBody] ChangeRoomDTO changeRoomDTO)
+        {
+            try
+            {
+                var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+                var member = await _context.Members.Where(m => m.Id == changeRoomDTO.MemberId).SingleOrDefaultAsync();
+                if (hostel == null)
+                {
+                    return BadRequest("Hostel not exist");
+                }
+                if (member == null)
+                {
+                    return BadRequest("Member not exist");
+                }
+                var fromRoom = await _context.Rooms.Where(fr => fr.Id == changeRoomDTO.FromRoomId 
+                && fr.HostelId == id).SingleOrDefaultAsync();
+                var toRoom = await _context.Rooms.Where(tr => tr.Id == changeRoomDTO.ToRoomId 
+                && tr.HostelId == id).SingleOrDefaultAsync();
+                if (fromRoom == null)
+                {
+                    return BadRequest("From room not exist");
+                }
+                if (toRoom == null)
+                {
+                    return BadRequest("To room not exist");
+                }
+                var checkInToRoomExist = await _context.Residents.Where(r => r.MemberId == changeRoomDTO.MemberId 
+                && r.RoomId == changeRoomDTO.ToRoomId && r.Status == 1).SingleOrDefaultAsync();
+                if (checkInToRoomExist != null)
+                {
+                    return BadRequest("You are in To Room");
+                }
+                var checkInFromRoomExist = await _context.Residents.Where(r => r.MemberId == changeRoomDTO.MemberId
+                && r.RoomId == changeRoomDTO.FromRoomId && r.Status == 1).SingleOrDefaultAsync();
+                if (checkInToRoomExist == null)
+                {
+                    return BadRequest("You are not in From Room");
+                }
+                checkInFromRoomExist.Status = 0;
+                _context.Residents.Update(checkInFromRoomExist);
+                Resident resident = new Resident
+                {
+                    HostelId = id,
+                    MemberId = changeRoomDTO.MemberId,
+                    RoomId = changeRoomDTO.ToRoomId,
+                    Status = 1,
+                    CreatedAt = DateTime.Now
+                };
+                _context.Residents.Add(resident);
+                await _context.SaveChangesAsync();
+                return Ok("Change room success");
             }
             catch (Exception e)
             {

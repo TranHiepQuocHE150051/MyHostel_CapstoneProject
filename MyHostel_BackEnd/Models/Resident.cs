@@ -12,6 +12,7 @@ namespace MyHostel_BackEnd.Models
         public byte Rate { get; set; }
         public string Comment { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
+        public int Id { get; set; }
 
         public virtual Hostel Hostel { get; set; } = null!;
         public virtual Member Member { get; set; } = null!;

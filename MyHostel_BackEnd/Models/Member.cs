@@ -23,7 +23,6 @@ namespace MyHostel_BackEnd.Models
         public DateTime CreatedAt { get; set; }
         public int RoleId { get; set; }
         public string FcmToken { get; set; } = null!;
-        public string? InviteCode { get; set; }
 
         public virtual Role Role { get; set; } = null!;
         public virtual ICollection<Hostel> Hostels { get; set; }
