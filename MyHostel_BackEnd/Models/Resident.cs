@@ -8,7 +8,7 @@ namespace MyHostel_BackEnd.Models
         public int HostelId { get; set; }
         public int MemberId { get; set; }
         public int RoomId { get; set; }
-        public byte ActiveFlg { get; set; }
+        public byte Status { get; set; }
         public byte Rate { get; set; }
         public string Comment { get; set; } = null!;
         public DateTime CreatedAt { get; set; }

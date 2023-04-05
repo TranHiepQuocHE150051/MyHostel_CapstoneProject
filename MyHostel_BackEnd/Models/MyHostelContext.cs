@@ -572,8 +572,6 @@ namespace MyHostel_BackEnd.Models
 
                 entity.Property(e => e.RoomId).HasColumnName("room_id");
 
-                entity.Property(e => e.ActiveFlg).HasColumnName("active_flg");
-
                 entity.Property(e => e.Comment)
                     .HasMaxLength(1000)
                     .HasColumnName("comment");
@@ -583,6 +581,8 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.Rate).HasColumnName("rate");
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Hostel)
                     .WithMany(p => p.Residents)

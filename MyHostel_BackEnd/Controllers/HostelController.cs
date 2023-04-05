@@ -534,7 +534,10 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return Ok(new
                 {
-                    IsSuccess = false
+                    IsSuccess = false,
+                    IsInHostel = false,
+                    Message = "invite Code not valid"
+
                 });
             }
             var hostel = _context.Hostels.Where(h => h.Id == id).SingleOrDefault();
@@ -543,7 +546,9 @@ namespace MyHostel_BackEnd.Controllers
                 //return BadRequest("Hostel not exist");
                 return Ok(new
                 {
-                    IsSuccess = false
+                    IsSuccess = false,
+                    IsInHostel = false,
+                    Message = "Hostel not exist"
                 });
             }
             else
@@ -553,7 +558,9 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return Ok(new
                     {
-                        IsSuccess = false
+                        IsSuccess = false,
+                        IsInHostel = false,
+                        Message = "This is landlord inviteCode"
                     });
                 }
 
@@ -565,23 +572,32 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         RoomInHostel = true;
                     }
-                    if (CountResidentInRoom(room) >= int.Parse(hostel.Capacity))
-                    {
-                        //return BadRequest("Room is full");
-                        return Ok(new
-                        {
-                            IsSuccess = false
-                        });
-                    }
+
                 }
                 if (!RoomInHostel)
                 {
                     //return BadRequest("Room is not in hostel");
                     return Ok(new
                     {
-                        IsSuccess = false
+                        IsSuccess = false,
+                        IsInHostel = false,
+                        Message = "Room is not in hostel"
                     });
                 }
+                Room requestRoom = _context.Rooms.Where(r => r.Id == resident.RoomId).SingleOrDefault();
+                if (requestRoom != null)
+                {
+                    if (CountResidentInRoom(requestRoom) >= int.Parse(hostel.Capacity.Trim()))
+                    {
+                        //return BadRequest("Room is full");
+                        return Ok(new
+                        {
+                            IsSuccess = false,
+                            IsInHostel = false,
+                            Message = "Room is full"
+                        });
+                    }
+                }              
             }
 
 
@@ -591,20 +607,42 @@ namespace MyHostel_BackEnd.Controllers
                 //return BadRequest("Account not exist");
                 return Ok(new
                 {
-                    IsSuccess = false
+                    IsSuccess = false,
+                    IsInHostel = false,
+                    Message = "Cannot find user"
                 });
             }
-            var residents = _context.Residents.ToList();
-            foreach(var item in residents)
+            var residentInfo = _context.Residents.Where(r=> r.MemberId==member.Id && r.Status==1).SingleOrDefault();
+            if (residentInfo != null)
             {
-                if (item.MemberId == member.Id)
+                if(residentInfo.HostelId == id)
+                {
+                    if(residentInfo.RoomId== resident.RoomId)
+                    {
+                        return Ok(new
+                        {
+                            IsSuccess = false,
+                            IsInHostel = true
+                        });
+
+                    }
+                    return Ok(new
+                    {
+                        IsSuccess = false,
+                        IsInHostel = true
+                    });
+                }
+                else
                 {
                     return Ok(new
                     {
-                        IsSuccess = false
+                        IsSuccess = false,
+                        IsInHostel = false,
+                        Message= "User is in another hostel"
                     });
                 }
-            }   
+            }
+
             try
             {
                 Resident resident1 = new Resident
@@ -612,7 +650,7 @@ namespace MyHostel_BackEnd.Controllers
                     HostelId = id,
                     MemberId = member.Id,
                     RoomId = resident.RoomId,
-                    ActiveFlg = 1,
+                    Status = 1,
                     Rate = 0,
                     Comment = "",
                     CreatedAt = DateTime.Now
@@ -623,14 +661,17 @@ namespace MyHostel_BackEnd.Controllers
                 //return Ok("Add new resident success");
                 return Ok(new
                 {
-                    IsSuccess = true
+                    IsSuccess = true,
+                    IsInHostel=false
                 });
             }
             catch (Exception e)
             {
                 return Ok(new
                 {
-                    IsSuccess = false
+                    IsSuccess = false,
+                    IsInHostel = false,
+                    Message = e.Message
                 });
             }
         }
@@ -717,6 +758,7 @@ namespace MyHostel_BackEnd.Controllers
         private int CountResidentInRoom(Room room)
         {
             var residents = _context.Residents.Where(r => r.RoomId == room.Id).ToList();
+            residents = residents.Where(r => r.Status == 1).ToList();
             return residents.Count();
         }
         [HttpPut("{id}/inspect")]
