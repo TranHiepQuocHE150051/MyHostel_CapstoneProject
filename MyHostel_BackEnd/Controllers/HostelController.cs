@@ -1,6 +1,7 @@
 ﻿using GoogleApi.Entities.Maps.Common;
 using GoogleApi.Entities.Maps.Directions.Request;
 using GoogleApi.Entities.Search.Common;
+using GoogleApi.Entities.Search.Video.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -944,17 +945,23 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("To room not exist");
                 }
+
+                if(CountResidentInRoom(toRoom)>= int.Parse(hostel.Capacity.Trim()))
+                {
+                    return BadRequest("To room is full");
+                }
                 var checkInToRoomExist = await _context.Residents.Where(r => r.MemberId == changeRoomDTO.MemberId 
                 && r.RoomId == changeRoomDTO.ToRoomId && r.Status == 1).SingleOrDefaultAsync();
                 if (checkInToRoomExist != null)
                 {
-                    return BadRequest("You are in To Room");
+                    return BadRequest("User is already in To Room");
                 }
+                
                 var checkInFromRoomExist = await _context.Residents.Where(r => r.MemberId == changeRoomDTO.MemberId
                 && r.RoomId == changeRoomDTO.FromRoomId && r.Status == 1).SingleOrDefaultAsync();
-                if (checkInToRoomExist == null)
+                if (checkInFromRoomExist == null)
                 {
-                    return BadRequest("You are not in From Room");
+                    return BadRequest("User is not in From Room");
                 }
                 checkInFromRoomExist.Status = 0;
                 _context.Residents.Update(checkInFromRoomExist);
@@ -964,6 +971,8 @@ namespace MyHostel_BackEnd.Controllers
                     MemberId = changeRoomDTO.MemberId,
                     RoomId = changeRoomDTO.ToRoomId,
                     Status = 1,
+                    Rate = 0,
+                    Comment = "",
                     CreatedAt = DateTime.Now
                 };
                 _context.Residents.Add(resident);
@@ -974,6 +983,78 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+        [HttpDelete("{id}/room")]
+        public async Task<ActionResult> DeleteRoom(int id, [FromBody] DeleteRoomDTO deleteRoom)
+        {
+            var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+            if (hostel == null)
+            {
+                return BadRequest("Hostel not exist");
+            }
+            var room = await _context.Rooms.Where(r => r.Id == deleteRoom.RoomId).SingleOrDefaultAsync();
+            if (room == null)
+            {
+                return BadRequest("Room not exist");
+            }
+            if (!IsRoomInHostel(room, hostel))
+            {
+                return BadRequest("Room is not in hostel");
+            }
+            var residents =_context.Residents.Where(r=> r.HostelId == id && r.RoomId==deleteRoom.RoomId ).ToList();
+            if (residents.Count > 0)
+            {
+                return BadRequest("Cannot delete this room");
+            }          
+            _context.Rooms.Remove(room);
+            if (_context.SaveChanges() > 0)
+            {
+                return Ok("Delete room successfully");
+            }
+            return BadRequest("Cannot delete this room");
+        }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteHostel (int id)
+        {
+            var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+            if (hostel == null)
+            {
+                return BadRequest("Hostel not exist");
+            }
+            hostel.Status = 3;
+            _context.Hostels.Update(hostel);
+            var residents = _context.Residents.Where(r => r.HostelId == id).ToList();
+            if (residents.Count() > 0)
+            {
+                foreach(var resident in residents)
+                {
+                    if (resident.Status == 1)
+                    {
+                        resident.Status = 2;
+                        _context.Residents.Update(resident);
+                    }
+                    
+                }
+            }
+            if (_context.SaveChanges() > 0)
+            {
+                return Ok("Delete hostel successfully");
+            }
+            return BadRequest("Cannot delete this hostel");
+        }
+        private bool IsRoomInHostel(Room RoomCheck, Hostel HostelCheck)
+        {
+            bool RoomInHostel = false;
+            var rooms = _context.Rooms.Where(r => r.HostelId == HostelCheck.Id).ToList();
+            foreach (var room in rooms)
+            {
+                if (RoomCheck.Id == room.Id)
+                {
+                    RoomInHostel = true;
+                }
+
+            }
+            return RoomInHostel;
         }
     }
 }

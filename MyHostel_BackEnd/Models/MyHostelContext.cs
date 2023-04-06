@@ -40,11 +40,11 @@ namespace MyHostel_BackEnd.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("server=(local); database=MyHostel;uid=sa;pwd=123456;");
-            }
+            var builder = new ConfigurationBuilder()
+                 .SetBasePath(Directory.GetCurrentDirectory())
+                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfigurationRoot configuration = builder.Build();
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("MyDB"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -378,6 +378,12 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(255)
                     .HasColumnName("google_id");
 
+                entity.Property(e => e.InviteCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("inviteCode")
+                    .IsFixedLength();
+
                 entity.Property(e => e.LastName)
                     .HasMaxLength(255)
                     .HasColumnName("last_name");
@@ -616,6 +622,12 @@ namespace MyHostel_BackEnd.Models
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
                     .HasColumnName("name");
+
+                entity.HasOne(d => d.Hostel)
+                    .WithMany(p => p.Rooms)
+                    .HasForeignKey(d => d.HostelId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Rooms_Hostels");
             });
 
             modelBuilder.Entity<Transaction>(entity =>
