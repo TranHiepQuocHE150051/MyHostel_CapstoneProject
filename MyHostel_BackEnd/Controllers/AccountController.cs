@@ -101,6 +101,7 @@ namespace MyHostel_BackEnd.Controllers
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim(ClaimTypes.Name,  acc.Id.ToString()),
+                        new Claim("Id",  acc.Id.ToString()),
                         new Claim("GoogleId", acc.GoogleId.ToString()),
                         new Claim("Fname", acc.FirstName.ToString()),
                         new Claim("Lname", acc.LastName.ToString()),
@@ -136,7 +137,7 @@ namespace MyHostel_BackEnd.Controllers
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("Id",  member.Id.ToString()),
-                        new Claim("FacebookId", member.GoogleId.ToString()),
+                        new Claim("GoogleId", member.GoogleId.ToString()),
                         new Claim("Fname", member.FirstName.ToString()),
                         new Claim("Lname", member.LastName.ToString()),
                         new Claim(ClaimTypes.Role, member.RoleId.ToString())
