@@ -2,7 +2,7 @@
 {
     public class ChangeRoomDTO
     {
-        public int MemberId { get; set; }
+        public string InviteCode { get; set; }
         public int FromRoomId { get; set; }
         public int ToRoomId { get; set; }
     }

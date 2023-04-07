@@ -440,13 +440,13 @@ namespace MyHostel_BackEnd.Controllers
                     room1.Name = room.Name;
                     foreach (var resident in room.Residents)
                     {
-                        var member = _context.Members.Where(m => m.Id == resident.MemberId).FirstOrDefault();
+                        var member = _context.Members.Where(m => m.Id == resident.MemberId && resident.Status == 1).FirstOrDefault();
                         if (member != null)
                         {
                             residents.Add(new ResidentDTO
                             {
                                 MemberId = member.Id,
-                                FullName = member.FirstName + member.LastName,
+                                FullName = member.FirstName+ " " + member.LastName,
                                 Avatar = member.Avatar
                             });
                         }
@@ -624,16 +624,16 @@ namespace MyHostel_BackEnd.Controllers
                         return Ok(new
                         {
                             IsSuccess = false,
-                            IsInHostel = true,
-                            RoomId= residentInfo.RoomId
+                            IsInHostel = true
                         });
-
                     }
+                    var roomInfo = _context.Rooms.Where(r => r.Id == residentInfo.RoomId).SingleOrDefault();
                     return Ok(new
                     {
                         IsSuccess = false,
                         IsInHostel = true,
-                        RoomId = residentInfo.RoomId
+                        RoomId= residentInfo.RoomId,
+                        RoomName = roomInfo.Name
                     });
                 }
                 else
@@ -936,7 +936,7 @@ namespace MyHostel_BackEnd.Controllers
             try
             {
                 var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
-                var member = await _context.Members.Where(m => m.Id == changeRoomDTO.MemberId).SingleOrDefaultAsync();
+                var member = await _context.Members.Where(m => m.InviteCode.Trim().Equals(changeRoomDTO.InviteCode.Trim())).SingleOrDefaultAsync();
                 if (hostel == null)
                 {
                     return BadRequest("Hostel not exist");
@@ -962,14 +962,14 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("To room is full");
                 }
-                var checkInToRoomExist = await _context.Residents.Where(r => r.MemberId == changeRoomDTO.MemberId 
+                var checkInToRoomExist = await _context.Residents.Where(r => r.MemberId == member.Id 
                 && r.RoomId == changeRoomDTO.ToRoomId && r.Status == 1).SingleOrDefaultAsync();
                 if (checkInToRoomExist != null)
                 {
                     return BadRequest("User is already in To Room");
                 }
                 
-                var checkInFromRoomExist = await _context.Residents.Where(r => r.MemberId == changeRoomDTO.MemberId
+                var checkInFromRoomExist = await _context.Residents.Where(r => r.MemberId == member.Id
                 && r.RoomId == changeRoomDTO.FromRoomId && r.Status == 1).SingleOrDefaultAsync();
                 if (checkInFromRoomExist == null)
                 {
@@ -980,7 +980,7 @@ namespace MyHostel_BackEnd.Controllers
                 Resident resident = new Resident
                 {
                     HostelId = id,
-                    MemberId = changeRoomDTO.MemberId,
+                    MemberId = member.Id,
                     RoomId = changeRoomDTO.ToRoomId,
                     Status = 1,
                     Rate = 0,
