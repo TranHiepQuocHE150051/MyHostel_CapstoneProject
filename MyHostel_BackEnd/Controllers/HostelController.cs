@@ -438,6 +438,8 @@ namespace MyHostel_BackEnd.Controllers
                     RoomDTO room1 = new RoomDTO();
                     room1.RoomId = room.Id;
                     room1.Name = room.Name;
+                    room1.Price = (decimal)room.Price;
+                    room1.RoomArea = (int)room.RoomArea;
                     foreach (var resident in room.Residents)
                     {
                         var member = _context.Members.Where(m => m.Id == resident.MemberId && resident.Status == 1).FirstOrDefault();
@@ -892,7 +894,18 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("Room not exist");
                 }
-                room.Name = updateRoomNameDTO.Name;
+                if (updateRoomNameDTO.Name != null)
+                {
+                    room.Name = updateRoomNameDTO.Name;
+                }
+                if (updateRoomNameDTO.Price != 0)
+                {
+                    room.Price = updateRoomNameDTO.Price;
+                }
+                if (updateRoomNameDTO.RoomArea != 0)
+                {
+                    room.RoomArea = updateRoomNameDTO.RoomArea;
+                }
                 _context.Rooms.Update(room);
                 await _context.SaveChangesAsync();
                 return Ok("Update room name success");
@@ -914,12 +927,22 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 if (addNewRoomDTO.Name == null || addNewRoomDTO.Name == "")
                 {
-                    addNewRoomDTO.Name = "New room";
+                    addNewRoomDTO.Name = hostel.Name + " " + "New room";
+                }
+                if (addNewRoomDTO.Price == 0)
+                {
+                    addNewRoomDTO.Price = hostel.Price;
+                }
+                if (addNewRoomDTO.RoomArea == 0)
+                {
+                    addNewRoomDTO.RoomArea = int.Parse(hostel.RoomArea);
                 }
                 Room room = new Room
                 {
                     HostelId = hostel.Id,
-                    Name = addNewRoomDTO.Name
+                    Name = addNewRoomDTO.Name,
+                    Price= addNewRoomDTO.Price,
+                    RoomArea = addNewRoomDTO.RoomArea
                 };
                 _context.Rooms.Add(room);
                 await _context.SaveChangesAsync();

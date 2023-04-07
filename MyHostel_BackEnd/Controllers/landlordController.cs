@@ -102,7 +102,10 @@ namespace MyHostel_BackEnd.Controllers
                     Room room = new Room
                     {
                         HostelId = hostel1.Id,
-                        Name = hostel.Name + " room " + i
+                        Name = hostel.Name + " room " + i,
+                        Price=hostel.Price,
+                        RoomArea = int.Parse(hostel.RoomArea)
+                        
 
                     };
                     _context.Rooms.Add(room);

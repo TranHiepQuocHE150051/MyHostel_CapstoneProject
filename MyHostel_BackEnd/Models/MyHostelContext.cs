@@ -623,6 +623,12 @@ namespace MyHostel_BackEnd.Models
                     .HasMaxLength(255)
                     .HasColumnName("name");
 
+                entity.Property(e => e.Price)
+                    .HasColumnType("money")
+                    .HasColumnName("price");
+
+                entity.Property(e => e.RoomArea).HasColumnName("room_Area");
+
                 entity.HasOne(d => d.Hostel)
                     .WithMany(p => p.Rooms)
                     .HasForeignKey(d => d.HostelId)
