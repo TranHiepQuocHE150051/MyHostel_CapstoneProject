@@ -14,6 +14,8 @@ namespace MyHostel_Admin.Models
         public int Id { get; set; }
         public int HostelId { get; set; }
         public string Name { get; set; } = null!;
+        public int? RoomArea { get; set; }
+        public decimal? Price { get; set; }
 
         public virtual Hostel Hostel { get; set; } = null!;
         public virtual ICollection<Resident> Residents { get; set; }

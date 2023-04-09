@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using MyHostel_Admin.Models;
 
 namespace MyHostel_Admin.Pages.Admin_Page.Hostels
@@ -15,6 +16,7 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
             Configuration = configuration;
         }
         public PaginatedList<Resident> Resident { get; set; }
+        public Hostel hostel { get; set; }
         public async Task<IActionResult> OnGetAsync(int? id, int? pageIndex)
         {
             if (HttpContext.Session.GetString("currentUser") == null)
@@ -37,13 +39,13 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
                     }
                 }
             }
-
+            hostel = context.Hostels.Where(h => h.Id == id).SingleOrDefault();
             IQueryable<Resident> personsIQ;
 
             personsIQ = from p in context.Residents
                         .Include(p => p.Member)
                         .Include(p => p.Room)
-                        where p.HostelId == id
+                        where p.HostelId == id && p.Status==1
                         select p;
 
             var pageSize = Configuration.GetValue("PageSize", 4);

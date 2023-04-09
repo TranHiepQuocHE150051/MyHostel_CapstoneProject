@@ -12,13 +12,13 @@
                         <i class="material-icons opacity-10">weekend</i>
                     </div>
                     <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Today's Rooms</p>
-                        <h4 class="mb-0">268</h4>
+                        <p class="text-sm mb-0 text-capitalize">Total Hostel</p>
+                        <h4 class="mb-0">@Model.TotalHostel</h4>
                     </div>
                 </div>
                 <hr class="dark horizontal my-0">
                 <div class="card-footer p-3">
-                    <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+55% </span>than last week</p>
+                    <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+@Model.hostelDiff.ToString("#.##")% </span>than last month</p>
                 </div>
             </div>
         </div>
@@ -29,13 +29,13 @@
                         <i class="material-icons opacity-10">person</i>
                     </div>
                     <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Total's Members</p>
-                        <h4 class="mb-0">2,300</h4>
+                        <p class="text-sm mb-0 text-capitalize">Total Users</p>
+                        <h4 class="mb-0">@Model.TotalUser</h4>
                     </div>
                 </div>
                 <hr class="dark horizontal my-0">
                 <div class="card-footer p-3">
-                    <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+3% </span>than last month</p>
+                    <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+@Model.userDiff </span>than last month</p>
                 </div>
             </div>
         </div>
@@ -46,13 +46,13 @@
                         <i class="material-icons opacity-10">person</i>
                     </div>
                     <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Total's Money</p>
-                        <h4 class="mb-0">3,462</h4>
+                        <p class="text-sm mb-0 text-capitalize">Total Residents</p>
+                        <h4 class="mb-0">@Model.TotalResidents</h4>
                     </div>
                 </div>
                 <hr class="dark horizontal my-0">
                 <div class="card-footer p-3">
-                    <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">-2%</span> than yesterday</p>
+                    <p class="mb-0"><span class="text-danger text-sm font-weight-bolder">+@Model.residentDiff</span> than last month</p>
                 </div>
             </div>
         </div>
@@ -63,8 +63,8 @@
                         <i class="material-icons opacity-10">weekend</i>
                     </div>
                     <div class="text-end pt-1">
-                        <p class="text-sm mb-0 text-capitalize">Total's Gi Do</p>
-                        <h4 class="mb-0">$103,430</h4>
+                        <p class="text-sm mb-0 text-capitalize">Total Rooms</p>
+                        <h4 class="mb-0">@Model.TotalRooms</h4>
                     </div>
                 </div>
                 <hr class="dark horizontal my-0">

@@ -54,7 +54,7 @@ namespace MyHostel_Admin.Pages.Admin_Page.HostelImages
             {
                 genresIQ = genresIQ.Where(s => s.Hostel.Name.ToLower().Contains(searchString.ToLower()));
             }
-            var pageSize = Configuration.GetValue("PageSize", 2);
+            var pageSize = Configuration.GetValue("PageSize", 4);
             HostelImage = await PaginatedList<HostelImage>.CreateAsync(genresIQ.AsNoTracking(), pageIndex ?? 1, pageSize);
             return Page();
         }

@@ -7,12 +7,7 @@
 <div class="page-breadcrumb">
     <div class="row align-items-center">
         <div class="col-6">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 d-flex align-items-center">
-                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
-                    <li class="breadcrumb-item active" aria-current="page">Person</li>
-                </ol>
-            </nav>
+            
             <h1 class="mb-0 fw-bold">Room Management</h1>
         </div>
         
@@ -55,22 +50,26 @@
             var nextDisabled = !Model.Room.HasNextPage ? "disabled" : "";
     }
     <div class="text-center mt-3">
-        <a asp-page="./Index"
+        <a asp-page="./Rooms"
+               asp-route-id="@Model.hostel.Id"
            asp-route-pageIndex="1"
            class="btn btn-primary @prevDisabled">
             First page
         </a>
-        <a asp-page="./Index"
+            <a asp-page="./Rooms"
+               asp-route-id="@Model.hostel.Id"
                asp-route-pageIndex="@(Model.Room.PageIndex - 1)"
            class="btn btn-primary @prevDisabled">
             Previous page
         </a>
-        <a asp-page="./Index"
+            <a asp-page="./Rooms"
+               asp-route-id="@Model.hostel.Id"
                asp-route-pageIndex="@(Model.Room.PageIndex + 1)"
            class="btn btn-primary @nextDisabled">
             Next page
         </a>
-        <a asp-page="./Index"
+            <a asp-page="./Rooms"
+               asp-route-id="@Model.hostel.Id"
                asp-route-pageIndex="@(Model.Room.TotalPages)"
            class="btn btn-primary @nextDisabled">
             Last page

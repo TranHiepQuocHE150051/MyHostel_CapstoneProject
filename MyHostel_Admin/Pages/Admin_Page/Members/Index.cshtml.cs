@@ -62,7 +62,7 @@ namespace MyHostel_Admin.Pages.Admin_Page.Members
                 personsIQ = personsIQ.Where(p => p.LastName.ToLower().Contains(searchString.ToLower())
                 || p.FirstName.ToLower().Contains(searchString.ToLower()));
             }
-            var pageSize = Configuration.GetValue("PageSize", 4);
+            var pageSize = Configuration.GetValue("PageSize", 6);
             Member = await PaginatedList<Member>.CreateAsync(personsIQ.AsNoTracking(), pageIndex ?? 1, pageSize);
             return Page();
         }

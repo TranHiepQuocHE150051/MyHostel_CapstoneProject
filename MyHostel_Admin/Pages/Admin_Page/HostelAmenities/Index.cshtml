@@ -7,20 +7,15 @@
 <div class="page-breadcrumb">
     <div class="row align-items-center">
         <div class="col-6">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 d-flex align-items-center">
-                    <li class="breadcrumb-item"><i class="mdi mdi-home-outline fs-4"></i></li>
-                    <li class="breadcrumb-item active" aria-current="page">Genre</li>
-                </ol>
-            </nav>
-            <h1 class="mb-0 fw-bold">Hostel Amenity Management</h1>
+            
+            <h1 class="mb-0 fw-bold">HostelAmenity Management</h1>
         </div>
     </div>
     <div class="row mt-3">
         <form asp-page="./Index" method="get" class="col-9">
             <div class="form-actions no-color">
                 <p>
-                    <input style="width:70%" type="text" name="searchString" value="@Model.CurrentFilter" class="btn btn-outline-primary" placeholder="Enter genres's name" />
+                    <input style="width:70%" type="text" name="searchString" value="@Model.CurrentFilter" class="btn btn-outline-primary" placeholder="Enter hostel's name" />
                     <input style="width:20%" type="submit" value="Search" class="btn btn-primary" />
                 </p>
             </div>

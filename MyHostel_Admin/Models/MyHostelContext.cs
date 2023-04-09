@@ -566,13 +566,7 @@ namespace MyHostel_Admin.Models
 
             modelBuilder.Entity<Resident>(entity =>
             {
-                entity.HasKey(e => new { e.HostelId, e.MemberId, e.RoomId });
-
-                entity.Property(e => e.HostelId).HasColumnName("hostel_id");
-
-                entity.Property(e => e.MemberId).HasColumnName("member_id");
-
-                entity.Property(e => e.RoomId).HasColumnName("room_id");
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Comment)
                     .HasMaxLength(1000)
@@ -582,7 +576,13 @@ namespace MyHostel_Admin.Models
                     .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
+                entity.Property(e => e.HostelId).HasColumnName("hostel_id");
+
+                entity.Property(e => e.MemberId).HasColumnName("member_id");
+
                 entity.Property(e => e.Rate).HasColumnName("rate");
+
+                entity.Property(e => e.RoomId).HasColumnName("room_id");
 
                 entity.Property(e => e.Status).HasColumnName("status");
 
@@ -624,6 +624,12 @@ namespace MyHostel_Admin.Models
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
                     .HasColumnName("name");
+
+                entity.Property(e => e.Price)
+                    .HasColumnType("money")
+                    .HasColumnName("price");
+
+                entity.Property(e => e.RoomArea).HasColumnName("room_Area");
 
                 entity.HasOne(d => d.Hostel)
                     .WithMany(p => p.Rooms)

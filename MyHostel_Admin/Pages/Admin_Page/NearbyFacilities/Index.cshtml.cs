@@ -56,7 +56,7 @@ namespace MyHostel_Admin.Pages.Admin_Page.NearbyFacilities
                 genresIQ = genresIQ.Where(s => s.Name.ToLower().Contains(searchString.ToLower())
                 || s.Hostel.Name.ToLower().Contains(searchString.ToLower()));
             }
-            var pageSize = Configuration.GetValue("PageSize", 2);
+            var pageSize = Configuration.GetValue("PageSize", 6);
             NearbyFacility = await PaginatedList<NearbyFacility>.CreateAsync(genresIQ.AsNoTracking(), pageIndex ?? 1, pageSize);
             return Page();
         }
