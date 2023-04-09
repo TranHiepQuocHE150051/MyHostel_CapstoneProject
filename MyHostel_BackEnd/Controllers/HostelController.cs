@@ -1,16 +1,9 @@
 ﻿using GoogleApi.Entities.Maps.Common;
 using GoogleApi.Entities.Maps.Directions.Request;
-using GoogleApi.Entities.Search.Common;
-using GoogleApi.Entities.Search.Video.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
-using Org.BouncyCastle.Utilities;
-using System.Configuration;
-using System.Linq;
-using static GoogleApi.GoogleMaps;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -720,8 +713,8 @@ namespace MyHostel_BackEnd.Controllers
                         Water = transaction.water,
                         Internet = transaction.internet,
                         Rent = transaction.rent,
-                        Security = transaction.security,
-                        SendAt = DateTime.Parse(transaction.sendAt),
+                        //Security = transaction.security,
+                        //SendAt = DateTime.Parse(transaction.sendAt),
                         Other = message
                     };
                     _context.Transactions.Add(transaction1);
@@ -880,7 +873,7 @@ namespace MyHostel_BackEnd.Controllers
         }
 
         [HttpPut("{id}/room")]
-        public async Task<ActionResult> UpdateRoomName(int id, [FromBody] UpdateRoomNameDTO updateRoomNameDTO)
+        public async Task<ActionResult> UpdateRoom(int id, [FromBody] UpdateRoomDTO updateRoomDTO)
         {
             try
             {
@@ -889,22 +882,22 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("Hostel not exist");
                 }
-                var room = await _context.Rooms.Where(r => r.Id == updateRoomNameDTO.RoomId).SingleOrDefaultAsync();
+                var room = await _context.Rooms.Where(r => r.Id == updateRoomDTO.RoomId).SingleOrDefaultAsync();
                 if (room == null)
                 {
                     return BadRequest("Room not exist");
                 }
-                if (updateRoomNameDTO.Name != null)
+                if (updateRoomDTO.Name != null)
                 {
-                    room.Name = updateRoomNameDTO.Name;
+                    room.Name = updateRoomDTO.Name;
                 }
-                if (updateRoomNameDTO.Price != 0)
+                if (updateRoomDTO.Price != 0)
                 {
-                    room.Price = updateRoomNameDTO.Price;
+                    room.Price = updateRoomDTO.Price;
                 }
-                if (updateRoomNameDTO.RoomArea != 0)
+                if (updateRoomDTO.RoomArea != 0)
                 {
-                    room.RoomArea = updateRoomNameDTO.RoomArea;
+                    room.RoomArea = updateRoomDTO.RoomArea;
                 }
                 _context.Rooms.Update(room);
                 await _context.SaveChangesAsync();

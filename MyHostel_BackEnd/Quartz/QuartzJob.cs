@@ -20,11 +20,11 @@ namespace MyHostel_BackEnd.Quartz
                 var total = transaction.Rent
                     + transaction.Electricity
                     + transaction.Water
-                    + transaction.Security
                     + transaction.Internet;
                 foreach (var other in others)
                 {
                     decimal price = Decimal.Parse(other.Split(':')[1]);
+                    total += price;
                 }
                 var message = new FirebaseAdmin.Messaging.Message()
                 {
