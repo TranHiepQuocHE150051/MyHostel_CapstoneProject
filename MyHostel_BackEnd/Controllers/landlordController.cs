@@ -51,10 +51,23 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return Unauthorized();
                 }
+                if (hostel == null)
+                {
+                    return BadRequest("You must fill all required fields");
+                }
+                if ( !IsNumeric(hostel.Price)
+                    || !IsInteger(hostel.rooms)
+                    || !IsInteger(hostel.Capacity)
+                    || !IsNumeric(hostel.Water)
+                    || !IsNumeric(hostel.Electricity)
+                    || !IsNumeric(hostel.Internet))
+                {
+                    return BadRequest("Wrong format");
+                }
                 Hostel hostel1 = new Hostel
                 {
                     Name = hostel.Name,
-                    Price = hostel.Price,
+                    Price = decimal.Parse(hostel.Price),
                     Capacity = hostel.Capacity,
                     DetailLocation = hostel.DetailLocation,
                     WardsCode = hostel.WardsCode,
@@ -62,9 +75,9 @@ namespace MyHostel_BackEnd.Controllers
                     Description = hostel.Description,
                     RoomArea = hostel.RoomArea,                   
                     LandlordId = landlordId,
-                    Electricity= hostel.Electricity,
-                    Water=hostel.Water,
-                    Internet=hostel.Internet,
+                    Electricity= decimal.Parse(hostel.Electricity),
+                    Water= decimal.Parse(hostel.Water),
+                    Internet= decimal.Parse(hostel.Internet),
                     CreatedAt=DateTime.Now,
                     Status=0
                 };
@@ -97,13 +110,13 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     
                 }
-                for (int i = 1; i <= hostel.rooms; i++)
+                for (int i = 1; i <= int.Parse(hostel.rooms); i++)
                 {
                     Room room = new Room
                     {
                         HostelId = hostel1.Id,
                         Name = hostel.Name + " room " + i,
-                        Price=hostel.Price,
+                        Price= decimal.Parse(hostel.Price),
                         RoomArea = int.Parse(hostel.RoomArea)
                         
 
@@ -171,6 +184,16 @@ namespace MyHostel_BackEnd.Controllers
                     } 
                 }
             }
+        }
+        private bool IsNumeric(string input)
+        {
+            decimal num;
+            return decimal.TryParse(input, out num)&& decimal.Parse(input) > 0;
+        }
+        private bool IsInteger(string input)
+        {
+            int num;
+            return int.TryParse(input, out num)&&int.Parse(input)>0;
         }
         private DistanceAndDuration CalculateDistanceAndDuration(double orglat, double orglng, double deslat, double deslng)
         {
