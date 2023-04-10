@@ -588,6 +588,10 @@ namespace MyHostel_BackEnd.Models
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
 
+                entity.Property(e => e.LeftAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("left_at");
+
                 entity.Property(e => e.MemberId).HasColumnName("member_id");
 
                 entity.Property(e => e.Rate).HasColumnName("rate");

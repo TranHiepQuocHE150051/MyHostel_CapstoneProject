@@ -30,12 +30,15 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     transactions = transactions.Where(t => t.CreatedAt.Value.Year == year).ToList();
                 }
+                
                 var result = new List<GetTransactionForRoomDTO>();
                 if (transactions.Any())
                 {
                     foreach (var transaction in transactions)
                     {
+                        var residents = _context.Residents.Where(r => r.RoomId == id && r.Status==1).ToList();
                         var otherCost = new List<OtherCostDTO>();
+                        var residentlist = new List<ResidentDTO>();
                         string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
                         Decimal total = 0;
                         if(transaction.Rent != null)
@@ -67,6 +70,23 @@ namespace MyHostel_BackEnd.Controllers
                                 });
                             }
                         }
+                        if (residents.Count > 0)
+                        {
+                            foreach(var res in residents)
+                            {
+                                var member = _context.Members.Where(m => m.Id == res.MemberId).FirstOrDefault();
+                                if (member != null)
+                                {
+                                    residentlist.Add(new ResidentDTO
+                                    {
+                                        MemberId = member.Id,
+                                        FullName = member.FirstName + " " + member.LastName,
+                                        Avatar = member.Avatar
+                                    });
+                                }
+                                
+                            }
+                        }
                         result.Add(new GetTransactionForRoomDTO
                         {
                             Id = transaction.Id,
@@ -75,6 +95,7 @@ namespace MyHostel_BackEnd.Controllers
                             Electricity = transaction.Electricity,
                             Water = transaction.Water,
                             Internet = transaction.Internet,
+                            Residents =residentlist.ToArray(),
                             IsPaid = transaction.PaidAt == null ? false : true,
                             Total = total,
                             OtherCost = otherCost.ToArray()

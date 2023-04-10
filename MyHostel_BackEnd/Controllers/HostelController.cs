@@ -1,4 +1,5 @@
-﻿using GoogleApi.Entities.Maps.Common;
+﻿using FirebaseAdmin.Messaging;
+using GoogleApi.Entities.Maps.Common;
 using GoogleApi.Entities.Maps.Directions.Request;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -682,19 +683,14 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest("Hostel not exist");
             }
-            else
+            var room = _context.Rooms.Where(r => r.Id == transaction.roomId).SingleOrDefault();
+            if(room==null)
             {
-                HashSet<int> roomInHostel = new HashSet<int>();
-                var rooms = _context.Rooms.Where(r => r.HostelId == id).ToList();
-                foreach (var room in rooms)
-                {
-                    roomInHostel.Add(room.Id);
-                }
-                HashSet<int> roomIds = new HashSet<int>(transaction.roomId);
-                if (!roomIds.IsSubsetOf(roomInHostel))
-                {
-                    return BadRequest("Room is not in hostel");
-                }
+                return BadRequest("Room not exist");
+            }
+            if (!IsRoomInHostel(room, hostel))
+            {
+                return BadRequest("Room is not in hostel");
             }
             try
             {
@@ -704,22 +700,49 @@ namespace MyHostel_BackEnd.Controllers
                     message = message + it + " - ";
                 }
                 message = message.Substring(0, message.Length - 3);
-                foreach (var item in transaction.roomId)
-                {
+                
                     Transaction transaction1 = new Transaction
                     {
-                        RoomId = item,
+                        RoomId = transaction.roomId,
                         Electricity = transaction.electricity,
                         Water = transaction.water,
                         Internet = transaction.internet,
                         Rent = transaction.rent,
                         //Security = transaction.security,
                         //SendAt = DateTime.Parse(transaction.sendAt),
-                        Other = message
+                        AtTime = transaction.AtTime,
+                        Other = message,
+                        CreatedAt=DateTime.Now
                     };
                     _context.Transactions.Add(transaction1);
                     await _context.SaveChangesAsync();
+                    var residents = _context.Residents.Where(r=>r.RoomId==transaction.roomId&&r.Status==1).ToList();
+                var total = CalculateTotalMoney(transaction1);
+                foreach(var res in residents)
+                {
+                    Models.Notification notification = new Models.Notification()
+                    {
+                        SendTo= res.MemberId,
+                        SendAt=DateTime.Now,
+                        CreateAt=DateTime.Now,
+                        SendAtHour=DateTime.Now.Hour,
+                        Type=false,
+                        Message= "Tiền cần đóng của " + room.Name + ": "+
+                        total.ToString()
+                    };
+                    _context.Notifications.Add(notification);
+                    await _context.SaveChangesAsync();
                 }
+                var registrationToken = "eoCu8IdWRZiP8StEZku0O7:APA91bGf_t2j0z4tEukJO8RMTfEyu9FpfxX6WI9Zqm0zdlk0x_fAGWERbgURnZ2pGAAyY5BXaA6gpGHCEJoyJhHnEiL6AtCIdZ_DH6PNVGqwULTgcwMHVVzGBkTOvI2ZR0IG_TNjn-dV";
+                var message1 = new FirebaseAdmin.Messaging.Message()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { "Tiền cần đóng của "+transaction1.Room.Name+": ", total.ToString() }
+                    },
+                    Token = registrationToken,
+                };
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message1);
                 return Ok("Add new transaction success");
             }
             catch (Exception e)
@@ -738,6 +761,21 @@ namespace MyHostel_BackEnd.Controllers
             return distance;
 
         }
+        private decimal CalculateTotalMoney(Transaction transaction)
+        {
+            string[] others = transaction.Other.Split('-');
+            decimal total = (decimal)(transaction.Rent
+                + transaction.Electricity
+                + transaction.Water
+                + transaction.Internet);
+            foreach (var other in others)
+            {
+                decimal price = Decimal.Parse(other.Split(':')[1]);
+                total += price;
+            }
+            return total;
+        }
+
         private double GetDistance(double longitude, double latitude, double otherLongitude, double otherLatitude)
         {
             var d1 = latitude * (Math.PI / 180.0);
@@ -992,6 +1030,7 @@ namespace MyHostel_BackEnd.Controllers
                     return BadRequest("User is not in From Room");
                 }
                 checkInFromRoomExist.Status = 0;
+                checkInFromRoomExist.LeftAt = DateTime.Now;
                 _context.Residents.Update(checkInFromRoomExist);
                 Resident resident = new Resident
                 {
@@ -1059,9 +1098,10 @@ namespace MyHostel_BackEnd.Controllers
                     if (resident.Status == 1)
                     {
                         resident.Status = 2;
+                        resident.LeftAt = DateTime.Now;
                         _context.Residents.Update(resident);
                     }
-                    
+            
                 }
             }
             if (_context.SaveChanges() > 0)
