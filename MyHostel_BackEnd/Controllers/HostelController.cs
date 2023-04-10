@@ -434,6 +434,7 @@ namespace MyHostel_BackEnd.Controllers
                     room1.Name = room.Name;
                     room1.Price = (decimal)room.Price;
                     room1.RoomArea = (int)room.RoomArea;
+                    room1.ConvertPrice = replaceString((decimal)room.Price);
                     foreach (var resident in room.Residents)
                     {
                         var member = _context.Members.Where(m => m.Id == resident.MemberId && resident.Status == 1).FirstOrDefault();
