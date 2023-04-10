@@ -272,6 +272,10 @@ namespace MyHostel_Admin.Models
                     .HasMaxLength(255)
                     .HasColumnName("name");
 
+                entity.Property(e => e.OtherCost)
+                    .HasMaxLength(1000)
+                    .HasColumnName("other_cost");
+
                 entity.Property(e => e.Phone)
                     .HasMaxLength(10)
                     .HasColumnName("phone")
@@ -469,16 +473,23 @@ namespace MyHostel_Admin.Models
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.CreateAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("create_at");
+
                 entity.Property(e => e.Message)
-                    .HasMaxLength(8000)
-                    .IsUnicode(false)
+                    .HasMaxLength(1000)
                     .HasColumnName("message");
 
                 entity.Property(e => e.SendAt)
                     .HasColumnType("datetime")
                     .HasColumnName("send_at");
 
+                entity.Property(e => e.SendAtHour).HasColumnName("send_at_hour");
+
                 entity.Property(e => e.SendTo).HasColumnName("send_to");
+
+                entity.Property(e => e.Type).HasColumnName("type");
 
                 entity.HasOne(d => d.SendToNavigation)
                     .WithMany(p => p.Notifications)
@@ -578,6 +589,10 @@ namespace MyHostel_Admin.Models
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
 
+                entity.Property(e => e.LeftAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("left_at");
+
                 entity.Property(e => e.MemberId).HasColumnName("member_id");
 
                 entity.Property(e => e.Rate).HasColumnName("rate");
@@ -642,6 +657,15 @@ namespace MyHostel_Admin.Models
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.AtTime)
+                    .HasMaxLength(7)
+                    .IsUnicode(false)
+                    .HasColumnName("at_time");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime")
+                    .HasColumnName("created_at");
+
                 entity.Property(e => e.Electricity)
                     .HasColumnType("money")
                     .HasColumnName("electricity");
@@ -663,14 +687,6 @@ namespace MyHostel_Admin.Models
                     .HasColumnName("rent");
 
                 entity.Property(e => e.RoomId).HasColumnName("room_id");
-
-                entity.Property(e => e.Security)
-                    .HasColumnType("money")
-                    .HasColumnName("security");
-
-                entity.Property(e => e.SendAt)
-                    .HasColumnType("datetime")
-                    .HasColumnName("send_at");
 
                 entity.Property(e => e.Water)
                     .HasColumnType("money")
