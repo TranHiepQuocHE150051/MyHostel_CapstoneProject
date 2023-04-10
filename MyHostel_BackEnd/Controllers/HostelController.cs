@@ -727,7 +727,7 @@ namespace MyHostel_BackEnd.Controllers
                         SendAt=DateTime.Now,
                         CreateAt=DateTime.Now,
                         SendAtHour=DateTime.Now.Hour,
-                        Type=false,
+                        Type=0,
                         Message= "Tiền cần đóng của " + room.Name + ": "+
                         total.ToString()
                     };

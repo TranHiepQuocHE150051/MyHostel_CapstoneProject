@@ -58,15 +58,28 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddQuartz(q =>
 {
     q.UseMicrosoftDependencyInjectionScopedJobFactory();
-    var jobKey = new JobKey("DemoJob");
-    q.AddJob<QuartzJob>(opts => opts.WithIdentity(jobKey));
-
+    var jobKey_QuartzJob = new JobKey("jobKey_QuartzJob");
+    q.AddJob<QuartzJob>(opts => opts.WithIdentity(jobKey_QuartzJob));
     q.AddTrigger(opts => opts
-        .ForJob(jobKey)
-        .WithIdentity("DemoJob-trigger")
+        .ForJob(jobKey_QuartzJob)
+        .WithIdentity("Job_trigger_QuartzJob")
         .WithCronSchedule("0 0 12 * * ?"));
 
+    var jobKey_CreateNotificationJob = new JobKey("jobKey_CreateNotificationJob");
+    q.AddJob<CreateNotificationJob>(opts => opts.WithIdentity(jobKey_CreateNotificationJob));
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey_CreateNotificationJob)
+        .WithIdentity("Job_trigger_CreateNotificationJob")
+        .WithCronSchedule("0 0 0 * * ?"));
+
+    var jobKey_SendAtHourJob = new JobKey("jobKey_SendAtHourJob");
+    q.AddJob<SendAtHourJob>(opts => opts.WithIdentity(jobKey_SendAtHourJob));
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey_SendAtHourJob)
+        .WithIdentity("Job_trigger_SendAtHourJob")
+        .WithCronSchedule("* * */1 * * ?"));
 });
+
 string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
 string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\GoogleCredential\googlekey.json");
 string sFilePath = Path.GetFullPath(sFile);
