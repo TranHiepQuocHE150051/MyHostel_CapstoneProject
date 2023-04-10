@@ -1110,6 +1110,59 @@ namespace MyHostel_BackEnd.Controllers
             }
             return BadRequest("Cannot delete this hostel");
         }
+        [HttpGet("{id}/other-cost")]
+        public async Task<ActionResult> GetOtherCost(int id)
+        {
+            var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+            if (hostel == null)
+            {
+                return BadRequest("Hostel not exist");
+            }
+            
+            if (hostel.OtherCost != null)
+            {
+                
+                string[] othercost = hostel.OtherCost.Split('|');
+                for(int i = 0; i < othercost.Length; i++)
+                {
+                    othercost[i]= othercost[i].Trim();
+                }
+                return Ok(new
+                {
+                    OtherCost = othercost
+                });
+            }
+            List<string> other = new List<string>();
+            return Ok(new
+            {
+                OtherCost = other
+            });
+
+        }
+        [HttpPut("{id}/other-cost")]
+        public async Task<ActionResult> UpdateOtherCost( int id, [FromBody]UpdateOtherCostDTO othercost)
+        {
+            var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+            if (hostel == null)
+            {
+                return BadRequest("Hostel not exist");
+            }
+            
+            foreach (var it in othercost.OtherCost)
+            {
+                hostel.OtherCost = hostel.OtherCost + it + " | ";
+            }
+            hostel.OtherCost = hostel.OtherCost.Substring(0, hostel.OtherCost.Length - 3);
+            _context.Hostels.Update(hostel);
+            if (_context.SaveChanges() > 0)
+            {
+                return Ok("Update hostel other cost successfully");
+            }
+            return BadRequest("Update failed");
+
+
+
+        }
         private bool IsRoomInHostel(Room RoomCheck, Hostel HostelCheck)
         {
             bool RoomInHostel = false;
