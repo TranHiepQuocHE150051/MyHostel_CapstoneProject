@@ -476,8 +476,7 @@ namespace MyHostel_BackEnd.Models
                     .HasColumnName("create_at");
 
                 entity.Property(e => e.Message)
-                    .HasMaxLength(8000)
-                    .IsUnicode(false)
+                    .HasMaxLength(1000)
                     .HasColumnName("message");
 
                 entity.Property(e => e.SendAt)

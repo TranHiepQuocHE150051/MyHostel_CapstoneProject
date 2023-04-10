@@ -715,7 +715,7 @@ namespace MyHostel_BackEnd.Controllers
                         CreatedAt=DateTime.Now
                     };
                     _context.Transactions.Add(transaction1);
-                    await _context.SaveChangesAsync();
+                    
                     var residents = _context.Residents.Where(r=>r.RoomId==transaction.roomId&&r.Status==1).ToList();
                 var total = CalculateTotalMoney(transaction1);
                 foreach(var res in residents)
@@ -730,19 +730,19 @@ namespace MyHostel_BackEnd.Controllers
                         Message= "Tiền cần đóng của " + room.Name + ": "+
                         total.ToString()
                     };
-                    _context.Notifications.Add(notification);
-                    await _context.SaveChangesAsync();
+                    _context.Notifications.Add(notification);                    
                 }
-                var registrationToken = "eoCu8IdWRZiP8StEZku0O7:APA91bGf_t2j0z4tEukJO8RMTfEyu9FpfxX6WI9Zqm0zdlk0x_fAGWERbgURnZ2pGAAyY5BXaA6gpGHCEJoyJhHnEiL6AtCIdZ_DH6PNVGqwULTgcwMHVVzGBkTOvI2ZR0IG_TNjn-dV";
-                var message1 = new FirebaseAdmin.Messaging.Message()
-                {
-                    Data = new Dictionary<string, string>()
-                    {
-                        { "Tiền cần đóng của "+transaction1.Room.Name+": ", total.ToString() }
-                    },
-                    Token = registrationToken,
-                };
-                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message1);
+                _context.SaveChanges();
+                //var registrationToken = "eoCu8IdWRZiP8StEZku0O7:APA91bGf_t2j0z4tEukJO8RMTfEyu9FpfxX6WI9Zqm0zdlk0x_fAGWERbgURnZ2pGAAyY5BXaA6gpGHCEJoyJhHnEiL6AtCIdZ_DH6PNVGqwULTgcwMHVVzGBkTOvI2ZR0IG_TNjn-dV";
+                //var message1 = new FirebaseAdmin.Messaging.Message()
+                //{
+                //    Data = new Dictionary<string, string>()
+                //    {
+                //        { "Tiền cần đóng của "+transaction1.Room.Name+": ", total.ToString() }
+                //    },
+                //    Token = registrationToken,
+                //};
+                //string response = await FirebaseMessaging.DefaultInstance.SendAsync(message1);
                 return Ok("Add new transaction success");
             }
             catch (Exception e)
