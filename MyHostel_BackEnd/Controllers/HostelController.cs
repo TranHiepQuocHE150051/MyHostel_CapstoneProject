@@ -1148,7 +1148,7 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest("Hostel not exist");
             }
-            
+            hostel.OtherCost = "";
             foreach (var it in othercost.OtherCost)
             {
                 hostel.OtherCost = hostel.OtherCost + it + " | ";

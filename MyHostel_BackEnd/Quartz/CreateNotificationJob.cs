@@ -12,22 +12,78 @@ namespace MyHostel_BackEnd.Quartz
             var transactions = await _context.Transactions.ToListAsync();
             foreach (var transaction in transactions)
             {
-                if(transaction.PaidAt != null)
+                var room = _context.Rooms.Where(r => r.Id == transaction.RoomId).SingleOrDefault();
+                var residents = await _context.Residents.Where(r => r.RoomId == transaction.RoomId && r.Status == 1).ToListAsync();
+                if (transaction.PaidAt != null)
                 {
                     continue;
                 }
                 if((DateTime.Now - (DateTime)transaction.CreatedAt).TotalDays <= 10){
                     continue;
                 }
+                if(room == null || residents.Count ==)
+                {
+                    continue;
+                }
                 if(int.Parse(transaction.AtTime.ToString().Substring(3)) < DateTime.Now.Year)
                 {
-                    //add noti
+                    string[] others = transaction.Other.Split('-');
+                    var total = transaction.Rent
+                        + transaction.Electricity
+                        + transaction.Water
+                        + transaction.Internet;
+                    foreach (var other in others)
+                    {
+                        decimal price = Decimal.Parse(other.Split(':')[1]);
+                        total += price;
+                    }
+                    foreach (var resident in residents)
+                    {
+                        Notification notification = new Notification
+                        {
+                            SendTo = resident.MemberId,
+                            SendAt = DateTime.Now,
+                            CreateAt = DateTime.Now,
+                            SendAtHour = DateTime.Now.Hour,
+                            Type = 0,
+                            Message = "Tiền cần đóng của " + room.Name + ": " +
+                        total.ToString()
+                        };
+                        _context.Notifications.Add(notification);
+                    }
+                    _context.SaveChanges();
+                    // send noti
                 }
                 else if (int.Parse(transaction.AtTime.ToString().Substring(3)) == DateTime.Now.Year)
                 {
                     if (int.Parse(transaction.AtTime.ToString().Substring(0,2)) < DateTime.Now.Month)
                     {
-                        //add noti
+                        string[] others = transaction.Other.Split('-');
+                        var total = transaction.Rent
+                            + transaction.Electricity
+                            + transaction.Water
+                            + transaction.Internet;
+                        foreach (var other in others)
+                        {
+                            decimal price = Decimal.Parse(other.Split(':')[1]);
+                            total += price;
+                        }
+                        foreach (var resident in residents)
+                        {
+                            Notification notification = new Notification
+                            {
+                                SendTo = resident.MemberId,
+                                SendAt = DateTime.Now,
+                                CreateAt = DateTime.Now,
+                                SendAtHour = DateTime.Now.Hour,
+                                Type = 0,
+                                Message = "Tiền cần đóng của " + room.Name + ": " +
+                            total.ToString()
+                            };
+                            _context.Notifications.Add(notification);
+                        }
+                        _context.SaveChanges();
+                        // send noti
                     }
                 }
             }
