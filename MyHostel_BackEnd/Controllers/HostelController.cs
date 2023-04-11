@@ -1136,7 +1136,7 @@ namespace MyHostel_BackEnd.Controllers
             List<string> other = new List<string>();
             return Ok(new
             {
-                OtherCost = other
+                OtherCost = new string[]{}
             });
 
         }
@@ -1153,7 +1153,7 @@ namespace MyHostel_BackEnd.Controllers
             {
                 hostel.OtherCost = hostel.OtherCost + it + " | ";
             }
-            hostel.OtherCost = hostel.OtherCost.Substring(0, hostel.OtherCost.Length - 3);
+            hostel.OtherCost = hostel.OtherCost == "" ? null : hostel.OtherCost.Substring(0, hostel.OtherCost.Length - 3);
             _context.Hostels.Update(hostel);
             if (_context.SaveChanges() > 0)
             {

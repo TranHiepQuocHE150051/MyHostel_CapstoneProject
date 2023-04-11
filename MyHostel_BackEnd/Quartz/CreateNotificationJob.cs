@@ -21,7 +21,7 @@ namespace MyHostel_BackEnd.Quartz
                 if((DateTime.Now - (DateTime)transaction.CreatedAt).TotalDays <= 10){
                     continue;
                 }
-                if(room == null || residents.Count ==)
+                if(room == null || residents.Count == 0)
                 {
                     continue;
                 }
