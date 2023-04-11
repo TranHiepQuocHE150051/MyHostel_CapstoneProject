@@ -21,22 +21,25 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                var transactions = await _context.Transactions.Where(t => t.RoomId == id).ToListAsync();
-                if (month != null)
+                //var transactions = await _context.Transactions.Where(t => t.RoomId == id).ToListAsync();
+                string checkTime = "";
+                if (month <= 0 || year < 2000 || month>12)
                 {
-                    transactions = transactions.Where(t => t.CreatedAt.Value.Month == month).ToList();
+                    return BadRequest("Input not valid, year must be after 2000. month from 1 to 12");
                 }
-                if (year != null)
+                if (month >= 1 && month < 10)
                 {
-                    transactions = transactions.Where(t => t.CreatedAt.Value.Year == year).ToList();
+                    checkTime = checkTime+"0"+month+"/"+year; 
                 }
-                
-                var result = new List<GetTransactionForRoomDTO>();
-                if (transactions.Any())
+                if (month >= 10)
                 {
-                    foreach (var transaction in transactions)
-                    {
-                        var residents = _context.Residents.Where(r => r.RoomId == id && r.Status==1).ToList();
+                    checkTime = checkTime+ month + "/" + year;
+                }
+                DateTime transactionTime = DateTime.Parse("01/"+checkTime);
+                var transaction =  _context.Transactions.Where(t => t.RoomId == id && t.AtTime.Equals(checkTime)).FirstOrDefault();
+                if (transaction!=null)
+                {                 
+                        var residents = _context.Residents.Where(r => r.RoomId == id).ToList();                       
                         var otherCost = new List<OtherCostDTO>();
                         var residentlist = new List<ResidentDTO>();
                         string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
@@ -74,7 +77,15 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             foreach(var res in residents)
                             {
-                                var member = _context.Members.Where(m => m.Id == res.MemberId).FirstOrDefault();
+                            if (res.CreatedAt > transactionTime)
+                            {                               
+                                continue;
+                            }
+                            if (res.LeftAt != null && res.LeftAt < transactionTime)
+                            {                               
+                                continue;
+                            }
+                            var member = _context.Members.Where(m => m.Id == res.MemberId).FirstOrDefault();
                                 if (member != null)
                                 {
                                     residentlist.Add(new ResidentDTO
@@ -86,23 +97,58 @@ namespace MyHostel_BackEnd.Controllers
                                 }
                                 
                             }
-                        }
-                        result.Add(new GetTransactionForRoomDTO
-                        {
-                            Id = transaction.Id,
-                            RoomId = transaction.RoomId,
-                            Rent = transaction.Rent,
-                            Electricity = transaction.Electricity,
-                            Water = transaction.Water,
-                            Internet = transaction.Internet,
-                            Residents =residentlist.ToArray(),
-                            IsPaid = transaction.PaidAt == null ? false : true,
-                            Total = total,
-                            OtherCost = otherCost.ToArray()
-                        });
-                    }
+                        }                     
+                    return Ok(new GetTransactionForRoomDTO
+                    {
+                        Id = transaction.Id,
+                        RoomId = transaction.RoomId,
+                        Rent = transaction.Rent,
+                        Electricity = transaction.Electricity,
+                        Water = transaction.Water,
+                        Internet = transaction.Internet,
+                        Residents = residentlist.ToArray(),
+                        IsPaid = transaction.PaidAt == null ? false : true,
+                        Total = total,
+                        OtherCost = otherCost.ToArray()
+                    });
                 }
-                return Ok(result);
+                else
+                {
+                    var residents = _context.Residents.Where(r => r.RoomId == id).ToList();
+                   
+                    var residentlist = new List<ResidentDTO>();
+                    if (residents.Count > 0)
+                    {
+                        foreach (var res in residents)
+                        {
+                            if (res.CreatedAt > transactionTime)
+                            {
+                                continue;
+                            }
+                            if (res.LeftAt != null && res.LeftAt < transactionTime)
+                            {
+                                continue;
+                            }
+                            var member = _context.Members.Where(m => m.Id == res.MemberId).FirstOrDefault();
+                            if (member != null)
+                            {
+                                residentlist.Add(new ResidentDTO
+                                {
+                                    MemberId = member.Id,
+                                    FullName = member.FirstName + " " + member.LastName,
+                                    Avatar = member.Avatar
+                                });
+                            }
+
+                        }
+                    }
+                    return Ok(new 
+                    {                       
+                       RoomId = id,
+                       Residents = residentlist.ToArray()
+                    });
+                }
+                
 
             }
             catch (Exception ex)
