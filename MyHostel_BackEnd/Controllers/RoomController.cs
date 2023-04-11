@@ -16,7 +16,7 @@ namespace MyHostel_BackEnd.Controllers
             _configuration = configuration;
             _context = context;
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id}/transaction")]
         public async Task<ActionResult> GetTransactionForRoom(int id, [FromQuery] int? month, [FromQuery] int? year)
         {
             try
