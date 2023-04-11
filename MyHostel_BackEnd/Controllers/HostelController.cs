@@ -428,7 +428,7 @@ namespace MyHostel_BackEnd.Controllers
                 List<RoomDTO> result = new List<RoomDTO>();
                 foreach (var room in rooms)
                 {
-                    List<ResidentDTO> residents = new List<ResidentDTO>();
+                    List<ResidentsInRoomDTO> residents = new List<ResidentsInRoomDTO>();
                     RoomDTO room1 = new RoomDTO();
                     room1.RoomId = room.Id;
                     room1.Name = room.Name;
@@ -440,11 +440,13 @@ namespace MyHostel_BackEnd.Controllers
                         var member = _context.Members.Where(m => m.Id == resident.MemberId && resident.Status == 1).FirstOrDefault();
                         if (member != null)
                         {
-                            residents.Add(new ResidentDTO
+                            residents.Add(new ResidentsInRoomDTO
                             {
                                 MemberId = member.Id,
                                 FullName = member.FirstName+ " " + member.LastName,
-                                Avatar = member.Avatar
+                                Avatar = member.Avatar,
+                                JoinedAt = resident.CreatedAt.ToString("MM/dd/yyyy"),
+                                InviteToken= member.InviteCode.Trim()
                             });
                         }
 

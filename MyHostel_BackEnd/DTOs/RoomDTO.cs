@@ -8,6 +8,6 @@
         public int RoomArea { get; set; }
         public string ConvertPrice {get; set;}= null!;
 
-        public List<ResidentDTO> Residents { get; set; } 
+        public List<ResidentsInRoomDTO> Residents { get; set; } 
     }
 }
