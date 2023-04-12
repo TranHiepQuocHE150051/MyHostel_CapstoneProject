@@ -21,12 +21,16 @@ namespace MyHostel_BackEnd.Controllers
         {
             try
             {
-                //var transactions = await _context.Transactions.Where(t => t.RoomId == id).ToListAsync();
-                string checkTime = "";               
+                string checkTime = "";
+                if (month >= 1 && month < 10)
+                {
+                    checkTime = checkTime +"0"+ month + "/" + year;
+                }
+                if (month > 10)
+                {
+                    checkTime = checkTime + month + "/" + year;
+                }
                 
-                 checkTime = checkTime+ month + "/" + year;
-                
-                DateTime transactionTime = DateTime.Parse("01/"+checkTime);
                 var transaction =  _context.Transactions.Where(t => t.RoomId == id && t.AtTime.Equals(checkTime)).FirstOrDefault();
                 if (transaction!=null)
                 {                 
@@ -68,13 +72,25 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             foreach(var res in residents)
                             {
-                            if (res.CreatedAt > transactionTime.AddMonths(1))
+                            if (res.CreatedAt.Year > year)
                             {                               
                                 continue;
                             }
-                            if (res.LeftAt != null && res.LeftAt < transactionTime.AddMonths(1))
-                            {                               
+                            if (res.CreatedAt.Year == year && res.CreatedAt.Month> month)
+                            {
                                 continue;
+                            }
+                            if (res.LeftAt.HasValue)
+                            {                      
+                                if(res.LeftAt.Value.Year< year)
+                                {
+                                    continue;
+                                }
+                                if(res.LeftAt.Value.Year == year && res.LeftAt.Value.Month < month)
+                                {
+                                    continue;
+                                }
+                                
                             }
                             var member = _context.Members.Where(m => m.Id == res.MemberId).FirstOrDefault();
                                 if (member != null)
@@ -112,13 +128,25 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         foreach (var res in residents)
                         {
-                            if (res.CreatedAt > transactionTime.AddMonths(1))
+                            if (res.CreatedAt.Year > year)
                             {
                                 continue;
                             }
-                            if (res.LeftAt != null && res.LeftAt < transactionTime.AddMonths(1))
+                            if (res.CreatedAt.Year == year && res.CreatedAt.Month > month)
                             {
                                 continue;
+                            }
+                            if (res.LeftAt.HasValue)
+                            {
+                                if (res.LeftAt.Value.Year < year)
+                                {
+                                    continue;
+                                }
+                                if (res.LeftAt.Value.Year == year && res.LeftAt.Value.Month < month)
+                                {
+                                    continue;
+                                }
+
                             }
                             var member = _context.Members.Where(m => m.Id == res.MemberId).FirstOrDefault();
                             if (member != null)
@@ -138,9 +166,7 @@ namespace MyHostel_BackEnd.Controllers
                        RoomId = id,
                        Residents = residentlist.ToArray()
                     });
-                }
-                
-
+                }                
             }
             catch (Exception ex)
             {
