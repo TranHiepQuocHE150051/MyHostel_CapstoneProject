@@ -6,7 +6,7 @@
         public string Name { get; set; } = null!;
         public string[] ImgURL { get; set; } = null!;
         public NearbyFacilitiesGetHostelDTO[] NearbyFacilities { get; set; } = null!;
-        public int[] Amenities { get; set; } = null!;
+        public AmenitiesGetHostelDTO[] Amenities { get; set; } = null!;
         public string DetailLocation { get; set; } = null!;
         public string WardCode { get; set; } = null!;
         public string WardName { get; set; } = null!;
@@ -23,6 +23,6 @@
         public string Water { get; set; } = null!;
         public string Internet { get; set; } = null!;
         public LandlordGetHostelDTO Landlord { get; set; } = null!;
-        public ReviewGetHostelDTO Review { get; set; } = null!;
+        public GetHostelReviewDTO Review { get; set; } = null!;
     }
 }

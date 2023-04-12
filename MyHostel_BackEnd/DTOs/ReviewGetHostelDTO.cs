@@ -1,6 +1,6 @@
 ﻿namespace MyHostel_BackEnd.DTOs
 {
-    public class ReviewGetHostelDTO
+    public class GetHostelReviewDTO
     {
         public double Rate { get; set; }
         public int NoRate { get; set; }

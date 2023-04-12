@@ -14,6 +14,7 @@ namespace MyHostel_BackEnd.Models
         public DateTime CreatedAt { get; set; }
         public int Id { get; set; }
         public DateTime? LeftAt { get; set; }
+        public short? IsAnonymousComment { get; set; }
 
         public virtual Hostel Hostel { get; set; } = null!;
         public virtual Member Member { get; set; } = null!;
