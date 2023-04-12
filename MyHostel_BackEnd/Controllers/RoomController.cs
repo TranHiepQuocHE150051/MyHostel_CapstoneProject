@@ -22,19 +22,10 @@ namespace MyHostel_BackEnd.Controllers
             try
             {
                 //var transactions = await _context.Transactions.Where(t => t.RoomId == id).ToListAsync();
-                string checkTime = "";
-                if (month <= 0 || year < 2000 || month>12)
-                {
-                    return BadRequest("Input not valid, year must be after 2000. month from 1 to 12");
-                }
-                if (month >= 1 && month < 10)
-                {
-                    checkTime = checkTime+"0"+month+"/"+year; 
-                }
-                if (month >= 10)
-                {
-                    checkTime = checkTime+ month + "/" + year;
-                }
+                string checkTime = "";               
+                
+                 checkTime = checkTime+ month + "/" + year;
+                
                 DateTime transactionTime = DateTime.Parse("01/"+checkTime);
                 var transaction =  _context.Transactions.Where(t => t.RoomId == id && t.AtTime.Equals(checkTime)).FirstOrDefault();
                 if (transaction!=null)
@@ -77,11 +68,11 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             foreach(var res in residents)
                             {
-                            if (res.CreatedAt > transactionTime)
+                            if (res.CreatedAt > transactionTime.AddMonths(1))
                             {                               
                                 continue;
                             }
-                            if (res.LeftAt != null && res.LeftAt < transactionTime)
+                            if (res.LeftAt != null && res.LeftAt < transactionTime.AddMonths(1))
                             {                               
                                 continue;
                             }
@@ -121,11 +112,11 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         foreach (var res in residents)
                         {
-                            if (res.CreatedAt > transactionTime)
+                            if (res.CreatedAt > transactionTime.AddMonths(1))
                             {
                                 continue;
                             }
-                            if (res.LeftAt != null && res.LeftAt < transactionTime)
+                            if (res.LeftAt != null && res.LeftAt < transactionTime.AddMonths(1))
                             {
                                 continue;
                             }
