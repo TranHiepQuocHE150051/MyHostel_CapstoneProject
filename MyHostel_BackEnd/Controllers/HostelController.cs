@@ -229,7 +229,8 @@ namespace MyHostel_BackEnd.Controllers
                         AmenitiesResult.Add(new AmenitiesGetHostelDTO
                         {
                             Id = amen.Id,
-                            Icon = amen.Icon
+                            Icon = amen.Icon,
+                            Name = amen.AmenitiyName
                         });
                     }
                     result.Amenities = AmenitiesResult.ToArray();
