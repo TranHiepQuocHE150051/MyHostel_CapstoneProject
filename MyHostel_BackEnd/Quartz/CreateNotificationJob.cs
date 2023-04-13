@@ -34,7 +34,7 @@ namespace MyHostel_BackEnd.Quartz
                         + transaction.Internet;
                     foreach (var other in others)
                     {
-                        decimal price = Decimal.Parse(other.Split(':')[1]);
+                        decimal price = decimal.Parse(other.Split(':')[1]);
                         total += price;
                     }
                     foreach (var resident in residents)
@@ -58,15 +58,18 @@ namespace MyHostel_BackEnd.Quartz
                 {
                     if (int.Parse(transaction.AtTime.ToString().Substring(0,2)) < DateTime.Now.Month)
                     {
-                        string[] others = transaction.Other.Split('-');
-                        var total = transaction.Rent
+                        string[] others = transaction.Other != "" ? transaction.Other.Split('-') : null;
+                        decimal total = (decimal)(transaction.Rent
                             + transaction.Electricity
                             + transaction.Water
-                            + transaction.Internet;
-                        foreach (var other in others)
+                            + transaction.Internet);
+                        if (others != null && others.Length > 0)
                         {
-                            decimal price = Decimal.Parse(other.Split(':')[1]);
-                            total += price;
+                            foreach (var other in others)
+                            {
+                                decimal price = decimal.Parse(other.Split(':')[1]);
+                                total += price;
+                            }
                         }
                         foreach (var resident in residents)
                         {
