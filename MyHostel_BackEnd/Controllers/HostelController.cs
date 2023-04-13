@@ -76,17 +76,17 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     if (prices[0] != "" && prices[1] != "")
                     {
-                        hostels = hostels.Where(h => h.Price >= Decimal.Parse(prices[0]) && h.Price <= Decimal.Parse(prices[1]));
+                        hostels = hostels.Where(h => h.Price >= decimal.Parse(prices[0]) && h.Price <= decimal.Parse(prices[1]));
                     }
                     else
                     {
                         if (prices[0] != "" && prices[1] == "")
                         {
-                            hostels = hostels.Where(h => h.Price >= Decimal.Parse(prices[0]));
+                            hostels = hostels.Where(h => h.Price >= decimal.Parse(prices[0]));
                         }
                         else if (prices[0] == "" && prices[1] != "")
                         {
-                            hostels = hostels.Where(h => h.Price <= Decimal.Parse(prices[1]));
+                            hostels = hostels.Where(h => h.Price <= decimal.Parse(prices[1]));
                         }
                     }
                 }
