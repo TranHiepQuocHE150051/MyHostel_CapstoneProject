@@ -602,6 +602,7 @@ namespace MyHostel_BackEnd.Controllers
                 }
             }
             var member = _context.Members.Where(m => m.InviteCode.Trim().Equals(resident.InviteCode.Trim())).SingleOrDefault();
+            var landlord = _context.Members.Where(m => m.Id== hostel.LandlordId).SingleOrDefault();
             if (member == null)
             {
                 //return BadRequest("Account not exist");
@@ -672,7 +673,8 @@ namespace MyHostel_BackEnd.Controllers
                             MemberId = hostel.LandlordId,
                             JoinedAt = DateTime.Now,
                             Role = 1,
-                            AnonymousTime = 3
+                            AnonymousTime = 3,
+                            NickName = landlord.FirstName + " " + landlord.LastName
 
                         };
                         _context.Participants.Add(admin);
@@ -683,7 +685,8 @@ namespace MyHostel_BackEnd.Controllers
                         MemberId = member.Id,
                         JoinedAt = DateTime.Now,
                         Role = 0,
-                        AnonymousTime = 3
+                        AnonymousTime = 3,
+                        NickName = member.FirstName + " " + member.LastName
 
                     };
                     _context.Participants.Add(participant);
@@ -707,7 +710,8 @@ namespace MyHostel_BackEnd.Controllers
                         MemberId = hostel.LandlordId,
                         JoinedAt = DateTime.Now,
                         Role = 1,
-                        AnonymousTime = 3
+                        AnonymousTime = 3,
+                        NickName = landlord.FirstName + " " + landlord.LastName
 
                     };
                     _context.Participants.Add(chatAdmin);                   
@@ -717,7 +721,8 @@ namespace MyHostel_BackEnd.Controllers
                         MemberId = member.Id,
                         JoinedAt = DateTime.Now,
                         Role = 0,
-                        AnonymousTime = 3
+                        AnonymousTime = 3,
+                        NickName = member.FirstName + " " + member.LastName
 
                     };
                     _context.Participants.Add(participant);

@@ -229,7 +229,7 @@ namespace MyHostel_BackEnd.Controllers
                     JoinedAt = DateTime.Now,
                     Role = 0,
                     AnonymousTime = 0,
-                    NickName = null
+                    NickName = member.FirstName+" "+member.LastName
                 };
                 _context.Participants.Add(participant);
                 await _context.SaveChangesAsync();
