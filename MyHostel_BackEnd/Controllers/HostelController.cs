@@ -663,12 +663,26 @@ namespace MyHostel_BackEnd.Controllers
                 var chat = _context.Chats.Where(c => c.HostelId == id).SingleOrDefault();
                 if (chat != null)
                 {
+                    var chatAdmin = _context.Participants.Where(p=>p.ChatId==chat.Id && p.MemberId==hostel.LandlordId).SingleOrDefault();
+                    if (chatAdmin == null)
+                    {
+                        Participant admin = new Participant
+                        {
+                            ChatId = chat.Id,
+                            MemberId = hostel.LandlordId,
+                            JoinedAt = DateTime.Now,
+                            Role = 1,
+                            AnonymousTime = 3
+
+                        };
+                        _context.Participants.Add(admin);
+                    }
                     Participant participant = new Participant
                     {
                         ChatId = chat.Id,
                         MemberId = member.Id,
                         JoinedAt = DateTime.Now,
-                        Role = 1,
+                        Role = 0,
                         AnonymousTime = 3
 
                     };
@@ -686,12 +700,23 @@ namespace MyHostel_BackEnd.Controllers
                     };
                     _context.Chats.Add(newChat);
                     _context.SaveChanges();
+                    
+                    Participant chatAdmin = new Participant
+                    {
+                        ChatId = newChat.Id,
+                        MemberId = hostel.LandlordId,
+                        JoinedAt = DateTime.Now,
+                        Role = 1,
+                        AnonymousTime = 3
+
+                    };
+                    _context.Participants.Add(chatAdmin);                   
                     Participant participant = new Participant
                     {
                         ChatId = newChat.Id,
                         MemberId = member.Id,
                         JoinedAt = DateTime.Now,
-                        Role = 1,
+                        Role = 0,
                         AnonymousTime = 3
 
                     };

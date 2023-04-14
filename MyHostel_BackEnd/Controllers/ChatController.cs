@@ -53,7 +53,7 @@ namespace MyHostel_BackEnd.Controllers
                     ChatId = chat.Id,
                     MemberId = member.Id,
                     JoinedAt = DateTime.Now,
-                    Role = (byte)member.RoleId,
+                    Role = 0,
                     AnonymousTime = 3,
                     NickName = nickname
                 };
@@ -122,6 +122,9 @@ namespace MyHostel_BackEnd.Controllers
                 };
                 _context.Messages.Add(message1);
                 await _context.SaveChangesAsync();
+                chat.LastMsgAt= DateTime.Now;
+                _context.Chats.Update(chat);
+                await _context.SaveChangesAsync();
                 return Ok("Create message success");
             }
             else
@@ -136,6 +139,9 @@ namespace MyHostel_BackEnd.Controllers
                     AnonymousFlg = (byte)message.AnonymousFlg
                 };
                 _context.Messages.Add(message1);
+                await _context.SaveChangesAsync();
+                chat.LastMsgAt = DateTime.Now;
+                _context.Chats.Update(chat);
                 await _context.SaveChangesAsync();
                 return Ok("Create message success");
             }
@@ -221,7 +227,7 @@ namespace MyHostel_BackEnd.Controllers
                     MemberId = addParticipantDTO.MemberId,
                     ChatId = addParticipantDTO.ChatId,
                     JoinedAt = DateTime.Now,
-                    Role = 1,
+                    Role = 0,
                     AnonymousTime = 0,
                     NickName = null
                 };
