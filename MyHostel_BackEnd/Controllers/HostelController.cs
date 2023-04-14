@@ -660,8 +660,46 @@ namespace MyHostel_BackEnd.Controllers
                 };
                 _context.Residents.Add(resident1);
                 await _context.SaveChangesAsync();
+                var chat = _context.Chats.Where(c => c.HostelId == id).SingleOrDefault();
+                if (chat != null)
+                {
+                    Participant participant = new Participant
+                    {
+                        ChatId = chat.Id,
+                        MemberId = member.Id,
+                        JoinedAt = DateTime.Now,
+                        Role = 1,
+                        AnonymousTime = 3
 
-                //return Ok("Add new resident success");
+                    };
+                    _context.Participants.Add(participant);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    Chat newChat = new Chat
+                    {
+                        HostelId = id,
+                        Name = hostel.Name + " group chat",
+                        CreatedAt = DateTime.Now,
+                        IsGroup = 1
+                    };
+                    _context.Chats.Add(newChat);
+                    _context.SaveChanges();
+                    Participant participant = new Participant
+                    {
+                        ChatId = newChat.Id,
+                        MemberId = member.Id,
+                        JoinedAt = DateTime.Now,
+                        Role = 1,
+                        AnonymousTime = 3
+
+                    };
+                    _context.Participants.Add(participant);
+                    _context.SaveChanges();
+
+                }
+                
                 return Ok(new
                 {
                     IsSuccess = true,
