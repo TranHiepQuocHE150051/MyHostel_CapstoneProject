@@ -9,7 +9,7 @@ using MyHostel_BackEnd.Quartz;
 using Quartz;
 using System.Text;
 using System.Text.Json.Serialization;
-
+using MyHostel_BackEnd.ChatHub;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -87,6 +87,7 @@ FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile(sFilePath),
 });
+builder.Services.AddSignalR();
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddCors();
 builder.Services.AddDbContext<MyHostelContext>(opt => opt.UseSqlServer(
@@ -106,7 +107,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 var app = builder.Build();
-
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<ChatHub>("/ws");
+});
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -118,9 +126,6 @@ app.UseCors(builder => builder.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 );
-app.UseAuthentication();
-app.UseAuthorization();
 
-app.MapControllers();
 
 app.Run();

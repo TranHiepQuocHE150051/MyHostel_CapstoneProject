@@ -101,6 +101,7 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             ChatId = chat.Id,
                             Name = chat.Name,
+                            Avatar = chat.AvatarUrl,
                             IsGroup = 1,
                             LastMsg = messages.Any() ? lastMessage : null
                         });
