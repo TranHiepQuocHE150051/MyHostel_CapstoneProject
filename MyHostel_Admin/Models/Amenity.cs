@@ -13,6 +13,7 @@ namespace MyHostel_Admin.Models
         public int Id { get; set; }
         public string AmenitiyName { get; set; } = null!;
         public string? Icon { get; set; }
+        public bool? Checked { get; set; }
 
         public virtual ICollection<HostelAmenity> HostelAmenities { get; set; }
     }
