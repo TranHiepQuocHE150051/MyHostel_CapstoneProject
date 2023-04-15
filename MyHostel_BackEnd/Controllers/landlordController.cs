@@ -152,7 +152,7 @@ namespace MyHostel_BackEnd.Controllers
             var facilities = _context.Facilities.ToList();
             foreach (var facility in facilities)
             {
-                string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=&location="+latitude+"%2C"+longitude+"&radius=1500&type="+facility.UtilityName+"&key=AIzaSyDLsmLiVOBVQKt-PP6Xf5b1zmNR3wqiURI";               
+                string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location="+latitude+","+longitude+"&radius=3000&type="+facility.UtilityName+"&key=AIzaSyDLsmLiVOBVQKt-PP6Xf5b1zmNR3wqiURI";               
                 WebRequest request = WebRequest.Create(URL);
                 WebResponse response = request.GetResponse();
                 Stream data = response.GetResponseStream();

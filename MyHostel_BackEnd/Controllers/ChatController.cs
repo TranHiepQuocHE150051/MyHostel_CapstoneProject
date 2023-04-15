@@ -192,6 +192,12 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         ParentMessageDTO parentMessage = new ParentMessageDTO();
                         var parentMessageWithImage = new object();
+                        List<string> images = new List<string>();
+                        var MessageImg = _context.MessageImages.Where(m => m.MessageId == message.Id).ToList();
+                        foreach (var item in MessageImg)
+                        {
+                            images.Add(item.ImageUrl);
+                        }
                         MemberInMessageDTO memberInMessage = new MemberInMessageDTO();
                         memberInMessage.Id = message.SenderId;
                         memberInMessage.Avatar = message.Sender.Avatar;
@@ -213,6 +219,7 @@ namespace MyHostel_BackEnd.Controllers
                                         MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
+                                        Img= images.Count==0? null: images,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
                                         ParentMsg =  parentMessage ,
                                         Member = memberInMessage
@@ -231,6 +238,7 @@ namespace MyHostel_BackEnd.Controllers
                                         MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
+                                        Img = images.Count == 0 ? null : images,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
                                         ParentMsg = parentMessageWithImage,
                                         Member = memberInMessage
@@ -245,6 +253,7 @@ namespace MyHostel_BackEnd.Controllers
                                 MessageId = message.Id,
                                 AnonymousFlg = message.AnonymousFlg,
                                 MsgText = message.MsgText,
+                                Img = images.Count == 0 ? null : images,
                                 CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
                                 ParentMsg = null,
                                 Member = memberInMessage
@@ -255,7 +264,13 @@ namespace MyHostel_BackEnd.Controllers
                     else
                     {
                         ParentMessageDTO parentMessage = new ParentMessageDTO();
-                        var parentMessageWithImage = new object();                       
+                        var parentMessageWithImage = new object();
+                        List<string> images = new List<string>();
+                        var MessageImg = _context.MessageImages.Where(m => m.MessageId == message.Id).ToList();
+                        foreach (var item in MessageImg)
+                        {
+                            images.Add(item.ImageUrl);
+                        }
                         if (message.ParentMsgId != null)
                         {
 
@@ -273,6 +288,7 @@ namespace MyHostel_BackEnd.Controllers
                                         MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
+                                        Img = images.Count == 0 ? null : images,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
                                         ParentMsg = parentMessage,
                                     });
@@ -290,6 +306,7 @@ namespace MyHostel_BackEnd.Controllers
                                         MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
+                                        Img = images.Count == 0 ? null : images,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
                                         ParentMsg = parentMessageWithImage,
                                     });
@@ -303,6 +320,7 @@ namespace MyHostel_BackEnd.Controllers
                                 MessageId = message.Id,
                                 AnonymousFlg = message.AnonymousFlg,
                                 MsgText = message.MsgText,
+                                Img = images.Count == 0 ? null : images,
                                 CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
                                 ParentMsg = null,
                             });
