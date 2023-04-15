@@ -183,7 +183,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     limit = 10;
                 }
-                IQueryable<Message> messages = from c in _context.Messages.Include(m => m.Sender) where c.ChatId == id && c.Status==1 select c;
+                IQueryable<Message> messages = from c in _context.Messages.Include(m => m.Sender) where c.ChatId == id && c.Status == 1 orderby c.CreatedAt descending select c;
                 PaginatedList<Message> messagesPL = await PaginatedList<Message>.CreateAsync(messages.AsNoTracking(), (int)page, (int)limit);
                 List<object> result = new List<object>();
                 foreach (var message in messagesPL)
@@ -210,6 +210,7 @@ namespace MyHostel_BackEnd.Controllers
                                     parentMessage.MsgText = parentMsg.MsgText;
                                     result.Add(new MessageDTO()
                                     {
+                                        MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
@@ -227,6 +228,7 @@ namespace MyHostel_BackEnd.Controllers
                                     };
                                     result.Add(new 
                                     {
+                                        MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
@@ -240,6 +242,7 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             result.Add(new MessageDTO()
                             {
+                                MessageId = message.Id,
                                 AnonymousFlg = message.AnonymousFlg,
                                 MsgText = message.MsgText,
                                 CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
@@ -267,6 +270,7 @@ namespace MyHostel_BackEnd.Controllers
                                     parentMessage.MsgText = parentMsg.MsgText;
                                     result.Add(new MessageDTO()
                                     {
+                                        MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
@@ -283,6 +287,7 @@ namespace MyHostel_BackEnd.Controllers
                                     };
                                     result.Add(new
                                     {
+                                        MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
                                         CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
@@ -295,6 +300,7 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             result.Add(new MessageDTO()
                             {
+                                MessageId = message.Id,
                                 AnonymousFlg = message.AnonymousFlg,
                                 MsgText = message.MsgText,
                                 CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
