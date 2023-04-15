@@ -140,6 +140,8 @@ namespace MyHostel_Admin.Models
                     .HasMaxLength(50)
                     .HasColumnName("amenitiy_name");
 
+                entity.Property(e => e.Checked).HasColumnName("checked");
+
                 entity.Property(e => e.Icon)
                     .HasMaxLength(50)
                     .IsUnicode(false)
@@ -150,11 +152,17 @@ namespace MyHostel_Admin.Models
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.AvatarUrl)
+                    .HasMaxLength(1000)
+                    .HasColumnName("avatarUrl");
+
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime")
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
+
+                entity.Property(e => e.IsGroup).HasColumnName("is_group");
 
                 entity.Property(e => e.LastMsgAt)
                     .HasColumnType("datetime")
@@ -162,13 +170,11 @@ namespace MyHostel_Admin.Models
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("name");
 
                 entity.HasOne(d => d.Hostel)
                     .WithMany(p => p.Chats)
                     .HasForeignKey(d => d.HostelId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Chats_Hostels");
             });
 
@@ -514,6 +520,10 @@ namespace MyHostel_Admin.Models
 
                 entity.Property(e => e.MemberId).HasColumnName("member_id");
 
+                entity.Property(e => e.NickName)
+                    .HasMaxLength(50)
+                    .HasColumnName("nick_name");
+
                 entity.Property(e => e.Role).HasColumnName("role");
 
                 entity.HasOne(d => d.Chat)
@@ -588,6 +598,8 @@ namespace MyHostel_Admin.Models
                     .HasColumnName("created_at");
 
                 entity.Property(e => e.HostelId).HasColumnName("hostel_id");
+
+                entity.Property(e => e.IsAnonymousComment).HasColumnName("isAnonymousComment");
 
                 entity.Property(e => e.LeftAt)
                     .HasColumnType("datetime")
