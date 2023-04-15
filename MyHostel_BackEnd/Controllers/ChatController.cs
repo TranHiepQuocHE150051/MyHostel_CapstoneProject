@@ -251,7 +251,6 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     else
                     {
-<<<<<<< Updated upstream
                         ParentMessageDTO parentMessage = new ParentMessageDTO();
                         var parentMessageWithImage = new object();                       
                         if (message.ParentMsgId != null)
@@ -307,15 +306,6 @@ namespace MyHostel_BackEnd.Controllers
 
                     
 
-=======
-                        MessageId = message.Id,
-                        AnonymousFlg = message.AnonymousFlg,
-                        MsgText = message.MsgText,
-                        CreatedAt = message.CreatedAt,
-                        ParentMsg = message.ParentMsgId != null ? parentMessage : null,
-                        Member = message.AnonymousFlg == 0 ? memberInMessage : null
-                    });
->>>>>>> Stashed changes
                 }
                 return Ok(result.ToArray());
             }
