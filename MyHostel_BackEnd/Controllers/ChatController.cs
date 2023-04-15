@@ -128,6 +128,9 @@ namespace MyHostel_BackEnd.Controllers
             };
             _context.Messages.Add(message1);
             await _context.SaveChangesAsync();
+            chat.LastMsgAt = DateTime.Now;
+            _context.Chats.Update(chat);
+            await _context.SaveChangesAsync();
             if (message.Img.Length > 0)
             {
                 foreach (string image in message.Img)
