@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
+using Microsoft.AspNetCore.SignalR;
+using MyHostel_BackEnd.ChatHubController;
+using Newtonsoft.Json;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -10,10 +13,12 @@ namespace MyHostel_BackEnd.Controllers
     [ApiController]
     public class ChatController : ControllerBase
     {
+        private readonly IHubContext<ChatHub> _hubContext;
         private IConfiguration _configuration;
         private MyHostelContext _context;
-        public ChatController(IConfiguration configuration, MyHostelContext context)
+        public ChatController(IConfiguration configuration, MyHostelContext context, IHubContext<ChatHub> hubContext)
         {
+            _hubContext = hubContext;
             _configuration = configuration;
             _context = context;
         }
@@ -110,41 +115,47 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest("Member is not in chat");
             }
-            if (chat.LastMsgAt == null)
+
+            Message message1 = new Message
             {
-                Message message1 = new Message
-                {
-                    ChatId = message.ChatId,
-                    SenderId = message.MemberId,
-                    MsgText = message.MsgText,
-                    CreatedAt = DateTime.Now,
-                    AnonymousFlg = (byte)message.AnonymousFlg
-                };
-                _context.Messages.Add(message1);
-                await _context.SaveChangesAsync();
-                chat.LastMsgAt= DateTime.Now;
-                _context.Chats.Update(chat);
-                await _context.SaveChangesAsync();
-                return Ok("Create message success");
-            }
-            else
+                ChatId = message.ChatId,
+                SenderId = message.MemberId,
+                MsgText = message.MsgText,
+                CreatedAt = DateTime.Now,
+                AnonymousFlg = (byte)message.AnonymousFlg
+            };
+            _context.Messages.Add(message1);
+            await _context.SaveChangesAsync();
+            string jsonStringResult = JsonConvert.SerializeObject(message1);
+            foreach (var participant in participants)
             {
-                Message message1 = new Message
+                if (member.Id != participant.MemberId)
                 {
-                    ChatId = message.ChatId,
-                    SenderId = message.MemberId,
-                    ParentMsgId = message.ParentMsgId,
-                    MsgText = message.MsgText,
-                    CreatedAt = DateTime.Now,
-                    AnonymousFlg = (byte)message.AnonymousFlg
-                };
-                _context.Messages.Add(message1);
-                await _context.SaveChangesAsync();
-                chat.LastMsgAt = DateTime.Now;
-                _context.Chats.Update(chat);
-                await _context.SaveChangesAsync();
-                return Ok("Create message success");
+                    await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{participant.MemberId}", "API", jsonStringResult);
+                }
             }
+            return Ok("Create message success");
+            //if (chat.LastMsgAt == null)
+            //{
+            //}
+            //else
+            //{
+            //    Message message1 = new Message
+            //    {
+            //        ChatId = message.ChatId,
+            //        SenderId = message.MemberId,
+            //        ParentMsgId = message.ParentMsgId,
+            //        MsgText = message.MsgText,
+            //        CreatedAt = DateTime.Now,
+            //        AnonymousFlg = (byte)message.AnonymousFlg
+            //    };
+            //    _context.Messages.Add(message1);
+            //    await _context.SaveChangesAsync();
+            //    chat.LastMsgAt = DateTime.Now;
+            //    _context.Chats.Update(chat);
+            //    await _context.SaveChangesAsync();
+            //    return Ok("Create message success");
+            //}
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessages(int id, [FromQuery] int? page, [FromQuery] int? limit)
@@ -171,16 +182,16 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     ParentMessageDTO parentMessage = new ParentMessageDTO();
                     MemberInMessageDTO memberInMessage = new MemberInMessageDTO();
-                    if(message.ParentMsgId != null)
+                    if (message.ParentMsgId != null)
                     {
                         var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
-                        if(parentMsg != null)
+                        if (parentMsg != null)
                         {
                             parentMessage.Id = parentMsg.Id;
                             parentMessage.MsgText = parentMsg.MsgText;
                         }
                     }
-                    if(message.AnonymousFlg == 0)
+                    if (message.AnonymousFlg == 0)
                     {
                         memberInMessage.Id = message.SenderId;
                         memberInMessage.Avatar = message.Sender.Avatar;
@@ -229,7 +240,7 @@ namespace MyHostel_BackEnd.Controllers
                     JoinedAt = DateTime.Now,
                     Role = 0,
                     AnonymousTime = 0,
-                    NickName = member.FirstName+" "+member.LastName
+                    NickName = member.FirstName + " " + member.LastName
                 };
                 _context.Participants.Add(participant);
                 await _context.SaveChangesAsync();

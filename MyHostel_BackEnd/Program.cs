@@ -9,7 +9,7 @@ using MyHostel_BackEnd.Quartz;
 using Quartz;
 using System.Text;
 using System.Text.Json.Serialization;
-using MyHostel_BackEnd.ChatHub;
+using MyHostel_BackEnd.ChatHubController;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -87,7 +87,7 @@ FirebaseApp.Create(new AppOptions()
 {
     Credential = GoogleCredential.FromFile(sFilePath),
 });
-builder.Services.AddSignalR();
+builder.Services.AddSignalR().AddJsonProtocol();
 builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 builder.Services.AddCors();
 builder.Services.AddDbContext<MyHostelContext>(opt => opt.UseSqlServer(
