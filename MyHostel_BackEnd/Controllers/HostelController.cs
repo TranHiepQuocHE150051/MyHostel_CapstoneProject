@@ -674,7 +674,8 @@ namespace MyHostel_BackEnd.Controllers
                             JoinedAt = DateTime.Now,
                             Role = 1,
                             AnonymousTime = 3,
-                            NickName = landlord.FirstName + " " + landlord.LastName
+                            NickName = landlord.FirstName + " " + landlord.LastName,
+                            Status=0
 
                         };
                         _context.Participants.Add(admin);
@@ -686,7 +687,8 @@ namespace MyHostel_BackEnd.Controllers
                         JoinedAt = DateTime.Now,
                         Role = 0,
                         AnonymousTime = 3,
-                        NickName = member.FirstName + " " + member.LastName
+                        NickName = member.FirstName + " " + member.LastName,
+                        Status=0
 
                     };
                     _context.Participants.Add(participant);
@@ -711,7 +713,8 @@ namespace MyHostel_BackEnd.Controllers
                         JoinedAt = DateTime.Now,
                         Role = 1,
                         AnonymousTime = 3,
-                        NickName = landlord.FirstName + " " + landlord.LastName
+                        NickName = landlord.FirstName + " " + landlord.LastName,
+                        Status=0
 
                     };
                     _context.Participants.Add(chatAdmin);                   
@@ -722,7 +725,8 @@ namespace MyHostel_BackEnd.Controllers
                         JoinedAt = DateTime.Now,
                         Role = 0,
                         AnonymousTime = 3,
-                        NickName = member.FirstName + " " + member.LastName
+                        NickName = member.FirstName + " " + member.LastName,
+                        Status=0
 
                     };
                     _context.Participants.Add(participant);

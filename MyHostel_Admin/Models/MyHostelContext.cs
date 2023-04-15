@@ -28,6 +28,7 @@ namespace MyHostel_Admin.Models
         public virtual DbSet<HostelImage> HostelImages { get; set; } = null!;
         public virtual DbSet<Member> Members { get; set; } = null!;
         public virtual DbSet<Message> Messages { get; set; } = null!;
+        public virtual DbSet<MessageImage> MessageImages { get; set; } = null!;
         public virtual DbSet<NearbyFacility> NearbyFacilities { get; set; } = null!;
         public virtual DbSet<Notification> Notifications { get; set; } = null!;
         public virtual DbSet<Participant> Participants { get; set; } = null!;
@@ -427,6 +428,8 @@ namespace MyHostel_Admin.Models
 
                 entity.Property(e => e.SenderId).HasColumnName("sender_id");
 
+                entity.Property(e => e.Status).HasColumnName("status");
+
                 entity.HasOne(d => d.Chat)
                     .WithMany(p => p.Messages)
                     .HasForeignKey(d => d.ChatId)
@@ -438,6 +441,25 @@ namespace MyHostel_Admin.Models
                     .HasForeignKey(d => d.SenderId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Messages_Members");
+            });
+
+            modelBuilder.Entity<MessageImage>(entity =>
+            {
+                entity.ToTable("Message_Images");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.ImageUrl)
+                    .HasMaxLength(1000)
+                    .HasColumnName("imageURL");
+
+                entity.Property(e => e.MessageId).HasColumnName("message_id");
+
+                entity.HasOne(d => d.Message)
+                    .WithMany(p => p.MessageImages)
+                    .HasForeignKey(d => d.MessageId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Message_Images_Messages");
             });
 
             modelBuilder.Entity<NearbyFacility>(entity =>
@@ -525,6 +547,8 @@ namespace MyHostel_Admin.Models
                     .HasColumnName("nick_name");
 
                 entity.Property(e => e.Role).HasColumnName("role");
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Chat)
                     .WithMany(p => p.Participants)

@@ -46,14 +46,14 @@ namespace MyHostel_BackEnd.Controllers
                 var result = new GetListChatDTO { MemberId = id,
                                                   Chats = new List<object>()
                                                         };
-                List<SingleChatDTO> SingleChatList = new List<SingleChatDTO>();
-                List<GroupChatDTO> GroupChatList = new List<GroupChatDTO>();
+
                 foreach (var chat in chatsPL)
                 {
                     var messages = await _context.Messages.Where(m => m.ChatId == chat.Id).Include(c => c.Sender).ToListAsync();
                     if (chat.IsGroup == 0)
                     {
                         SingleChatMessageDTO lastMessage = new SingleChatMessageDTO();
+                        var lastMessageWithImage = new object();
                         var otherparticipant = _context.Participants.Where(p => p.ChatId == chat.Id && p.MemberId != id).SingleOrDefault();
                         var otherMember = _context.Members.Where(m => m.Id == otherparticipant.MemberId).SingleOrDefault();
                         if (messages.Any())
@@ -62,49 +62,131 @@ namespace MyHostel_BackEnd.Controllers
                             
                             if (lastMsg != null)
                             {
-                                lastMessage.AnonymousFlg = lastMsg.AnonymousFlg;
-                                lastMessage.MemberId = lastMsg.SenderId;
-                                lastMessage.AvatarUrl = lastMsg.Sender.Avatar;
-                                lastMessage.MsgText = lastMsg.MsgText;
-                                lastMessage.CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm");
+                                var imgNo = _context.MessageImages.Where(m => m.MessageId == lastMsg.Id).Count();
+                                if (lastMsg.MsgText != null)
+                                {
+                                    lastMessage.AnonymousFlg = lastMsg.AnonymousFlg;
+                                    lastMessage.MemberId = lastMsg.SenderId;
+                                    lastMessage.AvatarUrl = lastMsg.Sender.Avatar;
+                                    lastMessage.MsgText = lastMsg.MsgText;
+                                    lastMessage.CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm");
+                                    result.Chats.Add(new SingleChatDTO()
+                                    {
+                                        ChatId = chat.Id,
+                                        Name = otherMember.FirstName + " " + otherMember.LastName,
+                                        IsGroup = 0,
+                                        LastMsg = lastMessage,
+                                        Participant = new SingleChatParicipantDTO
+                                        {
+                                            MemberId = otherMember.Id,
+                                            AvatarUrl = otherMember.Avatar,
+                                            Name = otherMember.FirstName + " " + otherMember.LastName
+
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    lastMessageWithImage = new
+                                    {
+                                    AnonymousFlg = lastMsg.AnonymousFlg,
+                                    MemberId = lastMsg.SenderId,
+                                    AvatarUrl = lastMsg.Sender.Avatar,
+                                    MsgText = lastMsg.MsgText,
+                                    CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                    ImgNo = imgNo
+                                    };
+                                    result.Chats.Add(new 
+                                    {
+                                        ChatId = chat.Id,
+                                        Name = otherMember.FirstName + " " + otherMember.LastName,
+                                        IsGroup = 0,
+                                        LastMsg =  lastMessageWithImage,
+                                        Participant = new SingleChatParicipantDTO
+                                        {
+                                            MemberId = otherMember.Id,
+                                            AvatarUrl = otherMember.Avatar,
+                                            Name = otherMember.FirstName + " " + otherMember.LastName
+
+                                        }
+                                    });
+                                }
                             }
                         }
-                        result.Chats.Add(new SingleChatDTO()
+                        else
                         {
-                            ChatId = chat.Id,
-                            Name = otherMember.FirstName + " " + otherMember.LastName,
-                            IsGroup = 0,
-                            LastMsg = messages.Any() ? lastMessage : null,
-                            Participant = new SingleChatParicipantDTO
+                            result.Chats.Add(new SingleChatDTO()
                             {
-                                MemberId= otherMember.Id,
-                                AvatarUrl= otherMember.Avatar,
-                                Name= otherMember.FirstName+" "+otherMember.LastName
-
-                            }
-                        });
+                                ChatId = chat.Id,
+                                Name = otherMember.FirstName + " " + otherMember.LastName,
+                                IsGroup = 0,
+                                LastMsg = null,
+                                Participant = new SingleChatParicipantDTO
+                                {
+                                    MemberId = otherMember.Id,
+                                    AvatarUrl = otherMember.Avatar,
+                                    Name = otherMember.FirstName + " " + otherMember.LastName
+                                }
+                            });
+                        }
+                        
                     }
                     else
                     {
                         GroupChatMessageDTO lastMessage = new GroupChatMessageDTO();
+                        var lastMessageWithImage = new object();
                         if (messages.Any())
                         {
                             var lastMsg = messages.OrderBy(m => m.CreatedAt).Last();
                             if (lastMsg != null)
                             {
-                                lastMessage.AnonymousFlg = lastMsg.AnonymousFlg;
-                                lastMessage.MsgText = lastMsg.MsgText;
-                                lastMessage.CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm");
+                                var imgNo = _context.MessageImages.Where(m => m.MessageId == lastMsg.Id).Count();
+                                if (lastMsg.MsgText != null)
+                                {
+                                    lastMessage.AnonymousFlg = lastMsg.AnonymousFlg;
+                                    lastMessage.MsgText = lastMsg.MsgText;
+                                    lastMessage.CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm");
+                                    result.Chats.Add(new GroupChatDTO()
+                                    {
+                                        ChatId = chat.Id,
+                                        Name = chat.Name,
+                                        Avatar = chat.AvatarUrl,
+                                        IsGroup = 1,
+                                        LastMsg =  lastMessage
+                                    });
+                                }
+                                else
+                                {
+                                    lastMessageWithImage = new
+                                    {
+                                        AnonymousFlg = lastMsg.AnonymousFlg,
+                                        MsgText = lastMsg.MsgText,
+                                        CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                        ImgNo = imgNo
+                                    };
+                                    result.Chats.Add(new
+                                    {
+                                        ChatId = chat.Id,
+                                        Name = chat.Name,
+                                        IsGroup = 1,
+                                        LastMsg = lastMessageWithImage,                                    
+                                    });
+                                }
+
                             }
                         }
-                        result.Chats.Add(new GroupChatDTO()
+                        else
                         {
-                            ChatId = chat.Id,
-                            Name = chat.Name,
-                            Avatar = chat.AvatarUrl,
-                            IsGroup = 1,
-                            LastMsg = messages.Any() ? lastMessage : null
-                        });
+                            result.Chats.Add(new GroupChatDTO()
+                            {
+                                ChatId = chat.Id,
+                                Name = chat.Name,
+                                Avatar = chat.AvatarUrl,
+                                IsGroup = 1,
+                                LastMsg = null
+                            });
+                        }
+                        
                     }
                 }
                 return Ok(result);

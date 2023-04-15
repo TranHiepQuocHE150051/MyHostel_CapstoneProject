@@ -7,5 +7,6 @@
         public int ParentMsgId { get; set; }
         public int AnonymousFlg { get; set; }
         public int MemberId { get; set; }
+        public string[] Img { get; set; }
     }
 }

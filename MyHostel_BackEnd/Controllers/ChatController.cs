@@ -60,7 +60,8 @@ namespace MyHostel_BackEnd.Controllers
                     JoinedAt = DateTime.Now,
                     Role = 0,
                     AnonymousTime = 3,
-                    NickName = nickname
+                    NickName = nickname,
+                    Status=0
                 };
                 _context.Participants.Add(participant1);
             }
@@ -122,11 +123,38 @@ namespace MyHostel_BackEnd.Controllers
                 SenderId = message.MemberId,
                 MsgText = message.MsgText,
                 CreatedAt = DateTime.Now,
-                AnonymousFlg = (byte)message.AnonymousFlg
+                AnonymousFlg = (byte)message.AnonymousFlg,
+                Status=1
             };
             _context.Messages.Add(message1);
             await _context.SaveChangesAsync();
-            string jsonStringResult = JsonConvert.SerializeObject(message1);
+            if (message.Img.Length > 0)
+            {
+                foreach (string image in message.Img)
+                {
+                    MessageImage messageImage = new MessageImage
+                    {
+                        MessageId = message1.Id,
+                        ImageUrl = image
+
+                    };
+                    _context.MessageImages.Add(messageImage);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            foreach(var participant in participants)
+            {
+                participant.Status=0;
+                _context.Participants.Update(participant);
+            }
+            await _context.SaveChangesAsync();
+            //string jsonStringResult = JsonConvert.SerializeObject(message1);
+            string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
+        new JsonSerializerSettings()
+    {
+        ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+    }
+    );
             foreach (var participant in participants)
             {
                 if (member.Id != participant.MemberId)
@@ -135,27 +163,7 @@ namespace MyHostel_BackEnd.Controllers
                 }
             }
             return Ok("Create message success");
-            //if (chat.LastMsgAt == null)
-            //{
-            //}
-            //else
-            //{
-            //    Message message1 = new Message
-            //    {
-            //        ChatId = message.ChatId,
-            //        SenderId = message.MemberId,
-            //        ParentMsgId = message.ParentMsgId,
-            //        MsgText = message.MsgText,
-            //        CreatedAt = DateTime.Now,
-            //        AnonymousFlg = (byte)message.AnonymousFlg
-            //    };
-            //    _context.Messages.Add(message1);
-            //    await _context.SaveChangesAsync();
-            //    chat.LastMsgAt = DateTime.Now;
-            //    _context.Chats.Update(chat);
-            //    await _context.SaveChangesAsync();
-            //    return Ok("Create message success");
-            //}
+
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessages(int id, [FromQuery] int? page, [FromQuery] int? limit)
@@ -175,36 +183,129 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     limit = 10;
                 }
-                IQueryable<Message> messages = from c in _context.Messages.Include(m => m.Sender) where c.ChatId == id select c;
+                IQueryable<Message> messages = from c in _context.Messages.Include(m => m.Sender) where c.ChatId == id && c.Status==1 select c;
                 PaginatedList<Message> messagesPL = await PaginatedList<Message>.CreateAsync(messages.AsNoTracking(), (int)page, (int)limit);
-                List<MessageDTO> result = new List<MessageDTO>();
+                List<object> result = new List<object>();
                 foreach (var message in messagesPL)
                 {
-                    ParentMessageDTO parentMessage = new ParentMessageDTO();
-                    MemberInMessageDTO memberInMessage = new MemberInMessageDTO();
-                    if (message.ParentMsgId != null)
-                    {
-                        var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
-                        if (parentMsg != null)
-                        {
-                            parentMessage.Id = parentMsg.Id;
-                            parentMessage.MsgText = parentMsg.MsgText;
-                        }
-                    }
                     if (message.AnonymousFlg == 0)
                     {
+                        ParentMessageDTO parentMessage = new ParentMessageDTO();
+                        var parentMessageWithImage = new object();
+                        MemberInMessageDTO memberInMessage = new MemberInMessageDTO();
                         memberInMessage.Id = message.SenderId;
                         memberInMessage.Avatar = message.Sender.Avatar;
                         memberInMessage.FullName = message.Sender.FirstName + " " + message.Sender.LastName;
+                        if (message.ParentMsgId != null)
+                        {
+
+                            var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
+
+                            if (parentMsg != null)
+                            {
+                                var imgNo = _context.MessageImages.Where(m => m.MessageId == parentMsg.Id).Count();
+                                if (parentMsg.MsgText != null)
+                                {
+                                    parentMessage.Id = parentMsg.Id;
+                                    parentMessage.MsgText = parentMsg.MsgText;
+                                    result.Add(new MessageDTO()
+                                    {
+                                        AnonymousFlg = message.AnonymousFlg,
+                                        MsgText = message.MsgText,
+                                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                        ParentMsg =  parentMessage ,
+                                        Member = memberInMessage
+                                    });
+                                }
+                                else
+                                {
+                                    parentMessageWithImage = new
+                                    {
+                                        Id = parentMsg.Id,
+                                        MsgText = parentMsg.MsgText,
+                                        ImgNo = imgNo
+                                    };
+                                    result.Add(new 
+                                    {
+                                        AnonymousFlg = message.AnonymousFlg,
+                                        MsgText = message.MsgText,
+                                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                        ParentMsg = parentMessageWithImage,
+                                        Member = memberInMessage
+                                    });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            result.Add(new MessageDTO()
+                            {
+                                AnonymousFlg = message.AnonymousFlg,
+                                MsgText = message.MsgText,
+                                CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                ParentMsg = null,
+                                Member = memberInMessage
+                            });
+                        }
+                        
                     }
-                    result.Add(new MessageDTO()
+                    else
                     {
-                        AnonymousFlg = message.AnonymousFlg,
-                        MsgText = message.MsgText,
-                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
-                        ParentMsg = message.ParentMsgId != null ? parentMessage : null,
-                        Member = message.AnonymousFlg == 0 ? memberInMessage : null
-                    });
+                        ParentMessageDTO parentMessage = new ParentMessageDTO();
+                        var parentMessageWithImage = new object();                       
+                        if (message.ParentMsgId != null)
+                        {
+
+                            var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
+
+                            if (parentMsg != null)
+                            {
+                                var imgNo = _context.MessageImages.Where(m => m.MessageId == parentMsg.Id).Count();
+                                if (parentMsg.MsgText != null)
+                                {
+                                    parentMessage.Id = parentMsg.Id;
+                                    parentMessage.MsgText = parentMsg.MsgText;
+                                    result.Add(new MessageDTO()
+                                    {
+                                        AnonymousFlg = message.AnonymousFlg,
+                                        MsgText = message.MsgText,
+                                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                        ParentMsg = parentMessage,
+                                    });
+                                }
+                                else
+                                {
+                                    parentMessageWithImage = new
+                                    {
+                                        Id = parentMsg.Id,
+                                        MsgText = parentMsg.MsgText,
+                                        ImgNo = imgNo
+                                    };
+                                    result.Add(new
+                                    {
+                                        AnonymousFlg = message.AnonymousFlg,
+                                        MsgText = message.MsgText,
+                                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                        ParentMsg = parentMessageWithImage,
+                                    });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            result.Add(new MessageDTO()
+                            {
+                                AnonymousFlg = message.AnonymousFlg,
+                                MsgText = message.MsgText,
+                                CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                ParentMsg = null,
+                            });
+                        }
+                        
+                    }
+
+                    
+
                 }
                 return Ok(result);
             }
@@ -240,11 +341,69 @@ namespace MyHostel_BackEnd.Controllers
                     JoinedAt = DateTime.Now,
                     Role = 0,
                     AnonymousTime = 0,
-                    NickName = member.FirstName + " " + member.LastName
+                    NickName = member.FirstName + " " + member.LastName,
+                    Status = 0
                 };
                 _context.Participants.Add(participant);
                 await _context.SaveChangesAsync();
                 return Ok("Add new Participant success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPut("{id}/participant")]
+        public async Task<IActionResult> UpdateStatusParticipant(int id,[FromBody] int ParticipantId)
+        {
+            try
+            {
+                var chat = await _context.Chats.Where(c => c.Id == id).FirstOrDefaultAsync();
+                if (chat == null)
+                {
+                    return BadRequest("Chat not exist");
+                }
+                var participant = _context.Participants.Where(p => p.Id == ParticipantId).SingleOrDefault();
+                if (participant.Status == 0)
+                {
+                    participant.Status = 1;
+                }
+                _context.Participants.Update(participant);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpDelete("{id}/message")]
+        public async Task<IActionResult> DeleteMessage(int id, [FromQuery] int IsImg)
+        {
+            try
+            {
+                var message = await _context.Messages.Where(c => c.Id == id).FirstOrDefaultAsync();
+                if (message == null)
+                {
+                    return BadRequest("Message not exist");
+                }
+                if (IsImg == 0)
+                {
+                    message.Status = 0;
+                    _context.Messages.Update(message);
+                    _context.SaveChanges();
+                    return Ok("Delete successfully");
+                }
+                else
+                {
+                    var MessageImage = _context.MessageImages.Where(m=>m.MessageId==id).ToList();
+                    foreach(var image in MessageImage)
+                    {
+                        _context.MessageImages.Remove(image);
+                    }
+                    _context.SaveChanges();
+                    return Ok("Delete successfully");
+                }
             }
             catch (Exception e)
             {
