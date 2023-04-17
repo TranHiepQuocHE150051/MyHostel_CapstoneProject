@@ -10,6 +10,9 @@
         public decimal? Internet { get; set; }
         public ResidentDTO[] Residents { get; set; }
         public OtherCostDTO[] OtherCost { get; set; }
+
+        public decimal? PaidAmount { get; set; }
+        public int Status { get; set; }
         public Boolean? IsPaid { get; set; }
         public decimal? Total { get; set; }
     }

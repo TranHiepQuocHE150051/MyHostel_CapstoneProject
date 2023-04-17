@@ -15,6 +15,8 @@ namespace MyHostel_BackEnd.Models
         public DateTime? PaidAt { get; set; }
         public DateTime? CreatedAt { get; set; }
         public string? AtTime { get; set; }
+        public decimal? PaidAmount { get; set; }
+        public int Status { get; set; }
 
         public virtual Room Room { get; set; } = null!;
     }

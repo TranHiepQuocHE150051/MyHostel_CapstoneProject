@@ -8,5 +8,6 @@
         public decimal Internet { get; set; }
         public decimal Rent { get; set; }
         public string[] Other { get; set; }
+        public decimal PaidAmount { get; set; }
     }
 }

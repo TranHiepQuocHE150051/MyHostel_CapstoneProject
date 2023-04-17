@@ -14,7 +14,7 @@ namespace MyHostel_BackEnd.Quartz
             {
                 var room = _context.Rooms.Where(r => r.Id == transaction.RoomId).SingleOrDefault();
                 var residents = await _context.Residents.Where(r => r.RoomId == transaction.RoomId && r.Status == 1).ToListAsync();
-                if (transaction.PaidAt != null)
+                if (transaction.Status != 2 && transaction.Status!=3)
                 {
                     continue;
                 }

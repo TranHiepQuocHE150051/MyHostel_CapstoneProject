@@ -114,7 +114,9 @@ namespace MyHostel_BackEnd.Controllers
                         Water = transaction.Water,
                         Internet = transaction.Internet,
                         Residents = residentlist.ToArray(),
-                        IsPaid = transaction.PaidAt == null ? false : true,
+                        PaidAmount = transaction.PaidAmount,
+                        Status = transaction.Status,
+                        IsPaid = transaction.Status == 0 ? false : true,
                         Total = total,
                         OtherCost = otherCost.ToArray()
                     });
@@ -201,7 +203,9 @@ namespace MyHostel_BackEnd.Controllers
                     Rent = transaction.Rent,
                     AtTime = transaction.AtTime,
                     Other = other,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTime.Now,
+                    Status=0,
+                    PaidAmount=0
                 };
                 _context.Transactions.Add(transaction1);
                 var residents = _context.Residents.Where(r => r.RoomId == id && r.Status == 1).ToList();
@@ -279,9 +283,21 @@ namespace MyHostel_BackEnd.Controllers
                 transaction.Internet = updateTransactionDTO.Internet;
                 transaction.Rent = updateTransactionDTO.Rent;
                 transaction.Other = other;
-                _context.Transactions.Update(transaction);
+                transaction.PaidAmount=   updateTransactionDTO.PaidAmount;
+                transaction.PaidAt = DateTime.Now;
+                
                 var residents = _context.Residents.Where(r => r.RoomId == id && r.Status == 1).ToList();
                 var total = CalculateTotalMoney(transaction);
+                if (total > transaction.PaidAmount)
+                {
+                    transaction.Status = 1;
+                    _context.Transactions.Update(transaction);
+                }
+                else if(total<=transaction.PaidAmount)
+                    _context.Transactions.Update(transaction);
+                {
+                    transaction.Status = 2;
+                }
                 foreach (var res in residents)
                 {
                     Notification notification = new Notification()
