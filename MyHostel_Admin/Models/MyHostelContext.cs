@@ -714,6 +714,10 @@ namespace MyHostel_Admin.Models
                     .HasMaxLength(1000)
                     .HasColumnName("other");
 
+                entity.Property(e => e.PaidAmount)
+                    .HasColumnType("money")
+                    .HasColumnName("paid_amount");
+
                 entity.Property(e => e.PaidAt)
                     .HasColumnType("datetime")
                     .HasColumnName("paid_at");
@@ -723,6 +727,8 @@ namespace MyHostel_Admin.Models
                     .HasColumnName("rent");
 
                 entity.Property(e => e.RoomId).HasColumnName("room_id");
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.Water)
                     .HasColumnType("money")

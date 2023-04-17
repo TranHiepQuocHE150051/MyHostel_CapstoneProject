@@ -277,12 +277,25 @@ namespace MyHostel_BackEnd.Controllers
                         other = other + it + " - ";
                     }
                     other = other.Substring(0, other.Length - 3);
+                    transaction.Other = other;
                 }
-                transaction.Electricity = updateTransactionDTO.Electricity;
-                transaction.Water = updateTransactionDTO.Water;
-                transaction.Internet = updateTransactionDTO.Internet;
-                transaction.Rent = updateTransactionDTO.Rent;
-                transaction.Other = other;
+                if (updateTransactionDTO.Electricity > 0)
+                {
+                    transaction.Electricity = updateTransactionDTO.Electricity;
+                }
+                if (updateTransactionDTO.Internet > 0)
+                {
+                    transaction.Internet = updateTransactionDTO.Electricity;
+                }
+                if (updateTransactionDTO.Water > 0)
+                {
+                    transaction.Water = updateTransactionDTO.Electricity;
+                }
+                if (updateTransactionDTO.Rent > 0)
+                {
+                    transaction.Rent = updateTransactionDTO.Electricity;
+                }
+                
                 transaction.PaidAmount=   updateTransactionDTO.PaidAmount;
                 transaction.PaidAt = DateTime.Now;
                 
@@ -293,11 +306,12 @@ namespace MyHostel_BackEnd.Controllers
                     transaction.Status = 1;
                     _context.Transactions.Update(transaction);
                 }
-                else if(total<=transaction.PaidAmount)
-                    _context.Transactions.Update(transaction);
+                else                   
                 {
                     transaction.Status = 2;
+                    _context.Transactions.Update(transaction);
                 }
+                var moneyToPay = total - updateTransactionDTO.PaidAmount;
                 foreach (var res in residents)
                 {
                     Notification notification = new Notification()
@@ -308,7 +322,7 @@ namespace MyHostel_BackEnd.Controllers
                         SendAtHour = DateTime.Now.Hour,
                         Type = 0,
                         Message = "Tiền cần đóng của " + room.Name + ": " +
-                        total.ToString()
+                        moneyToPay.ToString()
                     };
                     _context.Notifications.Add(notification);
                 }
