@@ -285,15 +285,15 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 if (updateTransactionDTO.Internet > 0)
                 {
-                    transaction.Internet = updateTransactionDTO.Electricity;
+                    transaction.Internet = updateTransactionDTO.Internet;
                 }
                 if (updateTransactionDTO.Water > 0)
                 {
-                    transaction.Water = updateTransactionDTO.Electricity;
+                    transaction.Water = updateTransactionDTO.Water;
                 }
                 if (updateTransactionDTO.Rent > 0)
                 {
-                    transaction.Rent = updateTransactionDTO.Electricity;
+                    transaction.Rent = updateTransactionDTO.Rent;
                 }
                 
                 transaction.PaidAmount=   updateTransactionDTO.PaidAmount;
