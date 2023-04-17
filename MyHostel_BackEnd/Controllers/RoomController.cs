@@ -279,19 +279,19 @@ namespace MyHostel_BackEnd.Controllers
                     other = other.Substring(0, other.Length - 3);
                     transaction.Other = other;
                 }
-                if (updateTransactionDTO.Electricity > 0)
+                if (updateTransactionDTO.Electricity >= 0)
                 {
                     transaction.Electricity = updateTransactionDTO.Electricity;
                 }
-                if (updateTransactionDTO.Internet > 0)
+                if (updateTransactionDTO.Internet >= 0)
                 {
                     transaction.Internet = updateTransactionDTO.Internet;
                 }
-                if (updateTransactionDTO.Water > 0)
+                if (updateTransactionDTO.Water >= 0)
                 {
                     transaction.Water = updateTransactionDTO.Water;
                 }
-                if (updateTransactionDTO.Rent > 0)
+                if (updateTransactionDTO.Rent >= 0)
                 {
                     transaction.Rent = updateTransactionDTO.Rent;
                 }
