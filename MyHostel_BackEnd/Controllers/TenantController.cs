@@ -80,7 +80,7 @@ namespace MyHostel_BackEnd.Controllers
             }
         }
         [HttpGet("{id}/unpaid")]
-        public async Task<ActionResult> GetUnpaidBill(int id)
+        public async Task<ActionResult> GetUnpaidBill(int id, [FromQuery]string status)
         {
             try
             {
@@ -99,65 +99,133 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("Room not exist");
                 }
-                
-                var transactions = _context.Transactions.Where(t => t.RoomId == room.Id && t.Status != 2 && t.Status != 3).ToList();
-                List<UnpaidBillDTO> result = new List<UnpaidBillDTO>();
-                if (transactions.Any())
+                if (status == null || !IsInteger(status))
                 {
-                    foreach(var transaction in transactions)
+                    var transactions = _context.Transactions.Where(t => t.RoomId == room.Id).ToList();
+                    List<UnpaidBillDTO> result = new List<UnpaidBillDTO>();
+                    if (transactions.Any())
                     {
-                        var otherCost = new List<OtherCostDTO>();
-                        string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
-                        decimal total = 0;
-                        if (transaction.Rent != null)
+                        foreach (var transaction in transactions)
                         {
-                            total += (decimal)transaction.Rent;
-                        }
-                        if (transaction.Electricity != null)
-                        {
-                            total += (decimal)transaction.Electricity;
-                        }
-                        if (transaction.Water != null)
-                        {
-                            total += (decimal)transaction.Water;
-                        }
-                        if (transaction.Internet != null)
-                        {
-                            total += (decimal)transaction.Internet;
-                        }
-                        if (others != null)
-                        {
-                            foreach (var other in others)
+                            var otherCost = new List<OtherCostDTO>();
+                            string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
+                            decimal total = 0;
+                            if (transaction.Rent != null)
                             {
-                                decimal price = decimal.Parse(other.Split(':')[1]);
-                                total += price;
-                                otherCost.Add(new OtherCostDTO
-                                {
-                                    Name = other.Split(':')[0],
-                                    Cost = price
-                                });
+                                total += (decimal)transaction.Rent;
                             }
+                            if (transaction.Electricity != null)
+                            {
+                                total += (decimal)transaction.Electricity;
+                            }
+                            if (transaction.Water != null)
+                            {
+                                total += (decimal)transaction.Water;
+                            }
+                            if (transaction.Internet != null)
+                            {
+                                total += (decimal)transaction.Internet;
+                            }
+                            if (others != null)
+                            {
+                                foreach (var other in others)
+                                {
+                                    decimal price = decimal.Parse(other.Split(':')[1]);
+                                    total += price;
+                                    otherCost.Add(new OtherCostDTO
+                                    {
+                                        Name = other.Split(':')[0],
+                                        Cost = price
+                                    });
+                                }
+                            }
+                            if (transaction.PaidAmount == null)
+                            {
+                                transaction.PaidAmount = 0;
+                            }
+                            decimal pay = (decimal)(total - transaction.PaidAmount);
+                            result.Add(new UnpaidBillDTO
+                            {
+                                Id = transaction.Id,
+                                AtTime = transaction.AtTime,
+                                Rent = transaction.Rent == null ? 0 : transaction.Rent.Value,
+                                Electricity = transaction.Electricity == null ? 0 : transaction.Electricity.Value,
+                                Water = transaction.Water == null ? 0 : transaction.Water.Value,
+                                Internet = transaction.Internet == null ? 0 : transaction.Internet.Value,
+                                OtherCost = otherCost,
+                                PaidAmount = transaction.PaidAmount == null ? 0 : transaction.PaidAmount.Value,
+                                NeedToPay = transaction.Status==2? 0: pay,
+                                Status= transaction.Status
+                            });
                         }
-                        if (transaction.PaidAmount == null)
-                        {
-                            transaction.PaidAmount = 0;
-                        }
-                        decimal pay = (decimal)(total - transaction.PaidAmount);
-                        result.Add(new UnpaidBillDTO
-                        {
-                            Id = transaction.Id,
-                            AtTime = transaction.AtTime,
-                            Rent = transaction.Rent == null ? 0 : transaction.Rent.Value,
-                            Electricity = transaction.Electricity == null ? 0 : transaction.Electricity.Value,
-                            Water = transaction.Water == null ? 0 : transaction.Water.Value,
-                            Internet = transaction.Internet == null ? 0 : transaction.Internet.Value,
-                            OtherCost = otherCost,
-                            PaidAmount = transaction.PaidAmount == null ? 0 : transaction.PaidAmount.Value,
-                            NeedToPay = pay
-                        });
                     }
+                    return Ok(result);
                 }
-                return Ok(result);
+                else
+                {
+                    int transactionStatus = int.Parse(status);
+                    var transactions = _context.Transactions.Where(t => t.RoomId == room.Id && t.Status== transactionStatus).ToList();
+                    List<UnpaidBillDTO> result = new List<UnpaidBillDTO>();
+                    if (transactions.Any())
+                    {
+                        foreach (var transaction in transactions)
+                        {
+                            var otherCost = new List<OtherCostDTO>();
+                            string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
+                            decimal total = 0;
+                            if (transaction.Rent != null)
+                            {
+                                total += (decimal)transaction.Rent;
+                            }
+                            if (transaction.Electricity != null)
+                            {
+                                total += (decimal)transaction.Electricity;
+                            }
+                            if (transaction.Water != null)
+                            {
+                                total += (decimal)transaction.Water;
+                            }
+                            if (transaction.Internet != null)
+                            {
+                                total += (decimal)transaction.Internet;
+                            }
+                            if (others != null)
+                            {
+                                foreach (var other in others)
+                                {
+                                    decimal price = decimal.Parse(other.Split(':')[1]);
+                                    total += price;
+                                    otherCost.Add(new OtherCostDTO
+                                    {
+                                        Name = other.Split(':')[0],
+                                        Cost = price
+                                    });
+                                }
+                            }
+                            if (transaction.PaidAmount == null)
+                            {
+                                transaction.PaidAmount = 0;
+                            }
+                            decimal pay = (decimal)(total - transaction.PaidAmount);
+                            result.Add(new UnpaidBillDTO
+                            {
+                                Id = transaction.Id,
+                                AtTime = transaction.AtTime,
+                                Rent = transaction.Rent == null ? 0 : transaction.Rent.Value,
+                                Electricity = transaction.Electricity == null ? 0 : transaction.Electricity.Value,
+                                Water = transaction.Water == null ? 0 : transaction.Water.Value,
+                                Internet = transaction.Internet == null ? 0 : transaction.Internet.Value,
+                                OtherCost = otherCost,
+                                PaidAmount = transaction.PaidAmount == null ? 0 : transaction.PaidAmount.Value,
+                                NeedToPay = transactionStatus==2 ? 0:pay,
+                                Status = transactionStatus
+                            });
+                        }
+                    }
+                    return Ok(result);
+                }
+                
+                
             }
             catch (Exception e)
             {
@@ -179,6 +247,11 @@ namespace MyHostel_BackEnd.Controllers
                 result1 = result.ToString() + "M";
             }
             return result1;
+        }
+        private bool IsInteger(string input)
+        {
+            int num;
+            return int.TryParse(input, out num) && int.Parse(input) > 0;
         }
     }
 }

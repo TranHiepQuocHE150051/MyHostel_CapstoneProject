@@ -11,5 +11,6 @@
         public List<OtherCostDTO> OtherCost { get; set; }
         public decimal PaidAmount { get; set; }
         public decimal NeedToPay { get; set; }
+        public int Status { get; set; }
     }
 }
