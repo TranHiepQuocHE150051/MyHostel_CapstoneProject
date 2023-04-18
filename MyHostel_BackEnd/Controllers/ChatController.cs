@@ -61,12 +61,15 @@ namespace MyHostel_BackEnd.Controllers
                     Role = 0,
                     AnonymousTime = 3,
                     NickName = nickname,
-                    Status=0
+                    Status = 0
                 };
                 _context.Participants.Add(participant1);
             }
             await _context.SaveChangesAsync();
-            return Ok("Create chat successfully");
+            return Ok(new
+            {
+                Id = chat.Id
+            });
         }
         [HttpPost("group")]
         public async Task<IActionResult> CreateGroupChat([FromBody] CreateGroupChatDTO groupChat)
@@ -124,7 +127,7 @@ namespace MyHostel_BackEnd.Controllers
                 MsgText = message.MsgText,
                 CreatedAt = DateTime.Now,
                 AnonymousFlg = (byte)message.AnonymousFlg,
-                Status=1
+                Status = 1
             };
             _context.Messages.Add(message1);
             await _context.SaveChangesAsync();
@@ -145,18 +148,18 @@ namespace MyHostel_BackEnd.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-            foreach(var participant in participants)
+            foreach (var participant in participants)
             {
-                participant.Status=0;
+                participant.Status = 0;
                 _context.Participants.Update(participant);
             }
             await _context.SaveChangesAsync();
             //string jsonStringResult = JsonConvert.SerializeObject(message1);
             string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
         new JsonSerializerSettings()
-    {
-        ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-    }
+        {
+            ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+        }
     );
             foreach (var participant in participants)
             {
@@ -165,9 +168,25 @@ namespace MyHostel_BackEnd.Controllers
                     await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{participant.MemberId}", "API", jsonStringResult);
                 }
             }
+            await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{message.ChatId}", "API", jsonStringResult);
             return Ok("Create message success");
 
         }
+        [HttpGet("{id}/info")]
+        public async Task<IActionResult> GetChatInfo(int id)
+        {
+            try
+            {
+                var chat = await _context.Chats.Where(c => c.Id == id).SingleOrDefaultAsync();
+                return Ok(chat);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessages(int id, [FromQuery] int? page, [FromQuery] int? limit)
         {
@@ -222,9 +241,9 @@ namespace MyHostel_BackEnd.Controllers
                                         MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
-                                        Img= images.Count==0? null: images,
-                                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
-                                        ParentMsg =  parentMessage ,
+                                        Img = images.Count == 0 ? null : images,
+                                        CreatedAt = message.CreatedAt,
+                                        ParentMsg = parentMessage,
                                         Member = memberInMessage
                                     });
                                 }
@@ -236,7 +255,7 @@ namespace MyHostel_BackEnd.Controllers
                                         MsgText = parentMsg.MsgText,
                                         ImgNo = imgNo
                                     };
-                                    result.Add(new 
+                                    result.Add(new
                                     {
                                         MessageId = message.Id,
                                         AnonymousFlg = message.AnonymousFlg,
@@ -257,12 +276,12 @@ namespace MyHostel_BackEnd.Controllers
                                 AnonymousFlg = message.AnonymousFlg,
                                 MsgText = message.MsgText,
                                 Img = images.Count == 0 ? null : images,
-                                CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                CreatedAt = message.CreatedAt,
                                 ParentMsg = null,
                                 Member = memberInMessage
                             });
                         }
-                        
+
                     }
                     else
                     {
@@ -292,7 +311,7 @@ namespace MyHostel_BackEnd.Controllers
                                         AnonymousFlg = message.AnonymousFlg,
                                         MsgText = message.MsgText,
                                         Img = images.Count == 0 ? null : images,
-                                        CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                        CreatedAt = message.CreatedAt,
                                         ParentMsg = parentMessage,
                                     });
                                 }
@@ -324,14 +343,14 @@ namespace MyHostel_BackEnd.Controllers
                                 AnonymousFlg = message.AnonymousFlg,
                                 MsgText = message.MsgText,
                                 Img = images.Count == 0 ? null : images,
-                                CreatedAt = message.CreatedAt.ToString("dd/MM/yyyy hh:mm"),
+                                CreatedAt = message.CreatedAt,
                                 ParentMsg = null,
                             });
                         }
-                        
+
                     }
 
-                    
+
 
                 }
                 return Ok(result.ToArray());
@@ -381,7 +400,7 @@ namespace MyHostel_BackEnd.Controllers
             }
         }
         [HttpPut("{id}/participant")]
-        public async Task<IActionResult> UpdateStatusParticipant(int id,[FromBody] int ParticipantId)
+        public async Task<IActionResult> UpdateStatusParticipant(int id, [FromBody] int ParticipantId)
         {
             try
             {
@@ -423,8 +442,8 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 else
                 {
-                    var MessageImage = _context.MessageImages.Where(m=>m.MessageId==id).ToList();
-                    foreach(var image in MessageImage)
+                    var MessageImage = _context.MessageImages.Where(m => m.MessageId == id).ToList();
+                    foreach (var image in MessageImage)
                     {
                         _context.MessageImages.Remove(image);
                     }
@@ -443,22 +462,29 @@ namespace MyHostel_BackEnd.Controllers
             try
             {
                 var SingleChats = _context.Chats.Where(c => c.IsGroup == 0).ToList();
-                foreach(var singlechat in SingleChats)
+                foreach (var singlechat in SingleChats)
                 {
                     var participants = _context.Participants.Where(p => p.ChatId == singlechat.Id).ToList();
                     List<int> memberIds = new List<int>();
-                    foreach(var item in participants)
+                    foreach (var item in participants)
                     {
                         memberIds.Add(item.MemberId);
                     }
                     if (memberIds.Contains(memberId) && memberIds.Contains(participant))
                     {
-                        return Ok(singlechat.Id);
+                        return Ok(new
+                        {
+                            Id = singlechat.Id
+                        });
                     }
                 }
-                return BadRequest();
+                return Ok(new
+                {
+                    Id = 0
 
-                
+                });
+
+
             }
             catch (Exception e)
             {

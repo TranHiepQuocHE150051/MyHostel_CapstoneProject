@@ -6,7 +6,7 @@
         public byte AnonymousFlg { get; set; }
         public string MsgText { get; set; } = null!;
         public List<string> Img { get; set; }
-        public string? CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         
         public ParentMessageDTO? ParentMsg { get; set; }
         public MemberInMessageDTO? Member { get; set; }

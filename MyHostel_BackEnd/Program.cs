@@ -63,7 +63,7 @@ builder.Services.AddQuartz(q =>
     q.AddTrigger(opts => opts
         .ForJob(jobKey_QuartzJob)
         .WithIdentity("Job_trigger_QuartzJob")
-        .WithCronSchedule("0 0 12 * * ?"));
+        .WithCronSchedule("0 0 */12 * * ?"));
 
     var jobKey_CreateNotificationJob = new JobKey("jobKey_CreateNotificationJob");
     q.AddJob<CreateNotificationJob>(opts => opts.WithIdentity(jobKey_CreateNotificationJob));

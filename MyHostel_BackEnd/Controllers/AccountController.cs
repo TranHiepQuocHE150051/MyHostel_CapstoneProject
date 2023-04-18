@@ -179,7 +179,8 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             MemberId = member.Id,
                             Name = member.FirstName + " " + member.LastName,
-                            AvatarUrl = member.Avatar
+                            AvatarUrl = member.Avatar,
+                            InviteCode = member.InviteCode
                         });                   
                 }
                 else
@@ -190,7 +191,8 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             MemberId = member.Id,
                             Name = member.FirstName + " " + member.LastName,
-                            AvatarUrl = member.Avatar
+                            AvatarUrl = member.Avatar,
+                            InviteCode = member.InviteCode
                         });
 
 
