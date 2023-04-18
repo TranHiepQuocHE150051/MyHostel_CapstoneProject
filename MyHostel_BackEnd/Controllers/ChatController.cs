@@ -437,5 +437,33 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> SearchChat([FromQuery] int memberId, [FromQuery] int participant)
+        {
+            try
+            {
+                var SingleChats = _context.Chats.Where(c => c.IsGroup == 0).ToList();
+                foreach(var singlechat in SingleChats)
+                {
+                    var participants = _context.Participants.Where(p => p.ChatId == singlechat.Id).ToList();
+                    List<int> memberIds = new List<int>();
+                    foreach(var item in participants)
+                    {
+                        memberIds.Add(item.MemberId);
+                    }
+                    if (memberIds.Contains(memberId) && memberIds.Contains(participant))
+                    {
+                        return Ok(singlechat.Id);
+                    }
+                }
+                return BadRequest();
+
+                
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
