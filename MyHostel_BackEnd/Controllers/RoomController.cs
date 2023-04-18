@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FirebaseAdmin.Messaging;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
+using Notification = MyHostel_BackEnd.Models.Notification;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -223,9 +225,9 @@ namespace MyHostel_BackEnd.Controllers
                         total.ToString()
                     };
                     _context.Notifications.Add(notification);
+                    SendNotification(res, notification);
                 }
                 _context.SaveChanges();
-                //Send notification here
                 return Ok("Add new transaction success");
             }
             catch (Exception e)
@@ -325,9 +327,9 @@ namespace MyHostel_BackEnd.Controllers
                         moneyToPay.ToString()
                     };
                     _context.Notifications.Add(notification);
+                    SendNotification(res, notification);
                 }
                 _context.SaveChanges();
-                //Send notification here
                 return Ok("Update transaction success");
             }
             catch (Exception e)
@@ -379,6 +381,32 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+        private async void SendNotification(Resident resident, Notification notification)
+        {
+            
+            try
+            {
+                var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
+                var registrationToken = member.FcmToken;
+                if (registrationToken.Equals(""))
+                {
+                    return;
+                }
+                var data = notification.Message.Split(':');
+                var message = new FirebaseAdmin.Messaging.Message()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { data[0]+": ", data[1] }
+                    },
+                    Token = registrationToken,
+                };
+            }catch(Exception e)
+            {
+                return;
+            }
+            
         }
     }
 }

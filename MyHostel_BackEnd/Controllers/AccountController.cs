@@ -203,6 +203,26 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpPut("fcm-token")]
+        public async Task<IActionResult> UpdateFCMToken([FromBody]UpdateFcmTokenDTO fcmTokenDTO)
+        {
+            try
+            {
+                var member = _context.Members.FirstOrDefault(m => m.Id == fcmTokenDTO.MemberId);
+                if(member != null)
+                {
+                    member.FcmToken = fcmTokenDTO.Token;
+                    _context.Members.Update(member);
+                    await _context.SaveChangesAsync();
+                    return Ok("Success");
+                }
+                return BadRequest("Member not exist");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
         private string GenerateInviteCode()
         {
             Guid g = Guid.NewGuid();

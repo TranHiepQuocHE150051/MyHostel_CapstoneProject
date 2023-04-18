@@ -13,9 +13,10 @@ namespace MyHostel_BackEnd.Quartz
         {
             Console.WriteLine("Start sent message ");
             var transactions = await _context.Transactions.Include(t => t.Room).Where(t => t.Status != 2).ToListAsync();
-            var registrationToken = "eoCu8IdWRZiP8StEZku0O7:APA91bGf_t2j0z4tEukJO8RMTfEyu9FpfxX6WI9Zqm0zdlk0x_fAGWERbgURnZ2pGAAyY5BXaA6gpGHCEJoyJhHnEiL6AtCIdZ_DH6PNVGqwULTgcwMHVVzGBkTOvI2ZR0IG_TNjn-dV";
             foreach (var transaction in transactions)
             {
+                var residents = await _context.Residents.Where(r => r.RoomId == transaction.RoomId && r.Status == 1).ToListAsync();
+
                 string[] others = transaction.Other != "" ? transaction.Other.Split('-') : null;
                 decimal total = (decimal)(transaction.Rent
                     + transaction.Electricity
@@ -29,16 +30,23 @@ namespace MyHostel_BackEnd.Quartz
                         total += price;
                     }
                 }
-                var message = new FirebaseAdmin.Messaging.Message()
+                foreach(var resident in residents)
                 {
-                    Data = new Dictionary<string, string>()
+                    var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
+                    var registrationToken = member.FcmToken;
+
+                    var message = new FirebaseAdmin.Messaging.Message()
+                    {
+                        Data = new Dictionary<string, string>()
                     {
                         { "Tiền cần đóng của "+transaction.Room.Name+": ", total.ToString() }
                     },
-                    Token = registrationToken,
-                };
-                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                Console.WriteLine("Successfully sent message: " + response);
+                        Token = registrationToken,
+                    };
+                    string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                    //Console.WriteLine("Successfully sent message: " + response);
+                }
+                
             }
             return;
         }

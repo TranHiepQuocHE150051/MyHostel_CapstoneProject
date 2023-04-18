@@ -17,7 +17,8 @@ namespace MyHostel_BackEnd.Quartz
                     && notification.SendAtHour == DateTime.Now.Hour 
                     && notification.CreateAt.Value.Date == DateTime.Now.Date)
                 {
-                    var registrationToken = "eoCu8IdWRZiP8StEZku0O7:APA91bGf_t2j0z4tEukJO8RMTfEyu9FpfxX6WI9Zqm0zdlk0x_fAGWERbgURnZ2pGAAyY5BXaA6gpGHCEJoyJhHnEiL6AtCIdZ_DH6PNVGqwULTgcwMHVVzGBkTOvI2ZR0IG_TNjn-dV";
+                    var member= _context.Members.Where(m=>m.Id==notification.SendTo).FirstOrDefault();
+                    var registrationToken = member.FcmToken;
                     var data = notification.Message.Split(':');
                     var message = new FirebaseAdmin.Messaging.Message()
                     {

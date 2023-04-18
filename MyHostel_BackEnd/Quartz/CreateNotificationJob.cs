@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FirebaseAdmin.Messaging;
+using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.Models;
 using Quartz;
+using Notification = MyHostel_BackEnd.Models.Notification;
 
 namespace MyHostel_BackEnd.Quartz
 {
@@ -14,7 +16,7 @@ namespace MyHostel_BackEnd.Quartz
             {
                 var room = _context.Rooms.Where(r => r.Id == transaction.RoomId).SingleOrDefault();
                 var residents = await _context.Residents.Where(r => r.RoomId == transaction.RoomId && r.Status == 1).ToListAsync();
-                if (transaction.Status != 2 && transaction.Status!=3)
+                if (transaction.Status == 2 || transaction.Status==3)
                 {
                     continue;
                 }
@@ -37,6 +39,10 @@ namespace MyHostel_BackEnd.Quartz
                         decimal price = decimal.Parse(other.Split(':')[1]);
                         total += price;
                     }
+                    if (transaction.PaidAmount != null)
+                    {
+                        total = total - transaction.PaidAmount;
+                    }
                     foreach (var resident in residents)
                     {
                         Notification notification = new Notification
@@ -44,12 +50,13 @@ namespace MyHostel_BackEnd.Quartz
                             SendTo = resident.MemberId,
                             SendAt = DateTime.Now,
                             CreateAt = DateTime.Now,
-                            SendAtHour = DateTime.Now.Hour,
-                            Type = 0,
+                            SendAtHour = 9,
+                            Type = 1,
                             Message = "Tiền cần đóng của " + room.Name + ": " +
                         total.ToString()
                         };
                         _context.Notifications.Add(notification);
+                        SendNotification(resident, notification);
                     }
                     _context.SaveChanges();
                     // send noti
@@ -71,6 +78,10 @@ namespace MyHostel_BackEnd.Quartz
                                 total += price;
                             }
                         }
+                        if (transaction.PaidAmount != null)
+                        {
+                            total = (decimal)(total - transaction.PaidAmount);
+                        }
                         foreach (var resident in residents)
                         {
                             Notification notification = new Notification
@@ -78,12 +89,13 @@ namespace MyHostel_BackEnd.Quartz
                                 SendTo = resident.MemberId,
                                 SendAt = DateTime.Now,
                                 CreateAt = DateTime.Now,
-                                SendAtHour = DateTime.Now.Hour,
-                                Type = 0,
+                                SendAtHour = 9,
+                                Type = 1,
                                 Message = "Tiền cần đóng của " + room.Name + ": " +
                             total.ToString()
                             };
                             _context.Notifications.Add(notification);
+                            SendNotification(resident,notification);
                         }
                         _context.SaveChanges();
                         // send noti
@@ -91,6 +103,31 @@ namespace MyHostel_BackEnd.Quartz
                 }
             }
             return;
+        }
+        private async void SendNotification(Resident resident, Notification notification)
+        {
+            try
+            {
+                var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
+                var registrationToken = member.FcmToken;
+                if (registrationToken.Equals(""))
+                {
+                    return;
+                }
+                var data = notification.Message.Split(':');
+                var message = new FirebaseAdmin.Messaging.Message()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { data[0]+": ", data[1] }
+                    },
+                    Token = registrationToken,
+                };
+            }
+            catch (Exception e)
+            {
+                return;
+            }
         }
     }
 }
