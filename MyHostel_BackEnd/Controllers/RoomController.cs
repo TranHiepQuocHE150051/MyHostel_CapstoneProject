@@ -301,12 +301,12 @@ namespace MyHostel_BackEnd.Controllers
                 
                 var residents = _context.Residents.Where(r => r.RoomId == id && r.Status == 1).ToList();
                 var total = CalculateTotalMoney(transaction);
-                if (total > transaction.PaidAmount)
+                if (total > transaction.PaidAmount && transaction.PaidAmount>0)
                 {
                     transaction.Status = 1;
                     _context.Transactions.Update(transaction);
                 }
-                else                   
+                else if(total <= transaction.PaidAmount && transaction.PaidAmount>0)                 
                 {
                     transaction.Status = 2;
                     _context.Transactions.Update(transaction);

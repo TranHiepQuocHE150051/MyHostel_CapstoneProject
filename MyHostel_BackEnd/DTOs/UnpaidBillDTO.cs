@@ -12,5 +12,6 @@
         public decimal PaidAmount { get; set; }
         public decimal NeedToPay { get; set; }
         public int Status { get; set; }
+        public string CreatedAt { get; set; }
     }
 }

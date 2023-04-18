@@ -107,6 +107,28 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         foreach (var transaction in transactions)
                         {
+                            string[] time = transaction.AtTime.Split("/");
+                            int month= int.Parse(time[0]);
+                            int year= int.Parse(time[1]);
+                            if (resident.CreatedAt.Year > year)
+                            {
+                                continue;
+                            }
+                            if (resident.CreatedAt.Year == year && resident.CreatedAt.Month > month)
+                            {
+                                continue;
+                            }
+                            if (resident.LeftAt.HasValue)
+                            {
+                                if (resident.LeftAt.Value.Year < year)
+                                {
+                                    continue;
+                                }
+                                if (resident.LeftAt.Value.Year == year && resident.LeftAt.Value.Month < month)
+                                {
+                                    continue;
+                                }
+                            }
                             var otherCost = new List<OtherCostDTO>();
                             string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
                             decimal total = 0;
@@ -155,7 +177,8 @@ namespace MyHostel_BackEnd.Controllers
                                 OtherCost = otherCost,
                                 PaidAmount = transaction.PaidAmount == null ? 0 : transaction.PaidAmount.Value,
                                 NeedToPay = transaction.Status==2? 0: pay,
-                                Status= transaction.Status
+                                Status= transaction.Status,
+                                CreatedAt = transaction.CreatedAt.Value.ToString("dd/MM/yyyy hh:mm")
                             });
                         }
                     }
@@ -170,6 +193,28 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         foreach (var transaction in transactions)
                         {
+                            string[] time = transaction.AtTime.Split("/");
+                            int month = int.Parse(time[0]);
+                            int year = int.Parse(time[1]);
+                            if (resident.CreatedAt.Year > year)
+                            {
+                                continue;
+                            }
+                            if (resident.CreatedAt.Year == year && resident.CreatedAt.Month > month)
+                            {
+                                continue;
+                            }
+                            if (resident.LeftAt.HasValue)
+                            {
+                                if (resident.LeftAt.Value.Year < year)
+                                {
+                                    continue;
+                                }
+                                if (resident.LeftAt.Value.Year == year && resident.LeftAt.Value.Month < month)
+                                {
+                                    continue;
+                                }
+                            }
                             var otherCost = new List<OtherCostDTO>();
                             string[] others = transaction.Other != null && transaction.Other.Trim() != "" ? transaction.Other.Trim().Split('-') : null;
                             decimal total = 0;
@@ -218,7 +263,8 @@ namespace MyHostel_BackEnd.Controllers
                                 OtherCost = otherCost,
                                 PaidAmount = transaction.PaidAmount == null ? 0 : transaction.PaidAmount.Value,
                                 NeedToPay = transactionStatus==2 ? 0:pay,
-                                Status = transactionStatus
+                                Status = transactionStatus,
+                                CreatedAt = transaction.CreatedAt.Value.ToString("dd/MM/yyyy hh:mm")
                             });
                         }
                     }
@@ -251,7 +297,7 @@ namespace MyHostel_BackEnd.Controllers
         private bool IsInteger(string input)
         {
             int num;
-            return int.TryParse(input, out num) && int.Parse(input) > 0;
+            return int.TryParse(input, out num) && int.Parse(input) >= 0;
         }
     }
 }
