@@ -63,21 +63,21 @@ builder.Services.AddQuartz(q =>
     q.AddTrigger(opts => opts
         .ForJob(jobKey_QuartzJob)
         .WithIdentity("Job_trigger_QuartzJob")
-        .WithCronSchedule("0 0 */12 * * ?"));
+        .WithCronSchedule("0 0 12 * * ?"));
 
     var jobKey_CreateNotificationJob = new JobKey("jobKey_CreateNotificationJob");
     q.AddJob<CreateNotificationJob>(opts => opts.WithIdentity(jobKey_CreateNotificationJob));
     q.AddTrigger(opts => opts
         .ForJob(jobKey_CreateNotificationJob)
         .WithIdentity("Job_trigger_CreateNotificationJob")
-        .WithCronSchedule("0 0 0 * * ?"));
+        .WithCronSchedule("0 0 12 * * ?"));
 
     var jobKey_SendAtHourJob = new JobKey("jobKey_SendAtHourJob");
     q.AddJob<SendAtHourJob>(opts => opts.WithIdentity(jobKey_SendAtHourJob));
     q.AddTrigger(opts => opts
         .ForJob(jobKey_SendAtHourJob)
         .WithIdentity("Job_trigger_SendAtHourJob")
-        .WithCronSchedule("* * */1 * * ?"));
+        .WithCronSchedule("0 0 12 * * ?"));
 });
 
 string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;

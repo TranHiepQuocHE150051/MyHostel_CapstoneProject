@@ -175,7 +175,7 @@ namespace MyHostel_BackEnd.Controllers
                         DetailLocation = hostel.DetailLocation,
                         Id = hostel.Id,
                         Name = hostel.Name,
-                        Price = hostel.Price,
+                        Price = replaceString(hostel.Price),
                         imgUrl = imgUrl
                     });
                 }
