@@ -170,14 +170,62 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         imgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
                     }
-                    result.Add(new HostelSearchDTO()
+                    List<object> amenitites = new List<object>();
+                    var HostelAmenities = _context.HostelAmenities.Where(h => h.HostedId == hostel.Id).ToList();
+                    foreach (var HostelAmenity in HostelAmenities)
                     {
-                        DetailLocation = hostel.DetailLocation,
-                        Id = hostel.Id,
-                        Name = hostel.Name,
-                        Price = replaceString(hostel.Price),
-                        imgUrl = imgUrl
-                    });
+                        var amenity = _context.Amenities.Where(a => a.Id == HostelAmenity.AmenitiesId).SingleOrDefault();
+                        amenitites.Add(new
+                        {
+                            Id = amenity.Id,
+                            Name = amenity.AmenitiyName,
+                            Icon = amenity.Icon
+                        });
+                    }
+                    var residents = _context.Residents.Where(r => r.HostelId == hostel.Id).ToList();
+                    int NoRate = 0;
+                    double Rate = 0;
+                    foreach (var resident in residents)
+                    {
+                        if (resident.Rate > 0)
+                        {
+                            Rate+=resident.Rate;
+                            NoRate++;
+                        }
+                    }
+                    if (NoRate == 0)
+                    {
+                        result.Add(new HostelSearchDTO()
+                        {
+                            DetailLocation = hostel.DetailLocation,
+                            Id = hostel.Id,
+                            Name = hostel.Name,
+                            Price = replaceString(hostel.Price),
+                            imgUrl = imgUrl,
+                            Amenities = amenitites,
+                            Review= new
+                            {
+                                Star=0
+                            }
+                        });
+                    }
+                    else
+                    {
+                        result.Add(new HostelSearchDTO()
+                        {
+                            DetailLocation = hostel.DetailLocation,
+                            Id = hostel.Id,
+                            Name = hostel.Name,
+                            Price = replaceString(hostel.Price),
+                            imgUrl = imgUrl,
+                            Amenities = amenitites,
+                            Review = new
+                            {
+                                Star = Rate/NoRate
+                            }
+                        });
+                    }
+                    
                 }
                 return Ok(result);
             }
@@ -369,19 +417,17 @@ namespace MyHostel_BackEnd.Controllers
             try
             {
                 var reviews = await _context.Residents.Where(r => r.HostelId == id).ToListAsync();
-                var result = new GetHostelReviewDTO
+                var result = new 
                 {
                     Rate = 0.0,
-                    NoRate = 0,
-                    NoComment = 0,
+                    RateNo = 0,
+                    Comment = new List<object>()
                 };
-                List<CommentReviewDTO> comment = new List<CommentReviewDTO>();
+                List<object> comment = new List<object>();
                 if (reviews.Count() > 0)
                 {
-                    GetHostelReviewDTO review = new GetHostelReviewDTO();
                     double rate = 0.0;
                     int noRate = 0;
-                    int noComment = 0;
                     foreach (var item in reviews)
                     {
                         rate += item.Rate;
@@ -389,31 +435,41 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             noRate++;
                         }
-                        if (!item.Comment.Equals("") || item.Comment != null)
-                        {
-                            noComment++;
-                        }
-
                         var AvatarUrl = "";
                         if (_context.Members.Where(m => m.Id == item.MemberId).FirstOrDefault() != null)
                         {
                             AvatarUrl = _context.Members.Where(m => m.Id == item.MemberId).FirstOrDefault().Avatar;
                         }
-                        comment.Add(new CommentReviewDTO
+                        if (item.IsAnonymousComment == 0)
                         {
-                            MemberId = item.MemberId,
-                            Text = item.Comment,
-                            Rate = item.Rate,
-                            CreatedDate = String.Format("{0:dd/MM/yyyy}", item.CreatedAt),
-                            AvatarUrl = AvatarUrl
-                        });
+                            comment.Add(new
+                            {
+                                IsAnonymous = 0,
+                                AvatarUrl = AvatarUrl,
+                                MemberId = item.MemberId,
+                                Text = item.Comment,
+                                Rate = item.Rate,
+                                CreatedDate = String.Format("{0:dd/MM/yyyy}", item.CreatedAt),
+
+                            });
+                        }
+                        else
+                        {
+                            comment.Add(new
+                            {
+                                IsAnonymous = 1,
+                                Text = item.Comment,
+                                Rate = item.Rate,
+                                CreatedDate = String.Format("{0:dd/MM/yyyy}", item.CreatedAt),
+
+                            });
+                        }                     
                     }
-                    result = new GetHostelReviewDTO
+                     result = new 
                     {
-                        Rate = rate / noRate,
-                        NoRate = noRate,
-                        NoComment = noComment,
-                        Comment = comment.ToArray()
+                        Rate = noRate==0? 0:(rate/noRate),
+                        RateNo = noRate,
+                        Comment = comment
                     };
                 }
                 return Ok(result);
@@ -1194,6 +1250,38 @@ namespace MyHostel_BackEnd.Controllers
                 _context.Residents.Update(resident);
                 await _context.SaveChangesAsync();
                 return Ok("Rate success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpGet("{id}/check")]
+        public async Task<IActionResult> CheckHostelResident(int id, [FromQuery] int memberId)
+        {
+            try
+            {
+                var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+                if (hostel == null)
+                {
+                    return BadRequest("Hostel not exist");
+                }
+                if (hostel.LandlordId == memberId)
+                {
+                    return Ok(false);
+                }
+                var residents = _context.Residents.Where(r => r.HostelId == id).ToList();
+                List<int> memberIds = new List<int>();
+                foreach(var res in residents)
+                {
+                    memberIds.Add(res.MemberId);
+                }
+                if (memberIds.Contains(memberId))
+                {
+                    return Ok(true);
+                }
+                return Ok(false);
+
             }
             catch (Exception e)
             {
