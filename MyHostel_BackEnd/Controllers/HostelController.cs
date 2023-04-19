@@ -430,6 +430,13 @@ namespace MyHostel_BackEnd.Controllers
                     int noRate = 0;
                     foreach (var item in reviews)
                     {
+                        if(CheckResidentChangedRoom(id, item.MemberId))
+                        {
+                            if (item.Status != 1)
+                            {
+                                continue;
+                            }
+                        }
                         rate += item.Rate;
                         if (item.Rate != 0)
                         {
@@ -478,6 +485,16 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return StatusCode(500);
             }
+        }
+        private bool CheckResidentChangedRoom(int hostelId,int MemberId)
+        {
+            var residents = _context.Residents.Where(r => r.HostelId == hostelId && r.MemberId == MemberId).ToList();
+            if (residents.Count > 1)
+            {
+                return true;
+            }
+            return false;
+
         }
         [HttpGet("{id}/rooms")]
         public async Task<ActionResult> GetHostelRooms(int id)
@@ -1079,8 +1096,8 @@ namespace MyHostel_BackEnd.Controllers
                     MemberId = member.Id,
                     RoomId = changeRoomDTO.ToRoomId,
                     Status = 1,
-                    Rate = 0,
-                    Comment = "",
+                    Rate = checkInFromRoomExist.Rate,
+                    Comment = checkInFromRoomExist.Comment,
                     CreatedAt = DateTime.Now
                 };
                 _context.Residents.Add(resident);
