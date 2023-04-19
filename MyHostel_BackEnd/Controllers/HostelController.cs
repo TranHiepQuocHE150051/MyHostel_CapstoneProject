@@ -437,29 +437,30 @@ namespace MyHostel_BackEnd.Controllers
                     int noRate = 0;
                     foreach (var item in reviews)
                     {
-                        rate += item.Rate;
                         if (item.Rate != 0)
                         {
+                            rate += item.Rate;
                             noRate++;
-                        }
-                        var AvatarUrl = "";
-                        var member = _context.Members.Where(m => m.Id == item.MemberId).FirstOrDefault();
-                        if (member != null)
-                        {
-                            AvatarUrl = member.Avatar;
+                            var AvatarUrl = "";
+                            var member = _context.Members.Where(m => m.Id == item.MemberId).FirstOrDefault();
+                            if (member != null)
+                            {
+                                AvatarUrl = member.Avatar;
+                            }
+
+                            comment.Add(new
+                            {
+                                IsAnonymous = 0,
+                                AvatarUrl = AvatarUrl,
+                                Name = $"{member.FirstName} {member.LastName}",
+                                MemberId = item.MemberId,
+                                Text = item.Comment,
+                                Rate = item.Rate,
+                                CreatedDate = String.Format("{0:dd/MM/yyyy}", item.CreatedAt),
+
+                            });
                         }
 
-                        comment.Add(new
-                        {
-                            IsAnonymous = 0,
-                            AvatarUrl = AvatarUrl,
-                            Name = $"{member.FirstName} {member.LastName}",
-                            MemberId = item.MemberId,
-                            Text = item.Comment,
-                            Rate = item.Rate,
-                            CreatedDate = String.Format("{0:dd/MM/yyyy}", item.CreatedAt),
-
-                        });
                     }
                     result = new
                     {
@@ -482,11 +483,11 @@ namespace MyHostel_BackEnd.Controllers
             try
             {
                 var reviews = await _context.Residents.Where(r => r.MemberId == memberId && r.HostelId == hostelId).OrderByDescending(r => r.CreatedAt).FirstOrDefaultAsync();
-              
-               
+
+
                 return Ok(new
                 {
-                    MemberId= memberId,
+                    MemberId = memberId,
                     Rate = reviews.Rate,
                     Text = reviews.Comment,
                     IsAnonymous = reviews.IsAnonymousComment
@@ -1101,19 +1102,21 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("User is not in From Room");
                 }
-                checkInFromRoomExist.Status = 0;
-                checkInFromRoomExist.LeftAt = DateTime.Now;
-                _context.Residents.Update(checkInFromRoomExist);
                 Resident resident = new Resident
                 {
                     HostelId = id,
                     MemberId = member.Id,
                     RoomId = changeRoomDTO.ToRoomId,
                     Status = 1,
-                    Rate = 0,
-                    Comment = "",
+                    Rate = checkInFromRoomExist.Rate,
+                    Comment = checkInFromRoomExist.Comment,
                     CreatedAt = DateTime.Now
                 };
+                checkInFromRoomExist.Rate = 0;
+                checkInFromRoomExist.Comment = "";
+                checkInFromRoomExist.Status = 0;
+                checkInFromRoomExist.LeftAt = DateTime.Now;
+                _context.Residents.Update(checkInFromRoomExist);
                 _context.Residents.Add(resident);
                 await _context.SaveChangesAsync();
                 return Ok("Change room success");
