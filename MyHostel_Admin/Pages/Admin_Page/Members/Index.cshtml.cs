@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +66,36 @@ namespace MyHostel_Admin.Pages.Admin_Page.Members
             var pageSize = Configuration.GetValue("PageSize", 6);
             Member = await PaginatedList<Member>.CreateAsync(personsIQ.AsNoTracking(), pageIndex ?? 1, pageSize);
             return Page();
+        }
+        public ActionResult OnPost()
+        {
+            var members = context.Members.Include(h => h.Role).ToList();
+            string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            string fileName = "members.xlsx";
+            using (var workbook = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = workbook.Worksheets.Add("Members");
+                worksheet.Cell(1, 1).Value = "Id";
+                worksheet.Cell(1, 2).Value = "FirstName";
+                worksheet.Cell(1, 3).Value = "LastName";
+                worksheet.Cell(1, 4).Value = "Role";
+                worksheet.Cell(1, 5).Value = "InviteCode";
+                for (int i = 1; i <= members.Count; i++)
+                {
+                    worksheet.Cell(i + 1, 1).Value = members[i - 1].Id;
+                    worksheet.Cell(i + 1, 2).Value = members[i - 1].FirstName;
+                    worksheet.Cell(i + 1, 3).Value = members[i - 1].LastName;
+                    worksheet.Cell(i + 1, 4).Value = members[i - 1].Role.RoleName;
+                    worksheet.Cell(i + 1, 5).Value = members[i - 1].InviteCode.Trim();
+                }
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+                    return File(content, contentType, fileName);
+                }
+            }
+
         }
     }
 }
