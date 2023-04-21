@@ -152,7 +152,7 @@ namespace MyHostel_BackEnd.Controllers
             var facilities = _context.Facilities.ToList();
             foreach (var facility in facilities)
             {
-                string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location="+latitude+","+longitude+"&radius=3000&type="+facility.UtilityName+"&key=AIzaSyDLsmLiVOBVQKt-PP6Xf5b1zmNR3wqiURI";               
+                string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location="+latitude+","+longitude+"&radius=3000&type="+facility.UtilityName+ "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4";               
                 WebRequest request = WebRequest.Create(URL);
                 WebResponse response = request.GetResponse();
                 Stream data = response.GetResponseStream();
@@ -165,8 +165,8 @@ namespace MyHostel_BackEnd.Controllers
                     var results = JsonSerializer.Deserialize<PlacesNearbySearchResponse>(responseFromServer);
                     if (results.results.Length > 0) {
                         Place nearByResult = results.results.First();
-                        double reslat = nearByResult.geometry.formatted_address.lat;
-                        double reslng = nearByResult.geometry.formatted_address.lng;
+                        double reslat = nearByResult.geometry.location.lat;
+                        double reslng = nearByResult.geometry.location.lng;
                         double orglat = Double.Parse(latitude);
                         double orglng = Double.Parse(longitude);
                         DistanceAndDuration distanceAndDuration = CalculateDistanceAndDuration(orglat, orglng, reslat, reslng);

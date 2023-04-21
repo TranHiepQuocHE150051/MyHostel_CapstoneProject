@@ -2,7 +2,7 @@
 {
     public class Geometry
     {
-        public LatLngLiteral formatted_address { get; set; }
+        public LatLngLiteral location { get; set; }
         public Bounds formatted_phone_number { get; set; }
     }
 }

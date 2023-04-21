@@ -296,14 +296,17 @@
                 <input id="pac-input"
                        class="controls"
                        type="text"
+                       value="@Model.Hostel.DetailLocation"
                        placeholder="Search Box" />
                 <div id="map"></div>
                 <br>
                 <form method="post">
-                    <input type="hidden" asp-for="@Model.Hostel.Id" />
-                    <input type="submit" value="Approve" class="btn btn-danger" /> |
-                    <button class="btn btn-danger"><a asp-page="/Admin_Page/Hostels/Index">Back to List</a></button>
+                    <input type="hidden" asp-for="@Model.approveRequest.HostelId" value="@Model.Hostel.Id" />
+                    <input type="hidden" id="placeLat" asp-for="@Model.approveRequest.Lat" />
+                    <input type="hidden" id="placeLng" asp-for="@Model.approveRequest.Lng"/>
+                    <input type="submit" value="Approve" class="btn btn-danger" /> 
                 </form>
+                <button class="btn btn-danger"><a asp-page="/Admin_Page/Hostels/Index">Back to List</a></button>
             </div>
         </div>
         <footer class="footer py-4  ">
@@ -396,7 +399,7 @@
     <script src="~/admin/js/plugins/chartjs.min.js"></script>
 @*    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLsmLiVOBVQKt-PP6Xf5b1zmNR3wqiURI&libraries=places"></script>
 *@
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLsmLiVOBVQKt-PP6Xf5b1zmNR3wqiURI&callback=initMap&libraries=places&v=weekly"
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4&callback=initMap&libraries=places&v=weekly"
             defer></script>
     <script>
         const sidebarLinks = document.querySelectorAll('.navbar-vertical .navbar-nav>.nav-item .nav-link');
@@ -460,7 +463,13 @@
 
                 // For each place, get the icon, name and location.
                 const bounds = new google.maps.LatLngBounds();
-
+                var res = places[0];
+                var latitude = res.geometry.location.lat();
+                var longitude = res.geometry.location.lng();
+                document.getElementById('placeLat').value = latitude;
+                document.getElementById('placeLng').value = longitude;
+                console.log(latitude);
+                console.log(longitude);
                 places.forEach((place) => {
                     if (!place.geometry || !place.geometry.location) {
                         console.log("Returned place contains no geometry");
