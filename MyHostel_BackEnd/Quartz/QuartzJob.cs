@@ -30,23 +30,27 @@ namespace MyHostel_BackEnd.Quartz
                         total += price;
                     }
                 }
-                foreach(var resident in residents)
+                foreach (var resident in residents)
                 {
+
                     var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
                     var registrationToken = member.FcmToken;
-
-                    var message = new FirebaseAdmin.Messaging.Message()
+                    if (registrationToken != null && registrationToken != "")
                     {
-                        Data = new Dictionary<string, string>()
+                        var message = new FirebaseAdmin.Messaging.Message()
+                        {
+                            Data = new Dictionary<string, string>()
                     {
                         { "Tiền cần đóng của "+transaction.Room.Name+": ", total.ToString() }
                     },
-                        Token = registrationToken,
-                    };
-                    string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                            Token = registrationToken,
+                        };
+                        string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+
+                    }
                     //Console.WriteLine("Successfully sent message: " + response);
                 }
-                
+
             }
             return;
         }

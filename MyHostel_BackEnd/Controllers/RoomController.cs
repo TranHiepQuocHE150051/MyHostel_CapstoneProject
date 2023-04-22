@@ -206,8 +206,8 @@ namespace MyHostel_BackEnd.Controllers
                     AtTime = transaction.AtTime,
                     Other = other,
                     CreatedAt = DateTime.Now,
-                    Status=0,
-                    PaidAmount=0
+                    Status = 0,
+                    PaidAmount = 0
                 };
                 _context.Transactions.Add(transaction1);
                 var residents = _context.Residents.Where(r => r.RoomId == id && r.Status == 1).ToList();
@@ -225,7 +225,8 @@ namespace MyHostel_BackEnd.Controllers
                         total.ToString()
                     };
                     _context.Notifications.Add(notification);
-                    SendNotification(res, notification);
+                    string title = $"";
+                    SendNotification(res, notification, title);
                 }
                 _context.SaveChanges();
                 return Ok("Add new transaction success");
@@ -242,7 +243,7 @@ namespace MyHostel_BackEnd.Controllers
                 + transaction.Electricity
                 + transaction.Water
                 + transaction.Internet);
-            if(others != null && others.Length > 0)
+            if (others != null && others.Length > 0)
             {
                 foreach (var other in others)
                 {
@@ -254,7 +255,8 @@ namespace MyHostel_BackEnd.Controllers
         }
         [HttpPut("{id}/transaction")]
         public async Task<ActionResult> UpdateTransaction(int id, [FromBody] UpdateTransactionDTO updateTransactionDTO)
-        {             
+        {
+            Console.WriteLine("Start sent message ");
             try
             {
                 var room = _context.Rooms.Where(r => r.Id == id).SingleOrDefault();
@@ -272,7 +274,7 @@ namespace MyHostel_BackEnd.Controllers
                     return BadRequest("Transaction not in this room");
                 }
                 string other = "";
-                if(updateTransactionDTO.Other != null)
+                if (updateTransactionDTO.Other != null)
                 {
                     foreach (var it in updateTransactionDTO.Other)
                     {
@@ -297,18 +299,18 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     transaction.Rent = updateTransactionDTO.Rent;
                 }
-                
-                transaction.PaidAmount=   updateTransactionDTO.PaidAmount;
+
+                transaction.PaidAmount = updateTransactionDTO.PaidAmount;
                 transaction.PaidAt = DateTime.Now;
-                
+
                 var residents = _context.Residents.Where(r => r.RoomId == id && r.Status == 1).ToList();
                 var total = CalculateTotalMoney(transaction);
-                if (total > transaction.PaidAmount && transaction.PaidAmount>0)
+                if (total > transaction.PaidAmount && transaction.PaidAmount > 0)
                 {
                     transaction.Status = 1;
                     _context.Transactions.Update(transaction);
                 }
-                else if(total <= transaction.PaidAmount && transaction.PaidAmount>0)                 
+                else if (total <= transaction.PaidAmount && transaction.PaidAmount > 0)
                 {
                     transaction.Status = 2;
                     _context.Transactions.Update(transaction);
@@ -327,7 +329,8 @@ namespace MyHostel_BackEnd.Controllers
                         moneyToPay.ToString()
                     };
                     _context.Notifications.Add(notification);
-                    SendNotification(res, notification);
+                    string title = $"Khoản thu của phòng bạn [{transaction.AtTime}]";
+                    SendNotification(res, notification, title);
                 }
                 _context.SaveChanges();
                 return Ok("Update transaction success");
@@ -352,7 +355,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("Transaction not exist");
                 }
-                if(transaction.RoomId != id)
+                if (transaction.RoomId != id)
                 {
                     return BadRequest("Transaction not in this room");
                 }
@@ -382,14 +385,13 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
-        private async void SendNotification(Resident resident, Notification notification)
+        private async void SendNotification(Resident resident, Notification notification, string title)
         {
-            
             try
             {
                 var member = _context.Members.Where(m => m.Id == resident.MemberId).SingleOrDefault();
                 var registrationToken = member.FcmToken;
-                if (registrationToken.Equals(""))
+                if (registrationToken.Equals("") || registrationToken == null)
                 {
                     return;
                 }
@@ -398,15 +400,21 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     Data = new Dictionary<string, string>()
                     {
-                        { data[0]+": ", data[1] }
+                        { "message",data[0]+": "+ data[1] },
+                        { "title", title }
                     },
                     Token = registrationToken,
                 };
-            }catch(Exception e)
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                Console.WriteLine(response.ToString() + "===========================================");
+
+            }
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 return;
             }
-            
+
         }
     }
 }

@@ -450,7 +450,7 @@ namespace MyHostel_BackEnd.Controllers
 
                             comment.Add(new
                             {
-                                IsAnonymous = 0,
+                                IsAnonymous = item.IsAnonymousComment,
                                 AvatarUrl = AvatarUrl,
                                 Name = $"{member.FirstName} {member.LastName}",
                                 MemberId = item.MemberId,
