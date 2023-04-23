@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.Models;
 using Quartz;
+using System.Globalization;
 using Notification = MyHostel_BackEnd.Models.Notification;
 
 namespace MyHostel_BackEnd.Quartz
@@ -52,8 +53,8 @@ namespace MyHostel_BackEnd.Quartz
                             CreateAt = DateTime.Now,
                             SendAtHour = 9,
                             Type = 1,
-                            Message = "Tiền cần đóng của " + room.Name + ": " +
-                        total.ToString()
+                            Message = "Tiền cần đóng của " + room.Name + ": " + 
+                            ((decimal)total).ToString("N0", new CultureInfo("vn-VN")) + "VNĐ"
                         };
                         _context.Notifications.Add(notification);
                         SendNotification(resident, notification);

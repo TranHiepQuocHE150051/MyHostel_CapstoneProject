@@ -6,6 +6,9 @@ using MyHostel_BackEnd.Models;
 using Microsoft.AspNetCore.SignalR;
 using MyHostel_BackEnd.ChatHubController;
 using Newtonsoft.Json;
+using FirebaseAdmin.Messaging;
+using Notification = MyHostel_BackEnd.Models.Notification;
+using Message = MyHostel_BackEnd.Models.Message;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -105,7 +108,7 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest("Chat is not exist");
             }
-            var participants = _context.Participants.Where(p => p.ChatId == message.ChatId).ToList();
+            var participants = _context.Participants.Where(p => p.ChatId == message.ChatId).Include(p => p.Member).ThenInclude(m => m.Residents).ToList();
             bool IsInChat = false;
             foreach (var participant in participants)
             {
@@ -156,22 +159,53 @@ namespace MyHostel_BackEnd.Controllers
             await _context.SaveChangesAsync();
             //string jsonStringResult = JsonConvert.SerializeObject(message1);
             string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
-        new JsonSerializerSettings()
-        {
-            ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-        }
-    );
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                }
+            );
             foreach (var participant in participants)
             {
                 if (member.Id != participant.MemberId)
                 {
                     await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{participant.MemberId}", "API", jsonStringResult);
+                    SendNewMessageNotification(participant, chat);
                 }
             }
             await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{message.ChatId}", "API", jsonStringResult);
             return Ok("Create message success");
-
         }
+
+        private async void SendNewMessageNotification(Participant participant, Chat chat)
+        {
+            try
+            {
+                var member = _context.Members.Where(m => m.Id == participant.MemberId).SingleOrDefault();
+                var registrationToken = member.FcmToken;
+                if (registrationToken.Equals("") || registrationToken == null)
+                {
+                    return;
+                }
+                var message = new FirebaseAdmin.Messaging.Message()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { "message", "Bạn có tin nhắn mới từ " + chat.Name },
+                        { "title", "Bạn có tin nhắn mới" }
+                    },
+                    Token = registrationToken,
+                };
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                Console.WriteLine(response.ToString() + "===========================================");
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return;
+            }
+        }
+
         [HttpGet("{id}/info")]
         public async Task<IActionResult> GetChatInfo(int id)
         {
@@ -185,8 +219,6 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessages(int id, [FromQuery] int? page, [FromQuery] int? limit)
         {
@@ -226,9 +258,7 @@ namespace MyHostel_BackEnd.Controllers
                         memberInMessage.FullName = message.Sender.FirstName + " " + message.Sender.LastName;
                         if (message.ParentMsgId != null)
                         {
-
                             var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
-
                             if (parentMsg != null)
                             {
                                 var imgNo = _context.MessageImages.Where(m => m.MessageId == parentMsg.Id).Count();
@@ -281,7 +311,6 @@ namespace MyHostel_BackEnd.Controllers
                                 Member = memberInMessage
                             });
                         }
-
                     }
                     else
                     {
@@ -295,9 +324,7 @@ namespace MyHostel_BackEnd.Controllers
                         }
                         if (message.ParentMsgId != null)
                         {
-
                             var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
-
                             if (parentMsg != null)
                             {
                                 var imgNo = _context.MessageImages.Where(m => m.MessageId == parentMsg.Id).Count();
@@ -347,11 +374,7 @@ namespace MyHostel_BackEnd.Controllers
                                 ParentMsg = null,
                             });
                         }
-
                     }
-
-
-
                 }
                 return Ok(result.ToArray());
             }
@@ -481,10 +504,7 @@ namespace MyHostel_BackEnd.Controllers
                 return Ok(new
                 {
                     Id = 0
-
                 });
-
-
             }
             catch (Exception e)
             {

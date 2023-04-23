@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.Models;
 using Quartz;
+using System.Globalization;
 
 namespace MyHostel_BackEnd.Quartz
 {
@@ -41,7 +42,7 @@ namespace MyHostel_BackEnd.Quartz
                         {
                             Data = new Dictionary<string, string>()
                     {
-                        { "Tiền cần đóng của "+transaction.Room.Name+": ", total.ToString() }
+                        { "Tiền cần đóng của "+transaction.Room.Name+": ", total.ToString("N0", new CultureInfo("vn-VN")) + "VNĐ" }
                     },
                             Token = registrationToken,
                         };

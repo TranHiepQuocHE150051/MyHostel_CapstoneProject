@@ -2,6 +2,7 @@
 using MyHostel_BackEnd.Models;
 using Microsoft.EntityFrameworkCore;
 using FirebaseAdmin.Messaging;
+using System.Globalization;
 
 namespace MyHostel_BackEnd.Quartz
 {
@@ -24,7 +25,7 @@ namespace MyHostel_BackEnd.Quartz
                     {
                         Data = new Dictionary<string, string>()
                     {
-                        { data[0]+": ", data[1] }
+                        { data[0]+": ", string.Format("N0", new CultureInfo("vn-VN"), data[1]) + "VNĐ" }
                     },
                         Token = registrationToken,
                     };

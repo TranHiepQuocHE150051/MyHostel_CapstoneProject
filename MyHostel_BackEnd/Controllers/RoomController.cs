@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
+using System.Globalization;
 using Notification = MyHostel_BackEnd.Models.Notification;
 
 namespace MyHostel_BackEnd.Controllers
@@ -222,7 +223,7 @@ namespace MyHostel_BackEnd.Controllers
                         SendAtHour = DateTime.Now.Hour,
                         Type = 0,
                         Message = "Tiền cần đóng của " + room.Name + ": " +
-                        total.ToString()
+                        total.ToString("N0", new CultureInfo("vn-VN")) + "VNĐ"
                     };
                     _context.Notifications.Add(notification);
                     string title = $"";
@@ -326,7 +327,7 @@ namespace MyHostel_BackEnd.Controllers
                         SendAtHour = DateTime.Now.Hour,
                         Type = 0,
                         Message = "Tiền cần đóng của " + room.Name + ": " +
-                        moneyToPay.ToString()
+                        moneyToPay.ToString("N0", new CultureInfo("vn-VN")) + "VNĐ"
                     };
                     _context.Notifications.Add(notification);
                     string title = $"Khoản thu của phòng bạn [{transaction.AtTime}]";
@@ -414,7 +415,6 @@ namespace MyHostel_BackEnd.Controllers
                 Console.WriteLine(e.Message);
                 return;
             }
-
         }
     }
 }
