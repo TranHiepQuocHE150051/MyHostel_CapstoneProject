@@ -2,8 +2,8 @@
 {
     public class NearbyFacilitiesGetHostelDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; } = null!;
-        public decimal Distance { get; set; }
-        public decimal Duration { get; set; }
+        public List<object> Places { get; set; }
     }
 }

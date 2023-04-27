@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
+using System.Net;
+using System.Xml;
 
 namespace MyHostel_BackEnd.Controllers
 {
@@ -259,15 +261,31 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     result.ImgURL = imageList.ToArray();
                     List<NearbyFacilitiesGetHostelDTO> nearbyFacilitiesResult = new List<NearbyFacilitiesGetHostelDTO>();
-                    foreach (var nearbyFacility in hostel.NearbyFacilities)
+                    var facilities = _context.Facilities.ToList();
+                    foreach (var facility in facilities)
                     {
-                        NearbyFacilitiesGetHostelDTO nearbyFacilitiesGetHostelDTO = new NearbyFacilitiesGetHostelDTO
+                        var nearbyfacilities = _context.NearbyFacilities.Where(n => n.HostelId == id && n.UltilityId == facility.Id).ToList();
+                        if (nearbyfacilities.Any())
                         {
-                            Name = nearbyFacility.Name,
-                            Distance = nearbyFacility.Distance,
-                            Duration = nearbyFacility.Duration
-                        };
-                        nearbyFacilitiesResult.Add(nearbyFacilitiesGetHostelDTO);
+                            NearbyFacilitiesGetHostelDTO nearby = new NearbyFacilitiesGetHostelDTO
+                            {
+                                Id = facility.Id,
+                                Name = facility.UtilityName,
+                                Places = new List<object>()
+
+                            };
+                            foreach(var nearbyfacility in nearbyfacilities)
+                            {
+                                nearby.Places.Add(new
+                                {
+                                    Name = nearbyfacility.Name,
+                                    Distance = nearbyfacility.Distance,
+                                    Duration = nearbyfacility.Duration
+
+                                });
+                            }
+                            nearbyFacilitiesResult.Add(nearby);
+                        }
                     }
                     result.NearbyFacilities = nearbyFacilitiesResult.ToArray();
 
@@ -584,16 +602,45 @@ namespace MyHostel_BackEnd.Controllers
                                              select h;
                 if (userLocationLat != null && userLocationLng != null && !userLocationLat.Equals("") && !userLocationLng.Equals(""))
                 {
-                    foreach (var hostel in hostels)
+                    var checkList = hostels;
+                    foreach (var hostel in checkList)
                     {
-                        int distance = CalculateDistance(double.Parse(userLocationLat),
-                            double.Parse(userLocationLng),
-                            double.Parse(hostel.GoogleLocationLat),
-                            double.Parse(hostel.GoogleLocationLnd));
-                        if (distance > 2000)
+                        if (hostel.GoogleLocationLat == null|| hostel.GoogleLocationLnd == null)
                         {
-                            hostels = hostels.Where(h => h != hostel);
+                            hostels = hostels.Where(h => h.Id != hostel.Id);
+                            continue;
                         }
+                        var distance = DistanceTo(double.Parse(userLocationLat.Replace(".", ",")),
+                                double.Parse(userLocationLng.Replace(".", ",")),
+                                double.Parse(hostel.GoogleLocationLat.Replace(".", ",")),
+                                double.Parse(hostel.GoogleLocationLnd.Replace(".", ",")));
+                        if (distance > 3000)
+                        {
+                            hostels = hostels.Where(h => h.Id != hostel.Id);
+                        }
+                        //var distance = GetDistance(userLocationLat, userLocationLng, hostel.GoogleLocationLat, hostel.GoogleLocationLnd);
+                        //if(distance > 0)
+                        //{
+                        //    if (distance > 3000)
+                        //    {
+                        //        hostels = hostels.Where(h => h != hostel);
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    distance = DistanceTo(double.Parse(userLocationLat.Replace(".",",")),
+                        //        double.Parse(userLocationLng.Replace(".",",")),
+                        //        double.Parse(hostel.GoogleLocationLat.Replace(".",",")),
+                        //        double.Parse(hostel.GoogleLocationLnd.Replace(".",",")));
+                        //    if (distance == 0)
+                        //    {
+                        //        continue;
+                        //    }
+                        //    if(distance > 3000)
+                        //    {
+                        //        hostels = hostels.Where(h => h != hostel);
+                        //    }
+                        //}
                     }
                 }
                 PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), (int)page, (int)limit);
@@ -642,6 +689,7 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     reponses.Add(new NearbyHostelReponse
                     {
+                        HostelId=hostel.Id,
                         Name = hostel.Name,
                         DetailLocation = hostel.DetailLocation,
                         WardName = hostel.WardsCodeNavigation.FullName,
@@ -654,7 +702,10 @@ namespace MyHostel_BackEnd.Controllers
                     })
                 ;
                 }
-                return Ok(reponses);
+                return Ok(new
+                {
+                    Hostels= reponses.ToArray()
+                });
             }
             catch (Exception e)
             {
@@ -881,26 +932,49 @@ namespace MyHostel_BackEnd.Controllers
                 });
             }
         }
-        private int CalculateDistance(double orglat, double orglng, double deslat, double deslng)
+        double GetDistance(string lat, string lng, string lat2, string lng2)
         {
-            DirectionsRequest request = new DirectionsRequest();
-            request.Key = GlobalVariables.API_KEY;
-            request.Origin = new LocationEx(new CoordinateEx(orglat, orglng));
-            request.Destination = new LocationEx(new CoordinateEx(deslat, deslng));
-            var response = GoogleApi.GoogleMaps.Directions.Query(request);
-            int distance = response.Routes.First().Legs.First().Distance.Value;
-            return distance;
+            string url = String.Format("https://maps.googleapis.com/maps/api/distancematrix/xml?units=imperial&origins={0},{1}&destinations={2},{3}&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw", lat, lng, lat2, lng2);
+            WebRequest request = WebRequest.Create(url);
+            WebResponse response = request.GetResponse();
+            Stream data = response.GetResponseStream();
 
+            StreamReader reader = new StreamReader(data);
+            string responseFromServer = reader.ReadToEnd();
+            Console.WriteLine(responseFromServer);
+            response.Close();
+            XmlDocument xmldoc = new XmlDocument();
+            xmldoc.LoadXml(responseFromServer);
+            if (xmldoc.GetElementsByTagName("status")[0].ChildNodes[0].InnerText == "OK")
+            {
+                XmlNodeList distance = xmldoc.GetElementsByTagName("distance");
+                return Convert.ToDouble(distance[0].ChildNodes[0].InnerText);
+            }
+            return 0;
         }
-        private double GetDistance(double longitude, double latitude, double otherLongitude, double otherLatitude)
+        private double DistanceTo(double lat1, double lon1, double lat2, double lon2)
         {
-            var d1 = latitude * (Math.PI / 180.0);
-            var num1 = longitude * (Math.PI / 180.0);
-            var d2 = otherLatitude * (Math.PI / 180.0);
-            var num2 = otherLongitude * (Math.PI / 180.0) - num1;
-            var d3 = Math.Pow(Math.Sin((d2 - d1) / 2.0), 2.0) + Math.Cos(d1) * Math.Cos(d2) * Math.Pow(Math.Sin(num2 / 2.0), 2.0);
+            try
+            {
+                double rlat1 = Math.PI * lat1 / 180;
+                double rlat2 = Math.PI * lat2 / 180;
+                double theta = lon1 - lon2;
+                double rtheta = Math.PI * theta / 180;
+                double dist =
+                    Math.Sin(rlat1) * Math.Sin(rlat2) + Math.Cos(rlat1) *
+                    Math.Cos(rlat2) * Math.Cos(rtheta);
+                dist = Math.Acos(dist);
+                dist = dist * 180 / Math.PI;
+                dist = dist * 60 * 1.1515;
 
-            return 6376500.0 * (2.0 * Math.Atan2(Math.Sqrt(d3), Math.Sqrt(1.0 - d3)));
+                return dist * 1609.344;
+            } catch (Exception e)
+            {
+                return 0;
+            }
+            
+
+
         }
         private string replaceString(decimal price)
         {

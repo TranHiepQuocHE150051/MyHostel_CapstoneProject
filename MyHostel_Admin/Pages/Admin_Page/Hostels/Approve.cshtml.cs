@@ -1,4 +1,4 @@
-using GoogleApi.Entities.Maps.Common;
+﻿using GoogleApi.Entities.Maps.Common;
 using GoogleApi.Entities.Maps.Directions.Request;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -9,6 +9,7 @@ using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.GoogleMapsResponseObject;
 using System.Net;
 using System.Text.Json;
+using System.Xml;
 using Place = MyHostel_BackEnd.GoogleMapsResponseObject.Place;
 
 namespace MyHostel_Admin.Pages.Admin_Page.Hostels
@@ -120,74 +121,94 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
                 var facilities = _context.Facilities.ToList();
                 foreach (var facility in facilities)
                 {
-                    string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=" + latitude + "," + longitude + "&radius=3000&type=" + facility.UtilityName + "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4";
+                    string URL = "";
+                    if (facility.Id==1)
+                    {
+                         URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=Chợ&location=" + latitude + "," + longitude + "&radius=1500"+"&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw";
+                    }
+                    else
+                    {
+                        URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=" + latitude + "," + longitude + "&radius=1500&type=" + facility.Code + "&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw";
+                    }
                     WebRequest request = WebRequest.Create(URL);
                     WebResponse response = request.GetResponse();
                     Stream data = response.GetResponseStream();
-
                     StreamReader reader = new StreamReader(data);
                     string responseFromServer = reader.ReadToEnd();
-                    Console.WriteLine(responseFromServer);
                     if (responseFromServer != null)
                     {
                         var results = JsonSerializer.Deserialize<PlacesNearbySearchResponse>(responseFromServer);
                         if (results.results.Length > 0)
                         {
-                            Place nearByResult = results.results.First();
-                            Console.WriteLine(nearByResult);
-                            double reslat = nearByResult.geometry.location.lat;
-                            double reslng = nearByResult.geometry.location.lng;
-                            double orglat = Double.Parse(latitude);
-                            double orglng = Double.Parse(longitude);
-                            DistanceAndDuration distanceAndDuration = CalculateDistanceAndDuration(orglng, orglat, reslng, reslat);
-                            NearbyFacility nearbyFacility = new NearbyFacility
+                            foreach(Place nearByResult in results.results)
                             {
-                                UltilityId = facility.Id,
-                                HostelId = hostelid,
-                                Name = nearByResult.name,
-                                Distance = distanceAndDuration.Distance,
-                                Duration = distanceAndDuration.Duration
+                                Console.WriteLine(nearByResult);
+                                double reslat = nearByResult.geometry.location.lat;
+                                double reslng = nearByResult.geometry.location.lng;
+                                double orglat = Double.Parse(latitude.Replace(".", ","));
+                                double orglng = Double.Parse(longitude.Replace(".", ","));
+                                DistanceAndDuration distanceAndDuration = DistanceTo(orglat, orglng, reslat, reslng);
+                                NearbyFacility nearbyFacility = new NearbyFacility
+                                {
+                                    UltilityId = facility.Id,
+                                    HostelId = hostelid,
+                                    Name = nearByResult.name,
+                                    Distance = distanceAndDuration.Distance,
+                                    Duration = distanceAndDuration.Duration
 
-                            };
-                            _context.NearbyFacilities.Add(nearbyFacility);
-                            _context.SaveChanges();
+                                };
+                                _context.NearbyFacilities.Add(nearbyFacility);
+                                _context.SaveChanges();
+                            }
+                            //Place nearByResult = results.results.First();
                         }
                     }
                 }
             }catch(Exception e)
             {
                 return;
+            }            
+        }
+        private DistanceAndDuration DistanceTo(double lat1, double lon1, double lat2, double lon2)
+        {
+                double rlat1 = Math.PI * lat1 / 180;
+                double rlat2 = Math.PI * lat2 / 180;
+                double theta = lon1 - lon2;
+                double rtheta = Math.PI * theta / 180;
+                double dist =
+                    Math.Sin(rlat1) * Math.Sin(rlat2) + Math.Cos(rlat1) *
+                    Math.Cos(rlat2) * Math.Cos(rtheta);
+                dist = Math.Acos(dist);
+                dist = dist * 180 / Math.PI;
+                dist = dist * 60 * 1.1515;
+                dist = dist * 1.609344;
+                double duration = dist * 15;
+                return new DistanceAndDuration
+                {
+                    Distance = (decimal)dist,
+                    Duration = (decimal)duration
+                };
+        }
+        double GetDistance(string lat, string lng, string lat2, string lng2)
+        {
+            string url = String.Format("https://maps.googleapis.com/maps/api/distancematrix/xml?units=imperial&origins={0},{1}&destinations={2},{3}&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw", lat, lng, lat2, lng2);
+            WebRequest request = WebRequest.Create(url);
+            WebResponse response = request.GetResponse();
+            Stream data = response.GetResponseStream();
+
+            StreamReader reader = new StreamReader(data);
+            string responseFromServer = reader.ReadToEnd();
+            Console.WriteLine(responseFromServer);
+            response.Close();
+            XmlDocument xmldoc = new XmlDocument();
+            xmldoc.LoadXml(responseFromServer);
+            if (xmldoc.GetElementsByTagName("status")[0].ChildNodes[0].InnerText == "OK")
+            {
+                XmlNodeList distance = xmldoc.GetElementsByTagName("distance");
+                return Convert.ToDouble(distance[0].ChildNodes[0].InnerText);
             }
-            
-        }
-        private DistanceAndDuration CalculateDistanceAndDuration(double longitude, double latitude, double otherLongitude, double otherLatitude)
-        {
-            Random random = new Random();
 
-            var distance = random.Next(200, 3000);
-            var duration = (distance/40);
-            return new DistanceAndDuration
-            {
-                Distance = distance,
-                Duration = duration
-            };
-        }
-        private DistanceAndDuration CalculateDistanceAndDuration2(double orglat, double orglng, double deslat, double deslng)
-        {
-            DirectionsRequest request = new DirectionsRequest();
-
-            request.Key = GlobalVariables.API_KEY;
-
-            request.Origin = new LocationEx(new CoordinateEx(orglat, orglng));
-            request.Destination = new LocationEx(new CoordinateEx(deslat, deslng));
-            var response = GoogleApi.GoogleMaps.Directions.Query(request);
-            DistanceAndDuration distanceAndDuration = new DistanceAndDuration
-            {
-                Distance = response.Routes.First().Legs.First().Distance.Value,
-                Duration = response.Routes.First().Legs.First().DurationInTraffic.Value
-
-            };
-            return distanceAndDuration;
+            return 0;
         }
     }
 }

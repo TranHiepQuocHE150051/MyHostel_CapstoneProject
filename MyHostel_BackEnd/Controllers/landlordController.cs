@@ -124,10 +124,10 @@ namespace MyHostel_BackEnd.Controllers
                     _context.Rooms.Add(room);
                     _context.SaveChanges();
                 }
-                if (hostel.LocationLat != null && hostel.LocationLng != null)
-                {
-                    CheckNearbyAmenity(hostel.LocationLat, hostel.LocationLng, hostel1.Id);
-                }
+                //if (hostel.LocationLat != null && hostel.LocationLng != null)
+                //{
+                //    CheckNearbyAmenity(hostel.LocationLat, hostel.LocationLng, hostel1.Id);
+                //}
                 return Ok("Add new hostel Success");
             } catch (Exception e)
             {
@@ -147,44 +147,44 @@ namespace MyHostel_BackEnd.Controllers
             return id;
         }
 
-        private void CheckNearbyAmenity(string latitude, string longitude , int hostelid)
-        {
-            var facilities = _context.Facilities.ToList();
-            foreach (var facility in facilities)
-            {
-                string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location="+latitude+","+longitude+"&radius=3000&type="+facility.UtilityName+ "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4";               
-                WebRequest request = WebRequest.Create(URL);
-                WebResponse response = request.GetResponse();
-                Stream data = response.GetResponseStream();
+        //private void CheckNearbyAmenity(string latitude, string longitude , int hostelid)
+        //{
+        //    var facilities = _context.Facilities.ToList();
+        //    foreach (var facility in facilities)
+        //    {
+        //        string URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location="+latitude+","+longitude+"&radius=3000&type="+facility.UtilityName+ "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4";               
+        //        WebRequest request = WebRequest.Create(URL);
+        //        WebResponse response = request.GetResponse();
+        //        Stream data = response.GetResponseStream();
 
-                StreamReader reader = new StreamReader(data);
-                string responseFromServer = reader.ReadToEnd();
-                Console.WriteLine(responseFromServer);
-                if (responseFromServer != null)
-                {
-                    var results = JsonSerializer.Deserialize<PlacesNearbySearchResponse>(responseFromServer);
-                    if (results.results.Length > 0) {
-                        Place nearByResult = results.results.First();
-                        double reslat = nearByResult.geometry.location.lat;
-                        double reslng = nearByResult.geometry.location.lng;
-                        double orglat = Double.Parse(latitude);
-                        double orglng = Double.Parse(longitude);
-                        DistanceAndDuration distanceAndDuration = CalculateDistanceAndDuration(orglat, orglng, reslat, reslng);
-                        NearbyFacility nearbyFacility = new NearbyFacility
-                        {
-                            UltilityId = facility.Id,
-                            HostelId = hostelid,
-                            Name = nearByResult.name,
-                            Distance = distanceAndDuration.Distance,
-                            Duration = distanceAndDuration.Duration
+        //        StreamReader reader = new StreamReader(data);
+        //        string responseFromServer = reader.ReadToEnd();
+        //        Console.WriteLine(responseFromServer);
+        //        if (responseFromServer != null)
+        //        {
+        //            var results = JsonSerializer.Deserialize<PlacesNearbySearchResponse>(responseFromServer);
+        //            if (results.results.Length > 0) {
+        //                Place nearByResult = results.results.First();
+        //                double reslat = nearByResult.geometry.location.lat;
+        //                double reslng = nearByResult.geometry.location.lng;
+        //                double orglat = Double.Parse(latitude);
+        //                double orglng = Double.Parse(longitude);
+        //                DistanceAndDuration distanceAndDuration = CalculateDistanceAndDuration(orglat, orglng, reslat, reslng);
+        //                NearbyFacility nearbyFacility = new NearbyFacility
+        //                {
+        //                    UltilityId = facility.Id,
+        //                    HostelId = hostelid,
+        //                    Name = nearByResult.name,
+        //                    Distance = distanceAndDuration.Distance,
+        //                    Duration = distanceAndDuration.Duration
 
-                        };
-                        _context.NearbyFacilities.Add(nearbyFacility);
-                        _context.SaveChanges();
-                    } 
-                }
-            }
-        }
+        //                };
+        //                _context.NearbyFacilities.Add(nearbyFacility);
+        //                _context.SaveChanges();
+        //            } 
+        //        }
+        //    }
+        //}
         private bool IsNumeric(string input)
         {
             decimal num;
@@ -195,22 +195,22 @@ namespace MyHostel_BackEnd.Controllers
             int num;
             return int.TryParse(input, out num)&&int.Parse(input)>0;
         }
-        private DistanceAndDuration CalculateDistanceAndDuration(double orglat, double orglng, double deslat, double deslng)
-        {
-            DirectionsRequest request = new DirectionsRequest();
+        //private DistanceAndDuration CalculateDistanceAndDuration(double orglat, double orglng, double deslat, double deslng)
+        //{
+        //    DirectionsRequest request = new DirectionsRequest();
 
-            request.Key = GlobalVariables.API_KEY;
+        //    request.Key = GlobalVariables.API_KEY;
 
-            request.Origin = new LocationEx(new CoordinateEx(orglat, orglng) );
-            request.Destination = new LocationEx(new CoordinateEx(deslat, deslng) );
-            var response = GoogleApi.GoogleMaps.Directions.Query(request);
-            DistanceAndDuration distanceAndDuration = new DistanceAndDuration
-            {
-                Distance = response.Routes.First().Legs.First().Distance.Value,
-                Duration = response.Routes.First().Legs.First().DurationInTraffic.Value
+        //    request.Origin = new LocationEx(new CoordinateEx(orglat, orglng) );
+        //    request.Destination = new LocationEx(new CoordinateEx(deslat, deslng) );
+        //    var response = GoogleApi.GoogleMaps.Directions.Query(request);
+        //    DistanceAndDuration distanceAndDuration = new DistanceAndDuration
+        //    {
+        //        Distance = response.Routes.First().Legs.First().Distance.Value,
+        //        Duration = response.Routes.First().Legs.First().DurationInTraffic.Value
 
-            };
-            return distanceAndDuration;
-        }
+        //    };
+        //    return distanceAndDuration;
+        //}
     }
 }

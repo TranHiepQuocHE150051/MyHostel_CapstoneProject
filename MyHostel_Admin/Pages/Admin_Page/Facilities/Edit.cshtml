@@ -33,6 +33,12 @@
                                        class="form-control form-control-line">
                             </div>
                             <span asp-validation-for="Facility.UtilityName" class="text-danger"></span>
+                            <label asp-for="Facility.Code" class="col-md-12"></label>
+                            <div class="col-md-12">
+                                <input asp-for="Facility.Code" type="text"
+                                       class="form-control form-control-line">
+                            </div>
+                            <span asp-validation-for="Facility.Code" class="text-danger"></span>
                         </div>
                         @*<div class="form-group">
                             <label class="col-md-12">Thể loại này đang có: @Model.Genre.Movies.Count Movies</label>

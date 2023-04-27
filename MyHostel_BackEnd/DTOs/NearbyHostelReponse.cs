@@ -2,6 +2,7 @@
 {
     public class NearbyHostelReponse
     {
+        public int HostelId { get; set; }
         public string Name { get; set; } = null!;
         public string DetailLocation { get; set; } = null!;
         public string WardName { get; set; } = null!;

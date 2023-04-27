@@ -229,6 +229,10 @@ namespace MyHostel_BackEnd.Models
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50)
+                    .HasColumnName("code");
+
                 entity.Property(e => e.UtilityName)
                     .HasMaxLength(50)
                     .HasColumnName("utility_name");

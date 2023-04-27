@@ -19,7 +19,6 @@ app.UseHttpsRedirection();
 app.UseSession();
 
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapRazorPages();
