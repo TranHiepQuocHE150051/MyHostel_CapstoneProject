@@ -1,6 +1,7 @@
 ﻿using FirebaseAdmin.Messaging;
 using GoogleApi.Entities.Maps.Common;
 using GoogleApi.Entities.Maps.Directions.Request;
+using GoogleApi.Entities.Search.Video.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.DTOs;
@@ -553,47 +554,49 @@ namespace MyHostel_BackEnd.Controllers
                 return StatusCode(500);
             }
         }
-        [HttpGet("searchNearbyHostel")]
+        [HttpGet("search/nearby")]
         public async Task<IActionResult> SearchNearbyHostel(
             [FromQuery] string? provinceCode,
             [FromQuery] string? userLocationLat,
             [FromQuery] string? userLocationLng,
-            [FromQuery] int? pageIndex,
-            [FromQuery] int? pageSize
+            [FromQuery] int? page,
+            [FromQuery] int? limit
             )
         {
             try
             {
-                if (pageIndex == null || pageIndex <= 0)
+                if (page == null || page <= 0)
                 {
-                    pageIndex = 1;
+                    page = 1;
                 }
-                if (pageSize == null || pageSize <= 0)
+                if (limit == null || limit <= 0)
                 {
-                    pageSize = 6;
+                    limit = 6;
                 }
                 IQueryable<Hostel> hostels = from h
                                              in _context.Hostels
                                              .Include(h => h.HostelImages)
+                                             .Include(h => h.HostelAmenities)
                                              .Include(h => h.WardsCodeNavigation)
                                              .ThenInclude(w => w.DistrictCodeNavigation)
+                                             .ThenInclude(d => d.ProvinceCodeNavigation)
                                              .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode))
                                              select h;
                 if (userLocationLat != null && userLocationLng != null && !userLocationLat.Equals("") && !userLocationLng.Equals(""))
                 {
                     foreach (var hostel in hostels)
                     {
-                        int distance = CalculateDistance(Double.Parse(userLocationLat),
-                            Double.Parse(userLocationLng),
-                            Double.Parse(hostel.GoogleLocationLat),
-                            Double.Parse(hostel.GoogleLocationLnd));
+                        int distance = CalculateDistance(double.Parse(userLocationLat),
+                            double.Parse(userLocationLng),
+                            double.Parse(hostel.GoogleLocationLat),
+                            double.Parse(hostel.GoogleLocationLnd));
                         if (distance > 2000)
                         {
                             hostels = hostels.Where(h => h != hostel);
                         }
                     }
                 }
-                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), (int)pageIndex, (int)pageSize);
+                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), (int)page, (int)limit);
                 List<NearbyHostelReponse> reponses = new List<NearbyHostelReponse>();
                 foreach (var hostel in hostelsPL)
                 {
@@ -602,12 +605,52 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
                     }
+                    List<AmenitiesGetHostelDTO> AmenitiesResult = new List<AmenitiesGetHostelDTO>();
+                    foreach (var amenity in hostel.HostelAmenities)
+                    {
+                        var amen = await _context.Amenities.Where(a => a.Id == amenity.AmenitiesId).FirstOrDefaultAsync();
+                        AmenitiesResult.Add(new AmenitiesGetHostelDTO
+                        {
+                            Id = amen.Id,
+                            Icon = amen.Icon,
+                            Name = amen.AmenitiyName
+                        });
+                    }
+                    double totalRate = 0.0;
+                    double Rate = 0.0;
+                    int noRate = 0;
+                    var reviews = _context.Residents.Where(r => r.HostelId == hostel.Id).ToList();
+                    if (reviews.Count() > 0)
+                    {
+                        GetHostelReviewDTO review = new GetHostelReviewDTO();
+                        foreach (var item in reviews)
+                        {
+                            if (CheckResidentChangedRoom(hostel.Id, item.MemberId))
+                            {
+                                if (item.Status != 1)
+                                {
+                                    continue;
+                                }
+                            }
+                            totalRate += item.Rate;
+                            if (item.Rate != 0)
+                            {
+                                noRate++;
+                            }
+                        }
+                        Rate = totalRate / noRate;
+                    }
                     reponses.Add(new NearbyHostelReponse
                     {
                         Name = hostel.Name,
                         DetailLocation = hostel.DetailLocation,
+                        WardName = hostel.WardsCodeNavigation.FullName,
+                        DistrictName = hostel.WardsCodeNavigation.DistrictCodeNavigation.FullName,
                         Price = replaceString(hostel.Price),
-                        ImgUrl = ImgUrl
+                        ImgUrl = ImgUrl,
+                        Amenities = AmenitiesResult.ToArray(),
+                        Rate = Rate,
+                        NoRate = noRate
                     })
                 ;
                 }
@@ -1290,12 +1333,12 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet("{id}/check")]
-        public async Task<IActionResult> CheckHostelResident(int id, [FromQuery] int memberId)
+        [HttpGet("{hostelId}/member/{memberId}/check")]
+        public async Task<IActionResult> CheckHostelResident(int hostelId, int memberId)
         {
             try
             {
-                var hostel = await _context.Hostels.Where(h => h.Id == id).SingleOrDefaultAsync();
+                var hostel = await _context.Hostels.Where(h => h.Id == hostelId).SingleOrDefaultAsync();
                 if (hostel == null)
                 {
                     return BadRequest("Hostel not exist");
@@ -1304,7 +1347,7 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return Ok(false);
                 }
-                var residents = _context.Residents.Where(r => r.HostelId == id).ToList();
+                var residents = _context.Residents.Where(r => r.HostelId == hostelId).ToList();
                 List<int> memberIds = new List<int>();
                 foreach (var res in residents)
                 {
