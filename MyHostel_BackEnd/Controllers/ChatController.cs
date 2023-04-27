@@ -158,6 +158,11 @@ namespace MyHostel_BackEnd.Controllers
             }
             await _context.SaveChangesAsync();
             //string jsonStringResult = JsonConvert.SerializeObject(message1);
+            if(message1.AnonymousFlg == 1)
+            {
+                message1.SenderId = 0;
+                message1.Sender = null;
+            }
             string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
                 new JsonSerializerSettings()
                 {
@@ -219,6 +224,8 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessages(int id, [FromQuery] int? page, [FromQuery] int? limit)
         {
@@ -322,6 +329,10 @@ namespace MyHostel_BackEnd.Controllers
                         {
                             images.Add(item.ImageUrl);
                         }
+                        MemberInMessageDTO memberInMessage = new MemberInMessageDTO();
+                        memberInMessage.Id = message.SenderId;
+                        memberInMessage.Avatar = message.Sender.Avatar;
+                        memberInMessage.FullName = message.Sender.FirstName + " " + message.Sender.LastName;
                         if (message.ParentMsgId != null)
                         {
                             var parentMsg = await _context.Messages.Where(m => m.Id == message.ParentMsgId).FirstOrDefaultAsync();
@@ -374,6 +385,7 @@ namespace MyHostel_BackEnd.Controllers
                                 ParentMsg = null,
                             });
                         }
+
                     }
                 }
                 return Ok(result.ToArray());

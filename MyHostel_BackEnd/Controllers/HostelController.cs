@@ -443,10 +443,12 @@ namespace MyHostel_BackEnd.Controllers
             try
             {
                 var reviews = await _context.Residents.Where(r => r.HostelId == id).ToListAsync();
+                var hostel = await _context.Hostels.Include(h => h.Landlord).Where(h => h.Id == id).FirstOrDefaultAsync();
                 var result = new
                 {
                     Rate = 0.0,
                     RateNo = 0,
+                    LandlordId = 0,
                     Comment = new List<object>()
                 };
                 List<object> comment = new List<object>();
@@ -485,6 +487,7 @@ namespace MyHostel_BackEnd.Controllers
                     {
                         Rate = noRate == 0 ? 0 : (rate / noRate),
                         RateNo = noRate,
+                        LandlordId = hostel.Landlord.Id,
                         Comment = comment
                     };
                 }

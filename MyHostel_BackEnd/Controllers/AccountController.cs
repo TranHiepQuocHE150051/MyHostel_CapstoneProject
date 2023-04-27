@@ -204,7 +204,8 @@ namespace MyHostel_BackEnd.Controllers
                             MemberId = member.Id,
                             Name = member.FirstName + " " + member.LastName,
                             AvatarUrl = member.Avatar,
-                            InviteCode = member.InviteCode
+                            InviteCode = member.InviteCode,
+                            OauthSocial = member.GoogleId != null ? "google" : "facebook"
                         });
                 }
                 else
@@ -216,7 +217,8 @@ namespace MyHostel_BackEnd.Controllers
                             MemberId = member.Id,
                             Name = member.FirstName + " " + member.LastName,
                             AvatarUrl = member.Avatar,
-                            InviteCode = member.InviteCode
+                            InviteCode = member.InviteCode,
+                            OauthSocial = member.GoogleId != null ? "google" : "facebook"
                         });
 
 
