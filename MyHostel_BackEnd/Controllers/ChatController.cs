@@ -226,8 +226,8 @@ namespace MyHostel_BackEnd.Controllers
         }
 
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetMessages(int id, [FromQuery] int? page, [FromQuery] int? limit)
+        [HttpGet("{id}/member/{memberId}")]
+        public async Task<IActionResult> GetMessages(int id, int memberId, [FromQuery] int? page, [FromQuery] int? limit)
         {
             try
             {
@@ -383,6 +383,7 @@ namespace MyHostel_BackEnd.Controllers
                                 Img = images.Count == 0 ? null : images,
                                 CreatedAt = message.CreatedAt,
                                 ParentMsg = null,
+                                Member  = memberId == message.SenderId ? memberInMessage : null
                             });
                         }
 
