@@ -15,7 +15,7 @@ namespace MyHostel_Admin.Pages.Admin_Page
             Configuration = configuration;
         }
         public int TotalHostel { get; set; }
-        public double hostelDiff { get; set; }
+        public int hostelDiff { get; set; }
         public int TotalUser { get; set; }
         public int userDiff { get; set; }
         public int TotalResidents { get; set; }
@@ -33,7 +33,7 @@ namespace MyHostel_Admin.Pages.Admin_Page
 
             int totalhostellastmonth;
             totalhostellastmonth = context.Hostels.Where(h=>h.Status==1&&h.CreatedAt<DateTime.Now.AddDays(-30)).ToList().Count;
-            hostelDiff = (((double)TotalHostel- (double)totalhostellastmonth)/ (double)totalhostellastmonth) * 100;
+            hostelDiff = TotalHostel- totalhostellastmonth;
             
             int totaluserlastmonth;
             totaluserlastmonth = context.Members.Where(h =>  h.CreatedAt < DateTime.Now.AddDays(-30)).ToList().Count;
