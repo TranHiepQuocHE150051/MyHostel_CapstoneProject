@@ -63,7 +63,7 @@
                                     @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
                                 </td>
                                 <td>
-                                    <img style="width:70px;height=70px;" src="item.Avatar" />
+                                    <img style="width:70px;height=70px;" src="@item.Avatar" />
                                 </td>
                                 <td>
                                     @{
@@ -83,7 +83,7 @@
                                     } @typeOfUser
                                 </td>
                                 <td>
-                                    <a asp-page="./Edit" asp-route-id="@item.Id">Details</a>
+                                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a>
                                 </td>
                             </tr>
                         }

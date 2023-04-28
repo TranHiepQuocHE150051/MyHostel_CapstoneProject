@@ -1,0 +1,414 @@
+﻿@page
+@model MyHostel_Admin.Pages.Admin_Page.Members.DetailsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.AspNetCore.Http
+@{
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" sizes="76x76" href="~/admin/img/download.png">
+    <link rel="icon" type="image/png" href="~/admin/img/download.png">
+    <title>@ViewData["Title"] - Admin</title>
+
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900|Roboto+Slab:400,700" />
+    <link href="~/admin/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="~/admin/css/nucleo-svg.css" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link id="pagestyle" href="~/admin/css/material-dashboard.css?v=3.0.5" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding-top: 40px;
+            color: #2e323c;
+            background: #f5f6fa;
+            position: relative;
+            height: 100%;
+        }
+
+        .account-settings .user-profile {
+            margin: 0 0 1rem 0;
+            padding-bottom: 1rem;
+            text-align: center;
+        }
+
+            .account-settings .user-profile .user-avatar {
+                margin: 0 0 1rem 0;
+            }
+
+                .account-settings .user-profile .user-avatar img {
+                    width: 90px;
+                    height: 90px;
+                    -webkit-border-radius: 100px;
+                    -moz-border-radius: 100px;
+                    border-radius: 100px;
+                }
+
+            .account-settings .user-profile h5.user-name {
+                margin: 0 0 0.5rem 0;
+            }
+
+            .account-settings .user-profile h6.user-email {
+                margin: 0;
+                font-size: 0.8rem;
+                font-weight: 400;
+                color: #9fa8b9;
+            }
+
+        .account-settings .about {
+            margin: 2rem 0 0 0;
+            text-align: center;
+        }
+
+            .account-settings .about h5 {
+                margin: 0 0 15px 0;
+                color: #007ae1;
+            }
+
+            .account-settings .about p {
+                font-size: 0.825rem;
+            }
+
+        .form-control {
+            border: 1px solid #cfd1d8;
+            -webkit-border-radius: 2px;
+            -moz-border-radius: 2px;
+            border-radius: 2px;
+            font-size: .825rem;
+            background: #ffffff;
+            color: #2e323c;
+        }
+
+        .card {
+            background: #ffffff;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            border: 0;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="g-sidenav-show  bg-gray-200">
+    <aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+        <div class="sidenav-header">
+
+            <img src="~/admin/img/logo-ct.png" class="navbar-brand-img h-100" alt="main_logo">
+            <span class="ms-1 font-weight-bold text-white" style="color: orangered !important;">ADMIN DASHBOARD </span>
+
+        </div>
+        <hr class="horizontal light mt-0 mb-2">
+        <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-white active bg-gradient-primary" asp-page="/Admin_Page/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">dashboard</i>
+                        </div>
+                        <span class="nav-link-text ms-1">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/Amenities/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">table_view</i>
+                        </div>
+                        <span class="nav-link-text ms-1">Amenities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/Facilities/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">table_view</i>
+                        </div>
+                        <span class="nav-link-text ms-1">Facilities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/HostelAmenities/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">table_view</i>
+                        </div>
+                        <span class="nav-link-text ms-1">HostelAmenities</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/HostelImages/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">receipt_long</i>
+                        </div>
+                        <span class="nav-link-text ms-1">HostelImages</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/Hostels/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">house</i>
+                        </div>
+                        <span class="nav-link-text ms-1">Hostels</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/Members/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">person</i>
+                        </div>
+                        <span class="nav-link-text ms-1">Members</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white " asp-page="/Admin_Page/NearbyFacilities/Index">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="material-icons opacity-10">receipt_long</i>
+                        </div>
+                        <span class="nav-link-text ms-1">NearbyFacilities</span>
+                    </a>
+                </li>
+
+
+
+            </ul>
+        </div>
+        <div class="sidenav-footer position-absolute w-100 bottom-0 ">
+            <div class="mx-3">
+                <a class="btn bg-gradient-primary mt-4 w-100" href="" type="button">Back to Home</a>
+            </div>
+        </div>
+    </aside>
+    <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+        <!-- Navbar -->
+        <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+            <div class="container-fluid py-1 px-3">
+                <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+                    <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+                        <div class="input-group input-group-outline">
+                            <label class="form-label">Type here...</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    @{
+                        var u = HttpContext.Session.GetString("currentUser");
+                    }
+                    <ul class="navbar-nav  justify-content-end">
+
+                        <li class="nav-item d-flex align-items-center">
+                            <span style="margin-right:5px"> Hello @u </span>
+                            <a asp-page="/Logout" class="nav-link text-body font-weight-bold px-0">
+                                <i class="fa fa-user me-sm-1"></i>
+                                <span class="d-sm-inline d-none">Sign out</span>
+                            </a>
+
+                        </li>
+                        <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+                            <a href="javascript:;" class="nav-link text-body p-0" id="iconNavbarSidenav">
+                                <div class="sidenav-toggler-inner">
+                                    <i class="sidenav-toggler-line"></i>
+                                    <i class="sidenav-toggler-line"></i>
+                                    <i class="sidenav-toggler-line"></i>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item px-3 d-flex align-items-center">
+                            <a href="javascript:;" class="nav-link text-body p-0">
+                                <i class="fa fa-cog fixed-plugin-button-nav cursor-pointer"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown pe-2 d-flex align-items-center">
+                            <a href="javascript:;" class="nav-link text-body p-0" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-bell cursor-pointer"></i>
+                            </a>
+                            <ul class="dropdown-menu  dropdown-menu-end  px-2 py-3 me-sm-n4" aria-labelledby="dropdownMenuButton">
+                                <li class="mb-2">
+                                    <a class="dropdown-item border-radius-md" href="javascript:;">
+                                        <div class="d-flex py-1">
+                                            <div class="my-auto">
+                                                <img src="../wwwroot/admin/img/team-2.jpg" class="avatar avatar-sm  me-3 ">
+                                            </div>
+                                            <div class="d-flex flex-column justify-content-center">
+                                                <h6 class="text-sm font-weight-normal mb-1">
+                                                    <span class="font-weight-bold">New message</span> from Hiep Quoc
+                                                </h6>
+                                                <p class="text-xs text-secondary mb-0">
+                                                    <i class="fa fa-clock me-1"></i>
+                                                    13 minutes ago
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row gutters">
+                <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="account-settings">
+                                <div class="user-profile">
+                                    <div class="user-avatar">
+                                        <img src="@Model.Member.Avatar">
+                                    </div>
+                                    <h5 class="user-name">@Model.Member.FirstName @Model.Member.LastName</h5>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="row gutters">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <h6 class="mb-2 text-primary">Personal Details</h6>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="fullName">Full Name</label>
+                                        <input type="text" class="form-control" id="fullName" value="@Model.Member.FirstName @Model.Member.LastName" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="eMail">Invite Code</label>
+                                        <input type="email" class="form-control" id="eMail" value="@Model.Member.InviteCode" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-12">
+                                    <div class="form-group">
+                                        <label for="phone">Role</label>
+                                        @if (Model.Member.RoleId == 3)
+                                        {
+                                            <input type="text" class="form-control" id="phone" value="ADMIN" readonly>
+                                        }
+                                        @if (Model.Member.RoleId == 2)
+                                        {
+                                            <input type="text" class="form-control" id="phone" value="LANDLORD" readonly>
+                                        }
+                                        @if (Model.Member.RoleId == 1)
+                                        {
+                                            <input type="text" class="form-control" id="phone" value="TENANT" readonly>
+                                        }
+                                        
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <br>
+                            <div class="row gutters">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <div class="text-right">
+                                        <button class="btn btn-danger"><a asp-page="/Admin_Page/Members/Index">Back to List</a></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer py-4  ">
+            <div class="container-fluid">
+                <div class="row align-items-center justify-content-lg-between">
+                    <div class="col-lg-6 mb-lg-0 mb-4">
+                        <div class="copyright text-center text-sm text-muted text-lg-start">
+                            © <script>
+                                  document.write(new Date().getFullYear())
+                            </script>,
+                            My Hostel Dashboard <i class="fa fa-heart"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </footer>
+    </main>
+    <div class="fixed-plugin">
+        <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+            <i class="material-icons py-2">settings</i>
+        </a>
+        <div class="card shadow-lg">
+            <div class="card-header pb-0 pt-3">
+                <div class="float-start">
+                    <h5 class="mt-3 mb-0">UI Configurator</h5>
+                    <p>dashboard options.</p>
+                </div>
+                <div class="float-end mt-4">
+                    <button class="btn btn-link text-dark p-0 fixed-plugin-close-button">
+                        <i class="material-icons">clear</i>
+                    </button>
+                </div>
+                <!-- End Toggle Button -->
+            </div>
+            <hr class="horizontal dark my-1">
+            <div class="card-body pt-sm-3 pt-0">
+                <!-- Sidebar Backgrounds -->
+                <div>
+                    <h6 class="mb-0">Sidebar Colors</h6>
+                </div>
+                <a href="javascript:void(0)" class="switch-trigger background-color">
+                    <div class="badge-colors my-2 text-start">
+                        <span class="badge filter bg-gradient-primary active" data-color="primary" onclick="sidebarColor(this)"></span>
+                        <span class="badge filter bg-gradient-dark" data-color="dark" onclick="sidebarColor(this)"></span>
+                        <span class="badge filter bg-gradient-info" data-color="info" onclick="sidebarColor(this)"></span>
+                        <span class="badge filter bg-gradient-success" data-color="success" onclick="sidebarColor(this)"></span>
+                        <span class="badge filter bg-gradient-warning" data-color="warning" onclick="sidebarColor(this)"></span>
+                        <span class="badge filter bg-gradient-danger" data-color="danger" onclick="sidebarColor(this)"></span>
+                    </div>
+                </a>
+                <!-- Sidenav Type -->
+                <div class="mt-3">
+                    <h6 class="mb-0">Sidenav Type</h6>
+                    <p class="text-sm">Choose between 2 different sidenav types.</p>
+                </div>
+                <div class="d-flex">
+                    <button class="btn bg-gradient-dark px-3 mb-2 active" data-class="bg-gradient-dark" onclick="sidebarType(this)">Dark</button>
+                    <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-transparent" onclick="sidebarType(this)">Transparent</button>
+                    <button class="btn bg-gradient-dark px-3 mb-2 ms-2" data-class="bg-white" onclick="sidebarType(this)">White</button>
+                </div>
+                <p class="text-sm d-xl-none d-block mt-2">You can change the sidenav type just on desktop view.</p>
+                <!-- Navbar Fixed -->
+                <div class="mt-3 d-flex">
+                    <h6 class="mb-0">Navbar Fixed</h6>
+                    <div class="form-check form-switch ps-0 ms-auto my-auto">
+                        <input class="form-check-input mt-1 ms-auto" type="checkbox" id="navbarFixed" onclick="navbarFixed(this)">
+                    </div>
+                </div>
+                <hr class="horizontal dark my-3">
+                <div class="mt-2 d-flex">
+                    <h6 class="mb-0">Light / Dark</h6>
+                    <div class="form-check form-switch ps-0 ms-auto my-auto">
+                        <input class="form-check-input mt-1 ms-auto" type="checkbox" id="dark-version" onclick="darkMode(this)">
+                    </div>
+                </div>
+                <hr class="horizontal dark my-sm-4">
+
+
+
+            </div>
+        </div>
+    </div>
+    <!--   Core JS Files   -->
+    <script src="~/admin/js/core/popper.min.js"></script>
+    <script src=".~/admin/js/core/bootstrap.min.js"></script>
+    <script src="~/admin/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="~/admin/js/plugins/smooth-scrollbar.min.js"></script>
+    <script src="~/admin/js/plugins/chartjs.min.js"></script>
+    <!-- Github buttons -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="~/admin/js/material-dashboard.min.js?v=3.0.5"></script>
+</body>
+
+</html>
