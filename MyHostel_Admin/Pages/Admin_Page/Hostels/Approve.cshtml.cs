@@ -124,11 +124,11 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
                     string URL = "";
                     if (facility.Id==1)
                     {
-                         URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=Chợ&location=" + latitude + "," + longitude + "&radius=1500"+ "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4-E";
+                         URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=Chợ&location=" + latitude + "," + longitude + "&radius=1500"+ "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4";
                     }
                     else
                     {
-                        URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=" + latitude + "," + longitude + "&radius=1500&type=" + facility.Code + "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4-E";
+                        URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=" + latitude + "," + longitude + "&radius=1500&type=" + facility.Code + "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4";
                     }
                     WebRequest request = WebRequest.Create(URL);
                     WebResponse response = request.GetResponse();
