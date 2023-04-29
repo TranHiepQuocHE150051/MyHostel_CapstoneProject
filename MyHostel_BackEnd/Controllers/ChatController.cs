@@ -160,8 +160,9 @@ namespace MyHostel_BackEnd.Controllers
             //string jsonStringResult = JsonConvert.SerializeObject(message1);
             if(message1.AnonymousFlg == 1)
             {
-                message1.SenderId = 0;
+                message1.SenderId = message.AnonymousCode;
                 message1.Sender = null;
+
             }
             string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
                 new JsonSerializerSettings()

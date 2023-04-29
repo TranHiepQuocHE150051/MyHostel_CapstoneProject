@@ -302,6 +302,8 @@ namespace MyHostel_BackEnd.Controllers
                     }
                     result.Amenities = AmenitiesResult.ToArray();
                     result.DetailLocation = hostel.DetailLocation;
+                    result.LocationLat = hostel.GoogleLocationLat;
+                    result.LocationLng = hostel.GoogleLocationLnd;
                     result.WardCode = hostel.WardsCode;
                     result.WardName = hostel.WardsCodeNavigation.FullName;
                     result.DistrictCode = hostel.WardsCodeNavigation.DistrictCode;
@@ -375,7 +377,7 @@ namespace MyHostel_BackEnd.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500);
+                return StatusCode(500, ex.Message);
             }
         }
         [HttpGet("landlord/{id}")]
