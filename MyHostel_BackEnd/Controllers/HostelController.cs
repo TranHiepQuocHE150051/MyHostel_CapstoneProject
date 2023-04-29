@@ -274,7 +274,7 @@ namespace MyHostel_BackEnd.Controllers
                                 Places = new List<object>()
 
                             };
-                            foreach(var nearbyfacility in nearbyfacilities)
+                            foreach (var nearbyfacility in nearbyfacilities)
                             {
                                 nearby.Places.Add(new
                                 {
@@ -608,7 +608,7 @@ namespace MyHostel_BackEnd.Controllers
                     var checkList = hostels;
                     foreach (var hostel in checkList)
                     {
-                        if (hostel.GoogleLocationLat == null|| hostel.GoogleLocationLnd == null)
+                        if (hostel.GoogleLocationLat == null || hostel.GoogleLocationLnd == null)
                         {
                             hostels = hostels.Where(h => h.Id != hostel.Id);
                             continue;
@@ -688,11 +688,14 @@ namespace MyHostel_BackEnd.Controllers
                                 noRate++;
                             }
                         }
-                        Rate = totalRate / noRate;
+                        if (noRate > 0)
+                        {
+                            Rate = totalRate / noRate;
+                        }
                     }
                     reponses.Add(new NearbyHostelReponse
                     {
-                        HostelId=hostel.Id,
+                        HostelId = hostel.Id,
                         Name = hostel.Name,
                         DetailLocation = hostel.DetailLocation,
                         WardName = hostel.WardsCodeNavigation.FullName,
@@ -707,7 +710,7 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 return Ok(new
                 {
-                    Hostels= reponses.ToArray()
+                    Hostels = reponses.ToArray()
                 });
             }
             catch (Exception e)
@@ -971,11 +974,12 @@ namespace MyHostel_BackEnd.Controllers
                 dist = dist * 60 * 1.1515;
 
                 return dist * 1609.344;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 return 0;
             }
-            
+
 
 
         }
@@ -1436,6 +1440,112 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 return Ok(false);
 
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpGet("suggest")]
+        public async Task<IActionResult> SuggestHostel(
+            [FromQuery] string provinceCode,
+            [FromQuery] int newHostel,
+            [FromQuery] int? page,
+            [FromQuery] int? limit
+            )
+        {
+            try
+            {
+                if (page == null || page <= 0)
+                {
+                    page = 1;
+                }
+                if (limit == null || limit <= 0)
+                {
+                    limit = 10;
+                }
+                if (provinceCode == null)
+                {
+                    return NotFound();
+                }
+                IQueryable<Hostel> hostels = from h
+                                            in _context.Hostels
+                                            .Include(h => h.WardsCodeNavigation)
+                                            .ThenInclude(w => w.DistrictCodeNavigation)
+                                             select h;
+                var hostelAmenities = await _context.HostelAmenities.ToListAsync();
+                hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCode == provinceCode);
+                if (newHostel == 1)
+                {
+                    hostels = hostels.OrderByDescending(h => h.CreatedAt);
+                }
+                PaginatedList<Hostel> hostelsPL = await PaginatedList<Hostel>.CreateAsync(hostels.AsNoTracking(), (int)page, (int)limit);
+                List<SuggestHostelDTO> reponses = new List<SuggestHostelDTO>();
+                foreach (var hostel in hostelsPL)
+                {
+                    string ImgUrl = "";
+                    if (hostel.HostelImages.FirstOrDefault() != null)
+                    {
+                        ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
+                    }
+                    List<AmenitiesGetHostelDTO> AmenitiesResult = new List<AmenitiesGetHostelDTO>();
+                    foreach (var amenity in hostel.HostelAmenities)
+                    {
+                        var amen = await _context.Amenities.Where(a => a.Id == amenity.AmenitiesId).FirstOrDefaultAsync();
+                        AmenitiesResult.Add(new AmenitiesGetHostelDTO
+                        {
+                            Id = amen.Id,
+                            Icon = amen.Icon,
+                            Name = amen.AmenitiyName
+                        });
+                    }
+                    double totalRate = 0.0;
+                    double Rate = 0.0;
+                    int noRate = 0;
+                    var reviews = _context.Residents.Where(r => r.HostelId == hostel.Id).ToList();
+                    if (reviews.Count() > 0)
+                    {
+                        GetHostelReviewDTO review = new GetHostelReviewDTO();
+                        foreach (var item in reviews)
+                        {
+                            if (CheckResidentChangedRoom(hostel.Id, item.MemberId))
+                            {
+                                if (item.Status != 1)
+                                {
+                                    continue;
+                                }
+                            }
+                            totalRate += item.Rate;
+                            if (item.Rate != 0)
+                            {
+                                noRate++;
+                            }
+                        }
+                        if (noRate > 0)
+                        {
+                            Rate = totalRate / noRate;
+                        }
+                    }
+                    reponses.Add(new SuggestHostelDTO
+                    {
+                        HostelId = hostel.Id,
+                        Name = hostel.Name,
+                        DetailLocation = hostel.DetailLocation,
+                        WardName = hostel.WardsCodeNavigation.FullName,
+                        DistrictName = hostel.WardsCodeNavigation.DistrictCodeNavigation.FullName,
+                        Price = replaceString(hostel.Price),
+                        ImgUrl = ImgUrl,
+                        Amenities = AmenitiesResult.ToArray(),
+                        Rate = Rate,
+                        NoRate = noRate
+                    })
+                ;
+                }
+                return Ok(new
+                {
+                    Hostels = reponses.ToArray()
+                });
             }
             catch (Exception e)
             {
