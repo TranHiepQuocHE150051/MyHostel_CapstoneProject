@@ -124,11 +124,11 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
                     string URL = "";
                     if (facility.Id==1)
                     {
-                         URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=Chợ&location=" + latitude + "," + longitude + "&radius=1500"+"&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw";
+                         URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?keyword=Chợ&location=" + latitude + "," + longitude + "&radius=1500"+ "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4-E";
                     }
                     else
                     {
-                        URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=" + latitude + "," + longitude + "&radius=1500&type=" + facility.Code + "&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw";
+                        URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?&location=" + latitude + "," + longitude + "&radius=1500&type=" + facility.Code + "&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4-E";
                     }
                     WebRequest request = WebRequest.Create(URL);
                     WebResponse response = request.GetResponse();
@@ -191,7 +191,7 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
         }
         double GetDistance(string lat, string lng, string lat2, string lng2)
         {
-            string url = String.Format("https://maps.googleapis.com/maps/api/distancematrix/xml?units=imperial&origins={0},{1}&destinations={2},{3}&key=AIzaSyCdUxZNK9Gx72Hw_dCrIHuB3n_UAiTMIXw", lat, lng, lat2, lng2);
+            string url = String.Format("https://maps.googleapis.com/maps/api/distancematrix/xml?units=imperial&origins={0},{1}&destinations={2},{3}&key=AIzaSyDgE-j9prihJMmwRqEdjIv8ZdBHYTfOsU4", lat, lng, lat2, lng2);
             WebRequest request = WebRequest.Create(url);
             WebResponse response = request.GetResponse();
             Stream data = response.GetResponseStream();
