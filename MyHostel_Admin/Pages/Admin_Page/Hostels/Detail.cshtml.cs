@@ -15,6 +15,8 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
             Configuration = configuration;
         }
         public Hostel Hostel { get; set; }
+        public HostelImage img { get; set; }
+
         public async Task<IActionResult> OnGetAsync(int? id)
         {
             if (HttpContext.Session.GetString("currentUser") == null)
@@ -42,8 +44,8 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
                 return NotFound();
             }
 
-            Hostel = await context.Hostels.FirstOrDefaultAsync(m => m.Id == id);
-
+            Hostel = await context.Hostels.Include(h=>h.HostelImages).FirstOrDefaultAsync(m => m.Id == id);
+            img = Hostel.HostelImages.First();
             if (Hostel == null)
             {
                 return NotFound();

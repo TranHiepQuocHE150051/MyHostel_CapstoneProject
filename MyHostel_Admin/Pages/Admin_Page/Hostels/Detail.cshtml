@@ -3,104 +3,103 @@
 @{
     Layout = "_LayoutAdmin";
 }
-
 <div class="page-breadcrumb">
     <div class="row align-items-center">
         <div class="col-6">
-            
-            <h1 class="mb-0 fw-bold">Hostel Detail Management</h1>
+
+            <h1 class="mb-0 fw-bold">Hostel Detail</h1>
         </div>
+
     </div>
 </div>
 
-<div class="container-fluid">
-    <div class="card">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">
-                                Id
-                            </th>
-                            <th scope="col">
-                                Name
-                            </th>
-                            <th scope="col">
-                                Price
-                            </th>
-                            <th scope="col">
-                                Room Capacity
-                            </th>
-                            <th scope="col">
-                                Description
-                            </th>
-                            <th scope="col">
-                                Room Area
-                            </th>
-                            <th scope="col">
-                                Electric
-                            </th>
-                            <th scope="col">
-                                Water
-                            </th>
-                            <th scope="col">
-                                Internet
-                            </th>
-                            <th scope="col">
-                                Room
-                            </th>
-                            <th scope="col">
-                                Resident
-                            </th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                            <tr>
-                                <th scope="row">
-                                    @Html.DisplayFor(modelItem => Model.Hostel.Id)
-                                </th>
-                                <td>
-                                @Html.DisplayFor(modelItem => Model.Hostel.Name)
-                                </td>
-                                <td>
-                                @Html.DisplayFor(modelItem => (Model.Hostel.Price))
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => (Model.Hostel.Capacity))
-                                </td>
-                                <td>
-                                @Html.DisplayFor(modelItem => (Model.Hostel.Description))
-                                </td>
-                                <td>
-                                @Html.DisplayFor(modelItem => (Model.Hostel.RoomArea))
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => (Model.Hostel.Electricity))
-                                </td>
-                                <td>
-                                @Html.DisplayFor(modelItem => (Model.Hostel.Water))
-                                </td>
-                                <td>
-                                @Html.DisplayFor(modelItem => (Model.Hostel.Internet))
-                                </td>
-                                <td>
-                                    @if(Model.Hostel.Status==1){
-                                    <a asp-page="/Admin_Page/Hostels/Rooms" asp-route-id="@Model.Hostel.Id">View rooms</a>
-                                    }                              
-                                </td>
-                                <td>
-                                @if (Model.Hostel.Status == 1) { 
-                                    <a asp-page="/Admin_Page/Hostels/Residents" asp-route-id="@Model.Hostel.Id">View residents</a>
-                                }                               
-                                </td>
-                            </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-1">
+        </dt>
+        <dd class="col-sm-11">
+            <img src="@Model.img.ImageUrl" style="width:500px;height:250px " />
+        </dd>
+    </dl>
+    <dl class="row" style="padding-left:100px">   
+        
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.DetailLocation)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.DetailLocation)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Price)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.Price) VND
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Capacity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.Capacity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.RoomArea)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.RoomArea) m²
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Water)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.Water) VND
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Electricity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Hostel.Electricity) VND
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Internet)
+        </dt>
+        <dd class="col-sm-10"> 
+            @Html.DisplayFor(model => model.Hostel.Internet) VND
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Residents)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Hostel.Status == 1)
+            {
+                <button class="btn btn-primary"><a asp-page="/Admin_Page/Hostels/Residents" asp-route-id="@Model.Hostel.Id" style="color:white">View residents</a></button>
+            }
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Hostel.Rooms)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Hostel.Status == 1)
+            {
+                <button class="btn btn-primary"><a asp-page="/Admin_Page/Hostels/Rooms" asp-route-id="@Model.Hostel.Id" style="color:white">View rooms</a></button>
+            }
+        </dd>
+    </dl>
+        <button class="btn btn-primary"><a asp-page="/Admin_Page/Hostels/Index" style="color:white">Back to List</a></button>
+
+</div>
     
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>

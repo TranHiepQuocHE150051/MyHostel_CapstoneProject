@@ -53,7 +53,7 @@ namespace MyHostel_Admin.Pages.Admin_Page.NearbyFacilities
                                                   select s;
             if (!String.IsNullOrEmpty(searchString))
             {
-                genresIQ = genresIQ.Where(s => s.Name.ToLower().Contains(searchString.ToLower())
+                genresIQ = genresIQ.Where(s => s.Ultility.UtilityName.ToLower().Contains(searchString.ToLower())
                 || s.Hostel.Name.ToLower().Contains(searchString.ToLower()));
             }
             var pageSize = Configuration.GetValue("PageSize", 6);

@@ -304,9 +304,9 @@
                     <input type="hidden" asp-for="@Model.approveRequest.HostelId" value="@Model.Hostel.Id" />
                     <input type="hidden" id="placeLat" asp-for="@Model.approveRequest.Lat" />
                     <input type="hidden" id="placeLng" asp-for="@Model.approveRequest.Lng"/>
-                    <input type="submit" value="Approve" class="btn btn-danger" /> 
+                    <input type="submit" value="Approve" class="btn btn-primary" style="color:white" /> 
                 </form>
-                <button class="btn btn-danger"><a asp-page="/Admin_Page/Hostels/Index">Back to List</a></button>
+                <button class="btn btn-primary"><a asp-page="/Admin_Page/Hostels/Index" style="color:white">Back to List</a></button>
             </div>
         </div>
         <footer class="footer py-4  ">

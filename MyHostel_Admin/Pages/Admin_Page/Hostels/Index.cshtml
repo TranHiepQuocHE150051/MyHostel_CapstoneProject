@@ -103,11 +103,11 @@
                                 </td>
                                 <td>
                                     @if (item.Status==1){
-                                        <a asp-page="./Detail" asp-route-id="@item.Id">Details</a>
+                                        <button class="btn btn-primary"><a asp-page="./Detail" asp-route-id="@item.Id" style="color:white">Details</a></button>                                        
                                     }@if (item.Status == 0)
                                     {
-                                        <a asp-page="./Approve" asp-route-id="@item.Id">Approve | </a> 
-                                        <a asp-page="./Cancel" asp-route-id="@item.Id">Cancel</a>
+                                        <button class="btn btn-primary"><a asp-page="./Approve" asp-route-id="@item.Id" style="color:white">Approve</a></button>
+                                        <button class="btn btn-primary"><a asp-page="./Cancel" asp-route-id="@item.Id" style="color:white">Cancel</a></button>
                                     }
                                     
                                 </td>

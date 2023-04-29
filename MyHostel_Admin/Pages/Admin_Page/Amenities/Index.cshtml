@@ -55,7 +55,8 @@
                                     @Html.DisplayFor(modelItem => item.AmenitiyName)
                                 </td>
                                 <td>
-                                    <a asp-page="./Edit" asp-route-id="@item.Id">Update</a>
+                                    <button class="btn btn-primary"><a asp-page="./Edit" asp-route-id="@item.Id" style="color:white">Update</a></button>
+                                    
                                 </td>
                             </tr>
                         }
