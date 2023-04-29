@@ -22,6 +22,8 @@
         public string Electricity { get; set; } = null!;
         public string Water { get; set; } = null!;
         public string Internet { get; set; } = null!;
+        public string LocationLat { get; set; } = null!;
+        public string LocationLng { get; set; } = null!;    
         public LandlordGetHostelDTO Landlord { get; set; } = null!;
         public GetHostelReviewDTO Review { get; set; } = null!;
     }
