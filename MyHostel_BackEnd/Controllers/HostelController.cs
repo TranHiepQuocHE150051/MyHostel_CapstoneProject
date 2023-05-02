@@ -1485,6 +1485,7 @@ namespace MyHostel_BackEnd.Controllers
                                             in _context.Hostels
                                             .Include(h => h.WardsCodeNavigation)
                                             .ThenInclude(w => w.DistrictCodeNavigation)
+                                            .Where(h => h.Status == 1)
                                              select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
                 hostels = hostels.Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCode == provinceCode);
@@ -1497,9 +1498,10 @@ namespace MyHostel_BackEnd.Controllers
                 foreach (var hostel in hostelsPL)
                 {
                     string ImgUrl = "";
-                    if (hostel.HostelImages.FirstOrDefault() != null)
+                    var hostelImg = hostel.HostelImages.FirstOrDefault();
+                    if ( hostelImg != null)
                     {
-                        ImgUrl = hostel.HostelImages.FirstOrDefault().ImageUrl;
+                        ImgUrl = hostelImg.ImageUrl;
                     }
                     List<AmenitiesGetHostelDTO> AmenitiesResult = new List<AmenitiesGetHostelDTO>();
                     foreach (var amenity in hostel.HostelAmenities)
