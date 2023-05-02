@@ -98,96 +98,106 @@ namespace MyHostel_BackEnd.Controllers
         [HttpPost("message")]
         public async Task<IActionResult> CreateMessage([FromBody] CreateMessageDTO message)
         {
-            var member = _context.Members.Where(m => m.Id == message.MemberId).SingleOrDefault();
-            if (member == null)
+            try
             {
-                return BadRequest("Member is not exist");
-            }
-            Chat chat = _context.Chats.Where(c => c.Id == message.ChatId).SingleOrDefault();
-            if (chat == null)
-            {
-                return BadRequest("Chat is not exist");
-            }
-            var participants = _context.Participants.Where(p => p.ChatId == message.ChatId).Include(p => p.Member).ThenInclude(m => m.Residents).ToList();
-            bool IsInChat = false;
-            foreach (var participant in participants)
-            {
-                if (member.Id == participant.MemberId)
+                var member = _context.Members.Where(m => m.Id == message.MemberId).SingleOrDefault();
+                if (member == null)
                 {
-                    IsInChat = true;
-                    break;
+                    return BadRequest("Member is not exist");
                 }
-            }
-            if (!IsInChat)
-            {
-                return BadRequest("Member is not in chat");
-            }
-
-            Message message1 = new Message
-            {
-                ChatId = message.ChatId,
-                SenderId = message.MemberId,
-                MsgText = message.MsgText,
-                CreatedAt = DateTime.Now,
-                AnonymousFlg = (byte)message.AnonymousFlg,
-                Status = 1
-            };
-            _context.Messages.Add(message1);
-            await _context.SaveChangesAsync();
-            chat.LastMsgAt = DateTime.Now;
-            _context.Chats.Update(chat);
-            await _context.SaveChangesAsync();
-            if (message.Img.Length > 0)
-            {
-                foreach (string image in message.Img)
+                Chat chat = _context.Chats.Where(c => c.Id == message.ChatId).SingleOrDefault();
+                if (chat == null)
                 {
-                    MessageImage messageImage = new MessageImage
+                    return BadRequest("Chat is not exist");
+                }
+                var participants = _context.Participants.Where(p => p.ChatId == message.ChatId).Include(p => p.Member).ThenInclude(m => m.Residents).ToList();
+                bool IsInChat = false;
+                foreach (var participant in participants)
+                {
+                    if (member.Id == participant.MemberId)
                     {
-                        MessageId = message1.Id,
-                        ImageUrl = image
-
-                    };
-                    _context.MessageImages.Add(messageImage);
-                    await _context.SaveChangesAsync();
+                        IsInChat = true;
+                        break;
+                    }
                 }
-            }
-            foreach (var participant in participants)
-            {
-                participant.Status = 0;
-                _context.Participants.Update(participant);
-            }
-            await _context.SaveChangesAsync();
-            //string jsonStringResult = JsonConvert.SerializeObject(message1);
-            if(message1.AnonymousFlg == 1)
-            {
-                message1.SenderId = message.AnonymousCode;
-                message1.Sender = null;
-
-            }
-            string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
-                new JsonSerializerSettings()
+                if (!IsInChat)
                 {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    return BadRequest("Member is not in chat");
                 }
-            );
-            foreach (var participant in participants)
-            {
-                if (member.Id != participant.MemberId)
+
+                Message message1 = new Message
                 {
-                    await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{participant.MemberId}", "API", jsonStringResult);
-                    SendNewMessageNotification(participant, chat);
+                    ChatId = message.ChatId,
+                    SenderId = message.MemberId,
+                    MsgText = message.MsgText,
+                    CreatedAt = DateTime.Now,
+                    AnonymousFlg = (byte)message.AnonymousFlg,
+                    Status = 1
+                };
+                _context.Messages.Add(message1);
+                await _context.SaveChangesAsync();
+                chat.LastMsgAt = DateTime.Now;
+                _context.Chats.Update(chat);
+                await _context.SaveChangesAsync();
+                if (message.Img.Length > 0)
+                {
+                    foreach (string image in message.Img)
+                    {
+                        MessageImage messageImage = new MessageImage
+                        {
+                            MessageId = message1.Id,
+                            ImageUrl = image
+
+                        };
+                        _context.MessageImages.Add(messageImage);
+                        await _context.SaveChangesAsync();
+                    }
                 }
+                foreach (var participant in participants)
+                {
+                    participant.Status = 0;
+                    _context.Participants.Update(participant);
+                }
+                await _context.SaveChangesAsync();
+                //string jsonStringResult = JsonConvert.SerializeObject(message1);
+                if (message1.AnonymousFlg == 1)
+                {
+                    message1.SenderId = message.AnonymousCode;
+                    message1.Sender = null;
+
+                }
+                string jsonStringResult = JsonConvert.SerializeObject(message1, Formatting.Indented,
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    }
+                );
+                foreach (var participant in participants)
+                {
+                    if (member.Id != participant.MemberId)
+                    {
+                        await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{participant.MemberId}", "API", jsonStringResult);
+                        SendNewMessageNotification(participant, chat, message.MemberId);
+                    }
+                }
+                await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{message.ChatId}", "API", jsonStringResult);
+                return Ok("Create message success");
             }
-            await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{message.ChatId}", "API", jsonStringResult);
-            return Ok("Create message success");
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
         }
 
-        private async void SendNewMessageNotification(Participant participant, Chat chat)
+        private async void SendNewMessageNotification(Participant participant, Chat chat, int senderId)
         {
             try
             {
                 var member = _context.Members.Where(m => m.Id == participant.MemberId).SingleOrDefault();
+                var sender = _context.Members.Where(m => m.Id == senderId).SingleOrDefault();
                 var registrationToken = member.FcmToken;
+                var msgFrom = chat.IsGroup == 1 ? chat.Name : $"{sender.FirstName} {sender.LastName}";
                 if (registrationToken.Equals("") || registrationToken == null)
                 {
                     return;
@@ -196,13 +206,12 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     Data = new Dictionary<string, string>()
                     {
-                        { "message", "Bạn có tin nhắn mới từ " + chat.Name },
+                        { "message", "Bạn có tin nhắn mới từ " + msgFrom },
                         { "title", "Bạn có tin nhắn mới" }
                     },
                     Token = registrationToken,
                 };
                 string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                Console.WriteLine(response.ToString() + "===========================================");
 
             }
             catch (Exception e)
@@ -384,7 +393,7 @@ namespace MyHostel_BackEnd.Controllers
                                 Img = images.Count == 0 ? null : images,
                                 CreatedAt = message.CreatedAt,
                                 ParentMsg = null,
-                                Member  = memberId == message.SenderId ? memberInMessage : null
+                                Member = memberId == message.SenderId ? memberInMessage : null
                             });
                         }
 

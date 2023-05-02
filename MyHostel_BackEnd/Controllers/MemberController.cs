@@ -138,6 +138,7 @@ namespace MyHostel_BackEnd.Controllers
                         if (messages.Any())
                         {
                             var lastMsg = messages.OrderBy(m => m.CreatedAt).Last();
+                            var memberLastMsg = await _context.Members.Where(m => m.Id == lastMsg.SenderId).FirstOrDefaultAsync();
                             if (lastMsg != null)
                             {
                                 var imgNo = _context.MessageImages.Where(m => m.MessageId == lastMsg.Id).Count();
@@ -146,13 +147,15 @@ namespace MyHostel_BackEnd.Controllers
                                     lastMessage.AnonymousFlg = lastMsg.AnonymousFlg;
                                     lastMessage.MsgText = lastMsg.MsgText;
                                     lastMessage.CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm");
+                                    lastMessage.ParticipantName = memberLastMsg.LastName;
                                     result.Chats.Add(new GroupChatDTO()
                                     {
                                         ChatId = chat.Id,
                                         Name = chat.Name,
                                         Avatar = chat.AvatarUrl,
                                         IsGroup = 1,
-                                        LastMsg =  lastMessage
+                                        LastMsg =  lastMessage,
+                                        
                                     });
                                 }
                                 else

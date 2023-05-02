@@ -189,7 +189,7 @@ namespace MyHostel_BackEnd.Controllers
                     return BadRequest("Room not exist");
                 }
                 string other = "";
-                if (transaction.Other != null)
+                if (transaction.Other.Length > 0)
                 {
                     foreach (var it in transaction.Other)
                     {
@@ -275,7 +275,7 @@ namespace MyHostel_BackEnd.Controllers
                     return BadRequest("Transaction not in this room");
                 }
                 string other = "";
-                if (updateTransactionDTO.Other != null)
+                if (updateTransactionDTO.Other.Length > 0)
                 {
                     foreach (var it in updateTransactionDTO.Other)
                     {
@@ -326,8 +326,8 @@ namespace MyHostel_BackEnd.Controllers
                         CreateAt = DateTime.Now,
                         SendAtHour = DateTime.Now.Hour,
                         Type = 0,
-                        Message = "Tiền cần đóng của " + room.Name + ": " +
-                        moneyToPay.ToString("N0", new CultureInfo("vn-VN")) + "VNĐ"
+                        Message =moneyToPay > 0 ? "Tiền cần đóng của " + room.Name + ": " +
+                        moneyToPay.ToString("N0", new CultureInfo("vn-VN")) + "VNĐ" : "Đã thanh toán tất cả khoản thu"
                     };
                     _context.Notifications.Add(notification);
                     string title = $"Khoản thu của phòng bạn [{transaction.AtTime}]";
