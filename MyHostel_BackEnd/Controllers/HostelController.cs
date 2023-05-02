@@ -186,6 +186,12 @@ namespace MyHostel_BackEnd.Controllers
                             Icon = amenity.Icon
                         });
                     }
+                    var nearbyFacility = _context.NearbyFacilities.Where(n => n.HostelId == hostel.Id).Include(n => n.Ultility).ToList();
+                    HashSet<string> hostelNearbyFacility = new HashSet<string>();
+                    foreach (var nearby in nearbyFacility)
+                    {
+                        hostelNearbyFacility.Add(nearby.Ultility.UtilityName);
+                    }
                     var residents = _context.Residents.Where(r => r.HostelId == hostel.Id).ToList();
                     int NoRate = 0;
                     double Rate = 0;
@@ -207,6 +213,7 @@ namespace MyHostel_BackEnd.Controllers
                             Price = replaceString(hostel.Price),
                             imgUrl = imgUrl,
                             Amenities = amenitites,
+                            NearbyFacilities = hostelNearbyFacility.ToList(),
                             Review = new
                             {
                                 Star = 0
@@ -223,6 +230,7 @@ namespace MyHostel_BackEnd.Controllers
                             Price = replaceString(hostel.Price),
                             imgUrl = imgUrl,
                             Amenities = amenitites,
+                            NearbyFacilities = hostelNearbyFacility.ToList(),
                             Review = new
                             {
                                 Star = Rate / NoRate

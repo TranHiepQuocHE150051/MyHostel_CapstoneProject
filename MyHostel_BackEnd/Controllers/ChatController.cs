@@ -534,5 +534,30 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpPut("avatar")]
+        public async Task<ActionResult> UpdateChatAvatar([FromBody] UpdateAvatarDTO avatar)
+        {
+            try
+            {
+                var chat = _context.Chats.Where(c => c.Id == avatar.Id).SingleOrDefault();
+                if (chat == null)
+                {
+                    return BadRequest("Chat not exist");
+                }
+                else
+                {
+                    chat.AvatarUrl = avatar.Avatar;
+                }
+
+                _context.Chats.Update(chat);
+                await _context.SaveChangesAsync();
+
+                return Ok("Update avatar success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

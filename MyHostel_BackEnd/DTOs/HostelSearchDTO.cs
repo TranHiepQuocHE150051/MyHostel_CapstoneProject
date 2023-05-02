@@ -8,6 +8,7 @@
         public string? Price { get; set; }
         public string imgUrl { get; set; } = null!;
         public List<object>? Amenities { get; set; }
+        public List<string>? NearbyFacilities { get; set; }
         public object? Review { get; set; }
     }
 }

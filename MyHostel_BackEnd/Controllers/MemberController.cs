@@ -200,11 +200,11 @@ namespace MyHostel_BackEnd.Controllers
             }
         }
         [HttpPut("avatar")]
-        public async Task<ActionResult> UpdateAvatar([FromBody] UpdateAvatarDTO avatar)
+        public async Task<ActionResult> UpdateMemberAvatar([FromBody] UpdateAvatarDTO avatar)
         {
             try
             {
-                var member = _context.Members.Where(m => m.Id == avatar.MemberId).SingleOrDefault();
+                var member = _context.Members.Where(m => m.Id == avatar.Id).SingleOrDefault();
                 if (member == null)
                 {
                     return BadRequest("Member not exist");

@@ -2,7 +2,7 @@
 {
     public class UpdateAvatarDTO
     {
-        public int MemberId { get; set; }
+        public int Id { get; set; }
         public string Avatar { get; set; }
     }
 }
