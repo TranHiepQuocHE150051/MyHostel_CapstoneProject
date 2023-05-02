@@ -199,6 +199,30 @@ namespace MyHostel_BackEnd.Controllers
                 return BadRequest(e.Message);
             }
         }
-        
+        [HttpPut("avatar")]
+        public async Task<ActionResult> UpdateAvatar([FromBody] UpdateAvatarDTO avatar)
+        {
+            try
+            {
+                var member = _context.Members.Where(m => m.Id == avatar.MemberId).SingleOrDefault();
+                if (member == null)
+                {
+                    return BadRequest("Member not exist");
+                }
+                else
+                {
+                    member.Avatar = avatar.Avatar;
+                }
+
+                _context.Members.Update(member);
+                await _context.SaveChangesAsync();
+
+                return Ok("Update avatar success");
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }
