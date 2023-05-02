@@ -48,6 +48,7 @@ namespace MyHostel_BackEnd.Controllers
                 IQueryable<Hostel> hostels = from h
                                             in _context.Hostels
                                             .Include(h => h.WardsCodeNavigation)
+                                            .Where(h => h.Status == 1)
                                              select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
                 if (locationCode == null)
@@ -396,7 +397,7 @@ namespace MyHostel_BackEnd.Controllers
             {
                 var hostels = await _context.Hostels
                     .Include(h => h.HostelImages)
-                    .Where(h => h.LandlordId == id).ToListAsync();
+                    .Where(h => h.LandlordId == id && h.Status != 4).ToListAsync();
                 var rooms = await _context.Rooms.ToListAsync();
                 var residents = await _context.Residents.ToListAsync();
                 List<HostelForLanlordResponse> result = new List<HostelForLanlordResponse>();
@@ -612,7 +613,7 @@ namespace MyHostel_BackEnd.Controllers
                                              .Include(h => h.WardsCodeNavigation)
                                              .ThenInclude(w => w.DistrictCodeNavigation)
                                              .ThenInclude(d => d.ProvinceCodeNavigation)
-                                             .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode))
+                                             .Where(h => h.WardsCodeNavigation.DistrictCodeNavigation.ProvinceCodeNavigation.Code.Equals(provinceCode) && h.Status == 1)
                                              select h;
                 if (userLocationLat != null && userLocationLng != null && !userLocationLat.Equals("") && !userLocationLng.Equals(""))
                 {
@@ -1298,7 +1299,7 @@ namespace MyHostel_BackEnd.Controllers
             {
                 return BadRequest("Hostel not exist");
             }
-            hostel.Status = 3;
+            hostel.Status = 4;
             _context.Hostels.Update(hostel);
             var residents = _context.Residents.Where(r => r.HostelId == id).ToList();
             if (residents.Count() > 0)
