@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.Models;
+using System.Globalization;
 using System.Net;
 using System.Xml;
 
@@ -615,10 +616,10 @@ namespace MyHostel_BackEnd.Controllers
                             hostels = hostels.Where(h => h.Id != hostel.Id);
                             continue;
                         }
-                        var distance = DistanceTo(double.Parse(userLocationLat.Replace(".", ",")),
-                                double.Parse(userLocationLng.Replace(".", ",")),
-                                double.Parse(hostel.GoogleLocationLat.Replace(".", ",")),
-                                double.Parse(hostel.GoogleLocationLnd.Replace(".", ",")));
+                        var distance = DistanceTo(Double.Parse(userLocationLat,new CultureInfo("en-US")),
+                                Double.Parse(userLocationLng,new CultureInfo("en-US")),
+                                Double.Parse(hostel.GoogleLocationLat, new CultureInfo("en-US")),
+                                Double.Parse(hostel.GoogleLocationLnd, new CultureInfo("en-US")));
                         if (distance > 3000)
                         {
                             hostels = hostels.Where(h => h.Id != hostel.Id);

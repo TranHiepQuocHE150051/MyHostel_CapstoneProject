@@ -7,6 +7,7 @@ using MyHostel_Admin.Models;
 using MyHostel_Admin.RequestObject;
 using MyHostel_BackEnd.DTOs;
 using MyHostel_BackEnd.GoogleMapsResponseObject;
+using System.Globalization;
 using System.Net;
 using System.Text.Json;
 using System.Xml;
@@ -145,8 +146,8 @@ namespace MyHostel_Admin.Pages.Admin_Page.Hostels
                                 Console.WriteLine(nearByResult);
                                 double reslat = nearByResult.geometry.location.lat;
                                 double reslng = nearByResult.geometry.location.lng;
-                                double orglat = Double.Parse(latitude.Replace(".", ","));
-                                double orglng = Double.Parse(longitude.Replace(".", ","));
+                                double orglat = Double.Parse(latitude, new CultureInfo("en-US"));
+                                double orglng = Double.Parse(longitude, new CultureInfo("en-US"));
                                 DistanceAndDuration distanceAndDuration = DistanceTo(orglat, orglng, reslat, reslng);
                                 NearbyFacility nearbyFacility = new NearbyFacility
                                 {
