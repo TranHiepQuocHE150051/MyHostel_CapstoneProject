@@ -144,6 +144,7 @@ namespace MyHostel_BackEnd.Controllers
                                 var imgNo = _context.MessageImages.Where(m => m.MessageId == lastMsg.Id).Count();
                                 if (lastMsg.MsgText != null)
                                 {
+                                    lastMessage.MemberId = memberLastMsg.Id;
                                     lastMessage.AnonymousFlg = lastMsg.AnonymousFlg;
                                     lastMessage.MsgText = lastMsg.MsgText;
                                     lastMessage.CreatedAt = lastMsg.CreatedAt.ToString("dd/MM/yyyy hh:mm");

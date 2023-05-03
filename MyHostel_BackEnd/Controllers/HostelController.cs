@@ -625,8 +625,8 @@ namespace MyHostel_BackEnd.Controllers
                             hostels = hostels.Where(h => h.Id != hostel.Id);
                             continue;
                         }
-                        var distance = DistanceTo(Double.Parse(userLocationLat,new CultureInfo("en-US")),
-                                Double.Parse(userLocationLng,new CultureInfo("en-US")),
+                        var distance = DistanceTo(Double.Parse(userLocationLat, new CultureInfo("en-US")),
+                                Double.Parse(userLocationLng, new CultureInfo("en-US")),
                                 Double.Parse(hostel.GoogleLocationLat, new CultureInfo("en-US")),
                                 Double.Parse(hostel.GoogleLocationLnd, new CultureInfo("en-US")));
                         if (distance > 3000)
@@ -1483,7 +1483,9 @@ namespace MyHostel_BackEnd.Controllers
                 }
                 IQueryable<Hostel> hostels = from h
                                             in _context.Hostels
-                                            .Include(h => h.WardsCodeNavigation)
+                                             .Include(h => h.HostelImages)
+                                             .Include(h => h.HostelAmenities)
+                                             .Include(h => h.WardsCodeNavigation)
                                             .ThenInclude(w => w.DistrictCodeNavigation)
                                             .Where(h => h.Status == 1)
                                              select h;
@@ -1498,8 +1500,8 @@ namespace MyHostel_BackEnd.Controllers
                 foreach (var hostel in hostelsPL)
                 {
                     string ImgUrl = "";
-                    var hostelImg = hostel.HostelImages.FirstOrDefault();
-                    if ( hostelImg != null)
+                    var hostelImg = _context.HostelImages.Where(h => h.HostelId == hostel.Id).FirstOrDefault();
+                    if (hostelImg != null)
                     {
                         ImgUrl = hostelImg.ImageUrl;
                     }
