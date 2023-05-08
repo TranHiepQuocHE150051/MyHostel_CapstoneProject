@@ -52,6 +52,7 @@ namespace MyHostel_BackEnd.Controllers
                     Roommate = new List<object>(),
                     Hostel = new
                     {
+                        HostelId = hostel.Id,
                         Name= hostel.Name,
                         DetailLocation = hostel.DetailLocation,
                         WardName= hostel.WardsCodeNavigation.FullName,

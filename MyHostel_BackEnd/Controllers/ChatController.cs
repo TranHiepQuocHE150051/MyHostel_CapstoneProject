@@ -177,7 +177,7 @@ namespace MyHostel_BackEnd.Controllers
                     if (member.Id != participant.MemberId)
                     {
                         await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{participant.MemberId}", "API", jsonStringResult);
-                        SendNewMessageNotification(participant, chat, message.MemberId);
+                        //SendNewMessageNotification(participant, chat, message.MemberId);
                     }
                 }
                 await _hubContext.Clients.All.SendAsync($"ReceiveMessage-{message.ChatId}", "API", jsonStringResult);
@@ -544,9 +544,13 @@ namespace MyHostel_BackEnd.Controllers
                 {
                     return BadRequest("Chat not exist");
                 }
-                else
+                if(!avatar.Avatar.Equals(""))
                 {
                     chat.AvatarUrl = avatar.Avatar;
+                }
+                if (!avatar.Name.Equals(""))
+                {
+                    chat.Name = avatar.Name;
                 }
 
                 _context.Chats.Update(chat);

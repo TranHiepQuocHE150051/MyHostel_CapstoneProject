@@ -48,6 +48,7 @@ namespace MyHostel_BackEnd.Controllers
                 IQueryable<Hostel> hostels = from h
                                             in _context.Hostels
                                             .Include(h => h.WardsCodeNavigation)
+                                            .Include(h => h.HostelImages)
                                             .Where(h => h.Status == 1)
                                              select h;
                 var hostelAmenities = await _context.HostelAmenities.ToListAsync();
